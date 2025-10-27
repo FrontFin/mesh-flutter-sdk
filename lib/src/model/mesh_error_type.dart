@@ -1,0 +1,1 @@
+enum MeshErrorType { userCancelled, unknown }
