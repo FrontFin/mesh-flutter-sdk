@@ -71,65 +71,21 @@ class MeshLinkController {
   }
 
   Future<void> _initWebViewController(Uri uri) async {
-    final linkHost = uri.host;
-
     final controller = WebViewController();
     await Future.wait([
       controller.setBackgroundColor(Colors.transparent),
       controller.setJavaScriptMode(JavaScriptMode.unrestricted),
-      controller.setOnConsoleMessage((consoleMessage) {
-        // TODO: move event parsing to onMessageReceived
-        final message = consoleMessage.message;
-        logger.info('Console message (${consoleMessage.level}): $message');
-        if (message.startsWith('Failed to send a message with webkit')) {
-          return;
-        }
-
-        final match = RegExp(r'\(type:(.*?)\)').firstMatch(message);
-        final eventString = match?.group(1);
-
-        final internalEvent = MeshInternalEvent.fromString({
-          'type': eventString,
-        });
-        if (internalEvent != null) {
-          logger.info('Internal event received: $internalEvent');
-          onInternalEvent(internalEvent);
-          return;
-        }
-
-        final event = MeshEvent.fromJson({'type': eventString});
-        if (event != null) {
-          logger.info('Event received: $event');
-          onEvent(event);
-        }
-      }),
+      controller.setOnConsoleMessage(_onJsConsoleMessage),
       controller.addJavaScriptChannel(
         'JSBridge',
-        onMessageReceived: (json) {
-          logger.info('JS message received: ${json.message}');
+        onMessageReceived: (jsMessage) {
+          _onJsMessageReceived(jsMessage.message);
         },
       ),
       controller.setNavigationDelegate(
         NavigationDelegate(
           onHttpAuthRequest: (navigation) {
             logger.info('HTTP auth request: ${navigation.host}');
-          },
-          onUrlChange: (navigation) {
-            logger.info('URL changed: ${navigation.url}');
-            final newUrl = navigation.url;
-            if (newUrl == null) {
-              return;
-            }
-
-            // TODO: use showNativeNavbar(true/false) event to show/hide
-            final newUri = Uri.parse(newUrl);
-            if (newUri.host.endsWith('.app.link') ||
-                newUri.host == 'apps.apple.com') {
-              // App redirect - ignore.
-              return;
-            }
-
-            onInternalEvent(ShowNativeNavBar(show: newUri.host != linkHost));
           },
           onNavigationRequest: (navigation) {
             logger.info('Navigation request: ${navigation.url}');
@@ -146,7 +102,11 @@ class MeshLinkController {
             }
           },
           onHttpError: (error) {
-            logger.warning('HTTP error: ${error.response}');
+            logger.warning(
+              'HTTP error ${error.response?.statusCode}. '
+              'Request (${error.request?.uri}). '
+              'Response ${error.response?.uri}',
+            );
           },
           onWebResourceError: (error) {
             logger.warning(
@@ -202,5 +162,42 @@ class MeshLinkController {
 
     onBrightnessChanged(brightness);
     _brightness = brightness;
+  }
+
+  void _onJsConsoleMessage(JavaScriptConsoleMessage consoleMessage) {
+    final log = switch (consoleMessage.level) {
+      JavaScriptLogLevel.error => logger.severe,
+      JavaScriptLogLevel.warning => logger.warning,
+      JavaScriptLogLevel.debug => logger.fine,
+      JavaScriptLogLevel.info => logger.info,
+      JavaScriptLogLevel.log => logger.info,
+    };
+
+    log('(JS) ${consoleMessage.message}');
+  }
+
+  void _onJsMessageReceived(String message) {
+    logger.fine('JS message received: $message');
+    final json = jsonDecode(message);
+    if (json is! Map<String, dynamic>) {
+      logger.warning('Invalid JS message format: $message');
+      return;
+    }
+
+    final internalEvent = MeshInternalEvent.fromJson(json);
+    if (internalEvent != null) {
+      logger.info('Internal event received: $internalEvent');
+      onInternalEvent(internalEvent);
+      return;
+    }
+
+    final event = MeshEvent.fromJson(json);
+    if (event != null) {
+      logger.info('Event received: $event');
+      onEvent(event);
+      return;
+    }
+
+    logger.warning('Unexpected JS message: $json');
   }
 }

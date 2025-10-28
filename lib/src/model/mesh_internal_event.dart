@@ -5,26 +5,26 @@ import 'package:mesh_sdk/src/util/logger.dart';
 sealed class MeshInternalEvent {
   const MeshInternalEvent();
 
-  static MeshInternalEvent? fromString(Map<String, dynamic> json) {
+  static MeshInternalEvent? fromJson(Map<String, dynamic> json) {
     try {
-      return switch (json['type']) {
+      final type = json['type'] as String?;
+      if (type == null) {
+        return null;
+      }
+
+      final payload = json['payload'];
+
+      return switch (type) {
         'showClose' => const ShowClose(),
-        'showNativeNavbar' => const ShowNativeNavBar(show: true),
-        'delayedAuthentication' => IntegrationConnected(
-          payload: DelayedAuthPayload.fromJson(
-            json['payload'] as Map<String, dynamic>,
-          ),
+        'showNativeNavbar' when payload is bool => ShowNativeNavBar(
+          show: payload,
         ),
-        'brokerageAccountAccessToken' => IntegrationConnected(
-          payload: AccessTokenPayload.fromJson(
-            json['payload'] as Map<String, dynamic>,
-          ),
-        ),
-        'transferFinished' => TransferFinished(
-          payload: TransferFinishedPayload.fromJson(
-            json['payload'] as Map<String, dynamic>,
-          ),
-        ),
+        'delayedAuthentication' when payload is Map<String, dynamic> =>
+          IntegrationConnected(payload: DelayedAuthPayload.fromJson(payload)),
+        'brokerageAccountAccessToken' when payload is Map<String, dynamic> =>
+          IntegrationConnected(payload: AccessTokenPayload.fromJson(payload)),
+        'transferFinished' when payload is Map<String, dynamic> =>
+          TransferFinished(payload: TransferFinishedPayload.fromJson(payload)),
         _ => null,
       };
     } catch (e, s) {

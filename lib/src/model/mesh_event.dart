@@ -7,11 +7,19 @@ sealed class MeshEvent {
 
   static MeshEvent? fromJson(Map<String, dynamic> json) {
     try {
+      final type = json['type'] as String?;
+      if (type == null) {
+        return null;
+      }
+
+      final payload = json['payload'];
+
       return switch (json['type']) {
-        'integrationSelected' => IntegrationSelectedEvent(
-          type: json['integrationType'] as String,
-          name: json['integrationName'] as String,
-        ),
+        'integrationSelected' when payload is Map<String, dynamic> =>
+          IntegrationSelectedEvent(
+            type: payload['integrationType'] as String,
+            name: payload['integrationName'] as String,
+          ),
         _ => null,
       };
     } catch (e, s) {
