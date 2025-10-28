@@ -1,1 +1,1 @@
-enum MeshErrorType { userCancelled, unknown }
+enum MeshErrorType { connectionError, userCancelled, unknown }

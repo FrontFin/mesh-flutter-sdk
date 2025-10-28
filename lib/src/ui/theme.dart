@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+const navBarColorDark = Color(0xFF1E1E24);
+const navBarColorLight = Color(0xFFFBFBFB);
+const iconColorDark = Colors.white;
+
 void onBrightnessChanged(Brightness brightness) {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(

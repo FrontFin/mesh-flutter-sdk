@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
-Logger createLogger() => Logger.detached('MeshSDK')
+final logger = Logger.detached('MeshSDK')
   ..level = Level.INFO
   ..onRecord.listen((record) {
     debugPrint(
-      '${record.loggerName}(${record.level.name}) :: '
+      '${getEmojiForLevel(record.level)} ${record.loggerName} :: '
       '${record.time} :: ${record.message}',
     );
 
@@ -17,3 +17,13 @@ Logger createLogger() => Logger.detached('MeshSDK')
       debugPrint('STACK TRACE: ${record.stackTrace}');
     }
   });
+
+String getEmojiForLevel(Level level) => switch (level) {
+  Level.FINEST || Level.FINER || Level.FINE => '🔍',
+  Level.CONFIG => '⚙️',
+  Level.INFO => 'ℹ️',
+  Level.WARNING => '⚠️',
+  Level.SEVERE => '❗',
+  Level.SHOUT => '🚨',
+  _ => 'ℹ️',
+};
