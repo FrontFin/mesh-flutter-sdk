@@ -71,6 +71,8 @@ class MeshLinkController {
   }
 
   Future<void> _initWebViewController(Uri uri) async {
+    final linkHost = uri.host;
+
     final controller = WebViewController();
     await Future.wait([
       controller.setBackgroundColor(Colors.transparent),
@@ -87,6 +89,22 @@ class MeshLinkController {
           onHttpAuthRequest: (navigation) {
             logger.info('HTTP auth request: ${navigation.host}');
           },
+          onUrlChange: (navigation) {
+            logger.info('URL changed: ${navigation.url}');
+            final newUrl = navigation.url;
+            if (newUrl == null) {
+              return;
+            }
+
+            final newUri = Uri.parse(newUrl);
+            if (newUri.host.endsWith('.app.link') ||
+                newUri.host == 'apps.apple.com') {
+              // App redirect - ignore.
+              return;
+            }
+
+            onInternalEvent(ShowNativeNavBar(show: newUri.host != linkHost));
+          },
           onNavigationRequest: (navigation) {
             logger.info('Navigation request: ${navigation.url}');
             final uri = Uri.parse(navigation.url);
@@ -94,7 +112,17 @@ class MeshLinkController {
             switch (uri.scheme) {
               case 'itms-appss':
                 logger.info('Opening App Store link: $uri');
-                unawaited(launchUrl(uri, mode: LaunchMode.externalApplication));
+                _launchExternalUri(uri, isApp: true);
+                return NavigationDecision.prevent;
+
+              case 'market':
+                logger.info('Opening Play Store link: $uri');
+                _launchExternalUri(uri, isApp: true);
+                return NavigationDecision.prevent;
+
+              case 'intent':
+                logger.info('Opening Android intent link: $uri');
+                _launchExternalUri(uri, isApp: true);
                 return NavigationDecision.prevent;
 
               default:
@@ -199,5 +227,16 @@ class MeshLinkController {
     }
 
     logger.warning('Unexpected JS message: $json');
+  }
+
+  void _launchExternalUri(Uri uri, {required bool isApp}) {
+    unawaited(
+      launchUrl(
+        uri,
+        mode: isApp
+            ? LaunchMode.externalApplication
+            : LaunchMode.platformDefault,
+      ),
+    );
   }
 }
