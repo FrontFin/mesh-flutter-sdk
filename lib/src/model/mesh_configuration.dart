@@ -9,6 +9,7 @@ class MeshConfiguration {
   const MeshConfiguration({
     required this.linkToken,
     this.language = _defaultLanguage,
+    this.isDomainWhitelistEnabled = true,
     this.integrationAccessTokens = const [],
     this.onExit,
     this.onEvent,
@@ -18,6 +19,7 @@ class MeshConfiguration {
 
   final String linkToken;
   final String language;
+  final bool isDomainWhitelistEnabled;
   final List<IntegrationAccessToken> integrationAccessTokens;
   final ValueChanged<MeshErrorType>? onExit;
   final ValueChanged<MeshEvent>? onEvent;

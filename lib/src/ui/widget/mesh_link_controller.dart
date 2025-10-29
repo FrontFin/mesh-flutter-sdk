@@ -8,6 +8,7 @@ import 'package:mesh_sdk/src/model/mesh_error_type.dart';
 import 'package:mesh_sdk/src/model/mesh_event.dart';
 import 'package:mesh_sdk/src/model/mesh_internal_event.dart';
 import 'package:mesh_sdk/src/ui/theme.dart';
+import 'package:mesh_sdk/src/util/constants.dart';
 import 'package:mesh_sdk/src/util/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -107,6 +108,13 @@ class MeshLinkController {
           },
           onNavigationRequest: (navigation) {
             logger.info('Navigation request: ${navigation.url}');
+            if (configuration.isDomainWhitelistEnabled &&
+                !isWhitelistedOrigin(navigation.url)) {
+              logger.severe('Blocked navigation to: ${navigation.url}');
+              onError(MeshErrorType.blockedNavigation);
+              return NavigationDecision.prevent;
+            }
+
             final uri = Uri.parse(navigation.url);
 
             switch (uri.scheme) {

@@ -4,12 +4,12 @@ sealed class MeshResult {
   const MeshResult();
 
   R when<R>({
-    required R Function(MeshSuccess) success,
+    required R Function() success,
     required R Function(MeshError) error,
   }) {
     final result = this;
     return switch (result) {
-      MeshSuccess() => success(result),
+      MeshSuccess() => success(),
       MeshError() => error(result),
     };
   }

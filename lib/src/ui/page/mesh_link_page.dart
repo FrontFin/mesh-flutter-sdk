@@ -28,9 +28,21 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
   void initState() {
     _controller = MeshLinkController(
       configuration: widget.configuration,
-      onInternalEvent: (event) => _handleInternalEvent(context, event),
-      onEvent: (event) => _handleEvent(context, event),
-      onError: (error) => _finish(context, MeshError(error)),
+      onInternalEvent: (event) {
+        if (mounted) {
+          _handleInternalEvent(context, event);
+        }
+      },
+      onEvent: (event) {
+        if (mounted) {
+          _handleEvent(context, event);
+        }
+      },
+      onError: (error) {
+        if (mounted) {
+          _finish(context, MeshError(error));
+        }
+      },
     );
     unawaited(
       _controller.init(context).then((_) {
