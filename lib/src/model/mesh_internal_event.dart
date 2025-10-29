@@ -13,18 +13,22 @@ sealed class MeshInternalEvent {
       }
 
       final payload = json['payload'];
+      final isPayloadMap = payload is Map<String, dynamic>;
 
       return switch (type) {
         'showClose' => const ShowClose(),
         'showNativeNavbar' when payload is bool => ShowNativeNavBar(
           show: payload,
         ),
-        'delayedAuthentication' when payload is Map<String, dynamic> =>
-          IntegrationConnected(payload: DelayedAuthPayload.fromJson(payload)),
-        'brokerageAccountAccessToken' when payload is Map<String, dynamic> =>
-          IntegrationConnected(payload: AccessTokenPayload.fromJson(payload)),
-        'transferFinished' when payload is Map<String, dynamic> =>
-          TransferFinished(payload: TransferFinishedPayload.fromJson(payload)),
+        'delayedAuthentication' when isPayloadMap => IntegrationConnected(
+          payload: DelayedAuthPayload.fromJson(payload),
+        ),
+        'brokerageAccountAccessToken' when isPayloadMap => IntegrationConnected(
+          payload: AccessTokenPayload.fromJson(payload),
+        ),
+        'transferFinished' when isPayloadMap => TransferFinished(
+          payload: TransferFinishedPayload.fromJson(payload),
+        ),
         _ => null,
       };
     } catch (e, s) {

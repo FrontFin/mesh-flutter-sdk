@@ -186,14 +186,14 @@ class MeshLinkController {
 
     final internalEvent = MeshInternalEvent.fromJson(json);
     if (internalEvent != null) {
-      logger.info('Internal event received: $internalEvent');
+      logger.info('Internal event received: ${internalEvent.runtimeType}');
       onInternalEvent(internalEvent);
       return;
     }
 
     final event = MeshEvent.fromJson(json);
     if (event != null) {
-      logger.info('Event received: $event');
+      logger.info('Event received: ${event.runtimeType}');
       onEvent(event);
       return;
     }
