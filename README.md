@@ -1,39 +1,96 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+Flutter package for integrating with Mesh Connect.
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+## Requirements
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- Dart >= 3.9.2
+- Flutter >= 3.35.7
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+To use the Mesh SDK in your Flutter application, add the following dependency to your `pubspec.yaml`
+file:
 
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
+```yaml
+dependencies:
+  mesh_sdk: <latest_version>
 ```
 
-## Additional information
+### Get Link Token
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+Link token should be obtained from the POST `/api/v1/linktoken` endpoint.
+API reference for this request is
+available [here](https://docs.meshconnect.com/reference/post_api-v1-linktoken). The request must be
+performed from the server side because it requires the client's secret.
+You will get the response in the following format:
+
+```json
+{
+  "content": {
+    "linkToken": "{linkToken}"
+  },
+  "status": "ok",
+  "message": ""
+}
+```
+
+### Usage
+
+```dart
+Future<void> _showMeshLinkPage(String linkToken) async {
+  final result = await MeshSdk.show(
+    context,
+    configuration: MeshConfiguration(
+      language: 'en',
+      integrationAccessTokens: const [
+        IntegrationAccessToken(
+          accessToken: 'token',
+          accountId: 'id',
+          accountName: 'name',
+          brokerName: 'broker',
+          brokerType: 'type',
+        ),
+      ],
+      linkToken: linkToken,
+      onEvent: (event) {
+        print('Mesh event: $event');
+      },
+      onExit: (errorType) {
+        print('Mesh exit: $errorType');
+      },
+      onIntegrationConnected: (integration) {
+        print('Integration connected: $integration');
+      },
+      onTransferFinished: (transfer) {
+        print('Transfer finished: $transfer');
+      },
+    ),
+  );
+
+  switch (result) {
+    case MeshSuccess():
+      print('Mesh link finished successfully');
+    case MeshError():
+      print('Mesh link error: ${result.type}');
+  }
+}
+```
+
+See full example [here](https://github.com/FrontFin/mesh-flutter-sdk/tree/main/example).
+
+## Configuration
+
+Here's what you can configure in the `MeshConfiguration`:
+
+| Parameter                  | Type                                       | Required | description                                                                                            |
+|----------------------------|--------------------------------------------|----------|--------------------------------------------------------------------------------------------------------|
+| `linkToken`                | `String`                                   | ✅        | Link token obtained from the backend.                                                                  |
+| `language`                 | `String`                                   |          | Language, defaults to "en".                                                                            |
+| `isDomainWhitelistEnabled` | `bool`                                     |          | If domain should be checked against our whitelist. Defaults to `true`.                                 |
+| `integrationAccessTokens`  | `List<IntegrationAccessToken>`             |          | List of cached `IntegrationAccessToken`s that you can pass, so users don't need to connect every time. |
+| `onExit`                   | `ValueChanged<MeshErrorType>?`             |          | Exit callback with a `MeshErrorType` that describes the error.                                         |
+| `onEvent`                  | `ValueChanged<MeshEvent>?`                 |          | Callback for when an event is triggered.                                                               |
+| `onIntegrationConnected`   | `ValueChanged<IntegrationConnectedEvent>?` |          | Callback for when an integration is connected. Use this to store the access token.                     |
+| `onTransferFinished`       | `ValueChanged<TransferFinishedEvent>?`     |          | Callback for when a crypto transfer is executed.                                                       |
+
+See the full list of whitelisted
+origins [here](https://github.com/FrontFin/mesh-flutter-sdk/blob/main/lib/src/util/constants.dart#L37).
