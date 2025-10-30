@@ -19,8 +19,8 @@ dependencies:
 
 Link token should be obtained from the POST `/api/v1/linktoken` endpoint.
 API reference for this request is
-available [here](https://docs.meshconnect.com/reference/post_api-v1-linktoken). The request must be
-performed from the server side because it requires the client's secret.
+available [here](https://docs.meshconnect.com/api-reference/managed-account-authentication/get-link-token-with-parameters).
+The request must be performed from the server side because it requires the client's secret.
 You will get the response in the following format:
 
 ```json
@@ -92,5 +92,9 @@ Here's what you can configure in the `MeshConfiguration`:
 | `onIntegrationConnected`   | `ValueChanged<IntegrationConnectedEvent>?` |          | Callback for when an integration is connected. Use this to store the access token.                     |
 | `onTransferFinished`       | `ValueChanged<TransferFinishedEvent>?`     |          | Callback for when a crypto transfer is executed.                                                       |
 
+### Whitelist
+
 See the full list of whitelisted
 origins [here](https://github.com/FrontFin/mesh-flutter-sdk/blob/main/lib/src/util/constants.dart#L37).
+
+To disable the whitelist check, set `isDomainWhitelistEnabled: false` in the `MeshConfiguration`.
