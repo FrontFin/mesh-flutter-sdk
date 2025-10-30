@@ -43,6 +43,11 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
           _finish(context, MeshError(error));
         }
       },
+      onSuccess: (success) {
+        if (mounted) {
+          _finish(context, MeshSuccess(payload: success));
+        }
+      },
     );
     unawaited(
       _controller.init(context).then((_) {
@@ -139,13 +144,14 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
   }
 
   void _finish(BuildContext context, MeshResult result) {
-    switch (result) {
-      case MeshSuccess():
-        throw UnimplementedError('MeshSuccess handling is not implemented');
-      case MeshError():
-        widget.configuration.onExit?.call(result.type);
-    }
-
-    Navigator.of(context).pop(result);
+    result.when(
+      success: (_) {
+        Navigator.pop(context, result);
+      },
+      error: (error) {
+        widget.configuration.onExit?.call(error.type);
+        Navigator.pop(context, result);
+      },
+    );
   }
 }

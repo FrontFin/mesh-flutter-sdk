@@ -75,7 +75,7 @@ Future<void> _showMeshLinkPage(String linkToken) async {
 }
 ```
 
-See full example [here](https://github.com/FrontFin/mesh-flutter-sdk/tree/main/example).
+See full example app [here](https://github.com/FrontFin/mesh-flutter-sdk/tree/main/example).
 
 ## Configuration
 

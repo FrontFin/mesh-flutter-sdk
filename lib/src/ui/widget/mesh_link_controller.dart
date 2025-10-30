@@ -7,6 +7,7 @@ import 'package:mesh_sdk/src/model/link_style.dart';
 import 'package:mesh_sdk/src/model/mesh_error_type.dart';
 import 'package:mesh_sdk/src/model/mesh_event.dart';
 import 'package:mesh_sdk/src/model/mesh_internal_event.dart';
+import 'package:mesh_sdk/src/model/success/transfer_success.dart';
 import 'package:mesh_sdk/src/ui/theme.dart';
 import 'package:mesh_sdk/src/util/constants.dart';
 import 'package:mesh_sdk/src/util/logger.dart';
@@ -20,12 +21,14 @@ class MeshLinkController {
     required this.onInternalEvent,
     required this.onEvent,
     required this.onError,
+    required this.onSuccess,
   });
 
   final MeshConfiguration configuration;
   final ValueChanged<MeshInternalEvent> onInternalEvent;
   final ValueChanged<MeshEvent> onEvent;
   final ValueChanged<MeshErrorType> onError;
+  final ValueChanged<TransferSuccessPayload> onSuccess;
 
   WebViewController? _webViewController;
   late Brightness _brightness;
@@ -231,6 +234,16 @@ class MeshLinkController {
     if (event != null) {
       logger.info('Event received: ${event.runtimeType}');
       onEvent(event);
+      return;
+    }
+
+    final result = MeshResult.fromJson(json);
+    if (result != null) {
+      logger.info('Result received: ${result.runtimeType}');
+      result.when(
+        success: (result) => onSuccess(result.payload),
+        error: (error) => onError(error.type),
+      );
       return;
     }
 
