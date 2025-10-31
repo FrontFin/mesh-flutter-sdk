@@ -10,7 +10,7 @@ class BrandInfo {
 
   factory BrandInfo.fromJson(Map<String, dynamic> json) {
     return BrandInfo(
-      brokerLogo: json['brokerLogo'] as String,
+      brokerLogo: json['brokerLogo'] as String?,
       brokerPrimaryColor: json['brokerPrimaryColor'] as String?,
       logoLightUrl: json['logoLightUrl'] as String?,
       logoDarkUrl: json['logoDarkUrl'] as String?,
@@ -19,7 +19,7 @@ class BrandInfo {
     );
   }
 
-  final String brokerLogo;
+  final String? brokerLogo;
   final String? brokerPrimaryColor;
   final String? logoLightUrl;
   final String? logoDarkUrl;
