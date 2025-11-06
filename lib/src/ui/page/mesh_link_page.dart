@@ -26,6 +26,8 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
 
   @override
   void initState() {
+    super.initState();
+
     _controller = MeshLinkController(
       configuration: widget.configuration,
       onInternalEvent: (event) {
@@ -49,6 +51,7 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
         }
       },
     );
+
     unawaited(
       _controller.init(context).then((_) {
         if (mounted) {
@@ -56,8 +59,6 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
         }
       }),
     );
-
-    super.initState();
   }
 
   @override
@@ -126,11 +127,13 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
 
       case ShowNativeNavBar():
         setState(() => _showNativeNavBar = event.show);
+
       case IntegrationConnected():
         final externalEvent = IntegrationConnectedEvent(payload: event.payload);
 
         _handleEvent(context, externalEvent);
         widget.configuration.onIntegrationConnected?.call(externalEvent);
+
       case TransferFinished():
         final externalEvent = TransferFinishedEvent(payload: event.payload);
 
