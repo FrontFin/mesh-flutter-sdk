@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  mesh_sdk:
+  mesh_sdk_flutter:
     path: ../
 
 dev_dependencies:

@@ -1,4 +1,4 @@
-name: mesh_sdk
+name: mesh_sdk_flutter
 description: "Flutter library for integrating with Mesh Connect."
 version: 0.0.1
 homepage: https://meshconnect.com

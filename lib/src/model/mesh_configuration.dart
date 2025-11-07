@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:mesh_sdk/src/model/integration_access_token.dart';
-import 'package:mesh_sdk/src/model/mesh_error_type.dart';
-import 'package:mesh_sdk/src/model/mesh_event.dart';
+import 'package:mesh_sdk_flutter/src/model/integration_access_token.dart';
+import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
+import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
 
 const _defaultLanguage = 'en';
 

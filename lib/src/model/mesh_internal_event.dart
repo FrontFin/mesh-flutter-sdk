@@ -1,6 +1,6 @@
-import 'package:mesh_sdk/src/model/integration/integration_connected_payload.dart';
-import 'package:mesh_sdk/src/model/transfer/transfer_finished_payload.dart';
-import 'package:mesh_sdk/src/util/logger.dart';
+import 'package:mesh_sdk_flutter/src/model/integration/integration_connected_payload.dart';
+import 'package:mesh_sdk_flutter/src/model/transfer/transfer_finished_payload.dart';
+import 'package:mesh_sdk_flutter/src/util/logger.dart';
 
 sealed class MeshInternalEvent {
   const MeshInternalEvent();

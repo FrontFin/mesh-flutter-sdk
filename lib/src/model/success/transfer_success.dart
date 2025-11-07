@@ -1,5 +1,5 @@
-import 'package:mesh_sdk/src/model/success/integration.dart';
-import 'package:mesh_sdk/src/model/success/transfer.dart';
+import 'package:mesh_sdk_flutter/src/model/success/integration.dart';
+import 'package:mesh_sdk_flutter/src/model/success/transfer.dart';
 
 class TransferSuccessPayload {
   const TransferSuccessPayload({

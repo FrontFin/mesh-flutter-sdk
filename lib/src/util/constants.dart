@@ -1,4 +1,4 @@
-import 'package:mesh_sdk/src/util/logger.dart';
+import 'package:mesh_sdk_flutter/src/util/logger.dart';
 
 bool isWhitelistedOrigin(String url) {
   try {

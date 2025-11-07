@@ -1,5 +1,5 @@
-import 'package:mesh_sdk/src/model/mesh_error_type.dart';
-import 'package:mesh_sdk/src/model/success/transfer_success.dart';
+import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
+import 'package:mesh_sdk_flutter/src/model/success/transfer_success.dart';
 
 sealed class MeshResult {
   const MeshResult();

@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mesh_sdk/mesh_sdk.dart';
-import 'package:mesh_sdk/src/model/mesh_error_type.dart';
+import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
 
 class TestApp extends StatelessWidget {
@@ -24,6 +24,18 @@ class TestApp extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class MockWebViewWidget extends PlatformWebViewWidget {
+  MockWebViewWidget({required PlatformWebViewController controller})
+    : super.implementation(
+        PlatformWebViewWidgetCreationParams(controller: controller),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text('Mock WebView Widget');
   }
 }
 
@@ -78,6 +90,13 @@ class MockWebViewController extends PlatformWebViewController {
   Future<void> loadRequest(LoadRequestParams params) async {
     _requestUri = params.uri;
   }
+
+  String? _lastJavaScript;
+
+  @override
+  Future<void> runJavaScript(String javaScript) async {
+    _lastJavaScript = javaScript;
+  }
 }
 
 class MockNavigationDelegate extends PlatformNavigationDelegate {
@@ -120,10 +139,12 @@ class MockWebViewPlatform extends WebViewPlatform {
   MockWebViewPlatform({
     required this.webViewController,
     required this.navigationDelegate,
+    required this.mockWebViewWidget,
   });
 
   final PlatformWebViewController webViewController;
   final PlatformNavigationDelegate navigationDelegate;
+  final PlatformWebViewWidget mockWebViewWidget;
 
   @override
   PlatformWebViewController createPlatformWebViewController(
@@ -138,20 +159,40 @@ class MockWebViewPlatform extends WebViewPlatform {
   ) {
     return navigationDelegate;
   }
+
+  @override
+  PlatformWebViewWidget createPlatformWebViewWidget(
+    PlatformWebViewWidgetCreationParams params,
+  ) {
+    return mockWebViewWidget;
+  }
 }
 
 void main() {
   MeshErrorType? errorType;
   late MockWebViewController webViewController;
   late MockNavigationDelegate navigationDelegate;
+  late MockWebViewWidget webViewWidget;
+
+  setUpAll(() {
+    PackageInfo.setMockInitialValues(
+      appName: '',
+      packageName: '',
+      version: '0.0.1',
+      buildNumber: '',
+      buildSignature: '',
+    );
+  });
 
   setUp(() {
     errorType = null;
     webViewController = MockWebViewController();
     navigationDelegate = MockNavigationDelegate();
+    webViewWidget = MockWebViewWidget(controller: webViewController);
     WebViewPlatform.instance = MockWebViewPlatform(
       webViewController: webViewController,
       navigationDelegate: navigationDelegate,
+      mockWebViewWidget: webViewWidget,
     );
   });
 
@@ -193,7 +234,7 @@ void main() {
 
       await tester.pumpWidget(TestApp(configuration: configuration));
       await tester.tap(find.byType(FilledButton));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(webViewController._requestUri, Uri.parse('$rawUrl?lng=en'));
     });
@@ -208,26 +249,66 @@ void main() {
 
       await tester.pumpWidget(TestApp(configuration: configuration));
       await tester.tap(find.byType(FilledButton));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(webViewController._requestUri, Uri.parse('$rawUrl?lng=de'));
     });
   });
 
   group('WebView', () {
-    testWidgets('WebView is initialized', (tester) async {
+    testWidgets('WebViewController is initialized', (tester) async {
       const rawUrl = 'https://test_linktoken';
       final linkToken = base64Encode(utf8.encode(rawUrl));
       final configuration = MeshConfiguration(linkToken: linkToken);
 
       await tester.pumpWidget(TestApp(configuration: configuration));
       await tester.tap(find.byType(FilledButton));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(webViewController._backgroundColor, Colors.transparent);
       expect(webViewController._javaScriptMode, JavaScriptMode.unrestricted);
       expect(webViewController._javaScriptChannel, 'JSBridge');
       expect(webViewController._requestUri, Uri.parse('$rawUrl?lng=en'));
+      expect(
+        webViewController._lastJavaScript,
+        "window.meshSdkPlatform='flutter';"
+        "window.meshSdkVersion='0.0.1';",
+      );
+      expect(find.text('Mock WebView Widget'), findsOneWidget);
+    });
+
+    testWidgets('Integration access tokens are passed to JS', (tester) async {
+      const rawUrl = 'https://test_linktoken';
+      final linkToken = base64Encode(utf8.encode(rawUrl));
+      final configuration = MeshConfiguration(
+        linkToken: linkToken,
+        integrationAccessTokens: const [
+          IntegrationAccessToken(
+            accountId: 'id',
+            accountName: 'name',
+            accessToken: 'token',
+            brokerType: 'brokerType',
+            brokerName: 'brokerName',
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(
+        webViewController._lastJavaScript,
+        "window.meshSdkPlatform='flutter';"
+        "window.meshSdkVersion='0.0.1';"
+        'window.integrationAccessTokens=[{'
+        '"accountId":"id",'
+        '"accountName":"name",'
+        '"accessToken":"token",'
+        '"brokerType":"brokerType",'
+        '"brokerName":"brokerName"'
+        '}];',
+      );
     });
   });
 }

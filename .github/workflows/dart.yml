@@ -34,3 +34,7 @@ jobs:
       # Analyze Code
       - name: Analyze project source
         run: flutter analyze
+
+      # Run Tests
+      - name: Run tests
+        run: flutter test --coverage

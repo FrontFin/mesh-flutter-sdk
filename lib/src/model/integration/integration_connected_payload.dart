@@ -1,5 +1,5 @@
-import 'package:mesh_sdk/src/model/integration/account_token.dart';
-import 'package:mesh_sdk/src/model/integration/brand_info.dart';
+import 'package:mesh_sdk_flutter/src/model/integration/account_token.dart';
+import 'package:mesh_sdk_flutter/src/model/integration/brand_info.dart';
 
 sealed class IntegrationConnectedPayload {
   const IntegrationConnectedPayload();

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mesh_sdk/src/ui/theme.dart';
+import 'package:mesh_sdk_flutter/src/ui/theme.dart';
 
 class MeshLinkNavBar extends StatelessWidget {
   const MeshLinkNavBar({

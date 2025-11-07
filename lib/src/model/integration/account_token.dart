@@ -1,4 +1,4 @@
-import 'package:mesh_sdk/src/model/integration/account.dart';
+import 'package:mesh_sdk_flutter/src/model/integration/account.dart';
 
 class AccountToken {
   const AccountToken({

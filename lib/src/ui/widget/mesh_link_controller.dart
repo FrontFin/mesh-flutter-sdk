@@ -2,15 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:mesh_sdk/mesh_sdk.dart';
-import 'package:mesh_sdk/src/model/link_style.dart';
-import 'package:mesh_sdk/src/model/mesh_error_type.dart';
-import 'package:mesh_sdk/src/model/mesh_event.dart';
-import 'package:mesh_sdk/src/model/mesh_internal_event.dart';
-import 'package:mesh_sdk/src/model/success/transfer_success.dart';
-import 'package:mesh_sdk/src/ui/theme.dart';
-import 'package:mesh_sdk/src/util/constants.dart';
-import 'package:mesh_sdk/src/util/logger.dart';
+import 'package:mesh_sdk_flutter/src/model/link_style.dart';
+import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
+import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
+import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
+import 'package:mesh_sdk_flutter/src/model/mesh_internal_event.dart';
+import 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
+import 'package:mesh_sdk_flutter/src/model/success/transfer_success.dart';
+import 'package:mesh_sdk_flutter/src/ui/theme.dart';
+import 'package:mesh_sdk_flutter/src/util/constants.dart';
+import 'package:mesh_sdk_flutter/src/util/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -32,6 +33,7 @@ class MeshLinkController {
 
   WebViewController? _webViewController;
   late Brightness _brightness;
+  bool _isExternalAppOpened = false;
 
   Brightness get brightness => _brightness;
 
@@ -107,7 +109,12 @@ class MeshLinkController {
               return;
             }
 
-            onInternalEvent(ShowNativeNavBar(show: newUri.host != linkHost));
+            final isLinkHost = newUri.host == linkHost;
+            if (_isExternalAppOpened && isLinkHost) {
+              _isExternalAppOpened = false;
+            }
+
+            onInternalEvent(ShowNativeNavBar(show: !isLinkHost));
           },
           onNavigationRequest: (navigation) {
             logger.info('Navigation request: ${navigation.url}');
@@ -251,6 +258,13 @@ class MeshLinkController {
   }
 
   void _launchExternalUri(Uri uri, {required bool isApp}) {
+    if (_isExternalAppOpened) {
+      logger.warning('External app already opened, ignoring: $uri');
+      unawaited(goBack());
+      return;
+    }
+
+    _isExternalAppOpened = true;
     unawaited(
       launchUrl(
         uri,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mesh_sdk/src/extension/context.dart';
+import 'package:mesh_sdk_flutter/src/extension/context.dart';
 
 class ExitDialog extends StatelessWidget {
   const ExitDialog({required this.onConfirm, super.key});
