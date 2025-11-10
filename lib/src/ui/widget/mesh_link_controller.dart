@@ -8,7 +8,7 @@ import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_internal_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
-import 'package:mesh_sdk_flutter/src/model/success/transfer_success.dart';
+import 'package:mesh_sdk_flutter/src/model/success/success.dart';
 import 'package:mesh_sdk_flutter/src/ui/theme.dart';
 import 'package:mesh_sdk_flutter/src/util/constants.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
@@ -29,7 +29,7 @@ class MeshLinkController {
   final ValueChanged<MeshInternalEvent> onInternalEvent;
   final ValueChanged<MeshEvent> onEvent;
   final ValueChanged<MeshErrorType> onError;
-  final ValueChanged<TransferSuccessPayload> onSuccess;
+  final ValueChanged<SuccessPayload> onSuccess;
 
   WebViewController? _webViewController;
   late Brightness _brightness;

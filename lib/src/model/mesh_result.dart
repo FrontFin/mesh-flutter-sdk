@@ -1,5 +1,5 @@
 import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
-import 'package:mesh_sdk_flutter/src/model/success/transfer_success.dart';
+import 'package:mesh_sdk_flutter/src/model/success/success.dart';
 
 sealed class MeshResult {
   const MeshResult();
@@ -11,6 +11,9 @@ sealed class MeshResult {
     return switch (type) {
       'close' when payload is Map<String, dynamic> => MeshSuccess(
         payload: TransferSuccessPayload.fromJson(payload),
+      ),
+      'done' when payload is Map<String, dynamic> => MeshSuccess(
+        payload: IntegrationSuccessPayload.fromJson(payload),
       ),
       _ => null,
     };
@@ -31,7 +34,7 @@ sealed class MeshResult {
 class MeshSuccess extends MeshResult {
   const MeshSuccess({required this.payload});
 
-  final TransferSuccessPayload payload;
+  final SuccessPayload payload;
 }
 
 class MeshError extends MeshResult {
