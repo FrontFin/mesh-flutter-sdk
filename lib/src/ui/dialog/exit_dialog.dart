@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mesh_sdk_flutter/src/extension/context.dart';
 
+/// A confirmation dialog for exiting Mesh Link.
 class ExitDialog extends StatelessWidget {
   const ExitDialog({required this.onConfirm, super.key});
 

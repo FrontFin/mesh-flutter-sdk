@@ -16,6 +16,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+/// A controller for managing the Mesh Link web view.
+/// This uses [WebViewController] and adds our own logic on top.
 class MeshLinkController {
   MeshLinkController({
     required this.configuration,
@@ -53,6 +55,10 @@ class MeshLinkController {
     await _webViewController?.runJavaScript('window.history.go(-1)');
   }
 
+  /// Initialize the controller using [configuration].
+  /// This will parse the [MeshConfiguration.linkToken],
+  /// initialize the [WebViewController] with all the callbacks, configuration,
+  /// and additional JavaScript code, and initialize the style.
   Future<void> init(BuildContext context) async {
     try {
       final url = String.fromCharCodes(base64Decode(configuration.linkToken));
@@ -210,6 +216,8 @@ class MeshLinkController {
     _brightness = brightness;
   }
 
+  /// Callback when a JavaScript console message is received.
+  /// We use this to log messages from the JS side, based on level.
   void _onJsConsoleMessage(JavaScriptConsoleMessage consoleMessage) {
     final log = switch (consoleMessage.level) {
       JavaScriptLogLevel.error => logger.severe,
@@ -222,6 +230,9 @@ class MeshLinkController {
     log('(JS) ${consoleMessage.message}');
   }
 
+  /// Callback when a custom message is received from the JS side.
+  /// This is used to parse events (internal and external),
+  /// and results (success and error).
   void _onJsMessageReceived(String message) {
     logger.fine('JS message received: $message');
     final json = jsonDecode(message);

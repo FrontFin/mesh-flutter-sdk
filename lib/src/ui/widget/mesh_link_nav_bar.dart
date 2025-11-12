@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mesh_sdk_flutter/src/ui/theme.dart';
 
+/// A navigation bar for the Mesh Link page.
+/// This will be shown when user navigates to an external webpage,
+/// such as a 3rd party integration.
 class MeshLinkNavBar extends StatelessWidget {
   const MeshLinkNavBar({
     required this.brightness,

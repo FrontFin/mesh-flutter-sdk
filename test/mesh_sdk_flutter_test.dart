@@ -201,7 +201,7 @@ void main() {
       const linkToken = 'not_base64_encoded';
       final configuration = MeshConfiguration(
         linkToken: linkToken,
-        onExit: (error) => errorType = error,
+        onError: (error) => errorType = error,
       );
 
       await tester.pumpWidget(TestApp(configuration: configuration));
@@ -215,7 +215,7 @@ void main() {
       final linkToken = base64Encode(utf8.encode('test_linktoken'));
       final configuration = MeshConfiguration(
         linkToken: linkToken,
-        onExit: (error) => errorType = error,
+        onError: (error) => errorType = error,
       );
 
       await tester.pumpWidget(TestApp(configuration: configuration));

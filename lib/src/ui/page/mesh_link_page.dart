@@ -11,6 +11,7 @@ import 'package:mesh_sdk_flutter/src/ui/widget/mesh_link_controller.dart';
 import 'package:mesh_sdk_flutter/src/ui/widget/mesh_link_nav_bar.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+/// A page that displays the Mesh Link web view.
 class MeshLinkPage extends StatefulWidget {
   const MeshLinkPage({required this.configuration, super.key});
 
@@ -22,6 +23,9 @@ class MeshLinkPage extends StatefulWidget {
 
 class _MeshLinkPageState extends State<MeshLinkPage> {
   late final MeshLinkController _controller;
+
+  /// Whether to show the native navigation bar
+  /// (for example, when we navigate to a 3rd party integration webpage).
   bool _showNativeNavBar = false;
 
   @override
@@ -55,6 +59,7 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
     unawaited(
       _controller.init(context).then((_) {
         if (mounted) {
+          // Update the UI
           setState(() {});
         }
       }),
@@ -88,6 +93,7 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
+          // Pop happened, no need to handle it
           return;
         }
 
@@ -97,10 +103,12 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
         }
 
         if (canGoBack) {
+          // Pass the back action to the web view controller
           await _controller.goBack();
           return;
         }
 
+        // We're on the root page, show the close dialog
         _showCloseDialog(context);
       },
       child: Scaffold(
@@ -148,13 +156,14 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
 
   void _finish(BuildContext context, MeshResult result) {
     result.when(
-      success: (_) {
-        Navigator.pop(context, result);
+      success: (success) {
+        widget.configuration.onSuccess?.call(success.payload);
       },
       error: (error) {
-        widget.configuration.onExit?.call(error.type);
-        Navigator.pop(context, result);
+        widget.configuration.onError?.call(error.type);
       },
     );
+
+    Navigator.pop(context, result);
   }
 }

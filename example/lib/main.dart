@@ -88,8 +88,11 @@ class _HomePageState extends State<HomePage> {
         onEvent: (event) {
           print('Mesh event: $event');
         },
-        onExit: (errorType) {
+        onError: (errorType) {
           print('Mesh exit: $errorType');
+        },
+        onSuccess: (payload) {
+          print('Mesh success: ${payload.integration.name}');
         },
         onIntegrationConnected: (integration) {
           print('Integration connected: $integration');

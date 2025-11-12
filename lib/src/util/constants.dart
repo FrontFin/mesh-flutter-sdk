@@ -6,7 +6,7 @@ bool isWhitelistedOrigin(String url) {
       return true;
     }
 
-    return whitelistedOrigins.any((origin) {
+    return _whitelistedOrigins.any((origin) {
       if (origin.startsWith('*.')) {
         // Wildcard origin, e.g. "*.meshconnect.com"
         final root = origin.substring(2);
@@ -34,7 +34,7 @@ bool isWhitelistedOrigin(String url) {
   }
 }
 
-const whitelistedOrigins = [
+const _whitelistedOrigins = [
   '*.meshconnect.com',
   '*.getfront.com',
   '*.walletconnect.com',

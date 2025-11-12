@@ -5,6 +5,9 @@ const navBarColorDark = Color(0xFF1E1E24);
 const navBarColorLight = Color(0xFFFBFBFB);
 const iconColorDark = Colors.white;
 
+/// This will update the system bar brightness.
+///
+/// Call this whenever Mesh Link brightness is changed.
 void onBrightnessChanged(Brightness brightness) {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(

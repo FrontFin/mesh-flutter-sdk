@@ -1,3 +1,4 @@
+import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
 import 'package:mesh_sdk_flutter/src/model/integration/integration_connected_payload.dart';
 import 'package:mesh_sdk_flutter/src/model/transfer/ineligible_token.dart';
 import 'package:mesh_sdk_flutter/src/model/transfer/network_fee.dart';
@@ -5,6 +6,9 @@ import 'package:mesh_sdk_flutter/src/model/transfer/transfer_executed_status.dar
 import 'package:mesh_sdk_flutter/src/model/transfer/transfer_finished_payload.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
 
+/// Represents an event that can occur in the Mesh SDK.
+///
+/// Use [MeshConfiguration.onEvent] to listen for these events.
 sealed class MeshEvent {
   const MeshEvent();
 

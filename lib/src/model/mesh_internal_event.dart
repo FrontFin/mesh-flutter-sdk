@@ -2,6 +2,9 @@ import 'package:mesh_sdk_flutter/src/model/integration/integration_connected_pay
 import 'package:mesh_sdk_flutter/src/model/transfer/transfer_finished_payload.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
 
+/// Events handled internally by the Mesh SDK.
+///
+/// These events are not exposed to the user directly.
 sealed class MeshInternalEvent {
   const MeshInternalEvent();
 

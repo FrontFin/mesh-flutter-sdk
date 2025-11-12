@@ -1,3 +1,13 @@
+import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
+
+/// Represents an access token for a specific integration.
+///
+/// To skip the need to authenticate the user every time,
+/// pass a list of integration access tokens to Mesh SDK
+/// using [MeshConfiguration.integrationAccessTokens].
+///
+/// To save the access token on your end,
+/// use [MeshConfiguration.onIntegrationConnected] callback.
 class IntegrationAccessToken {
   const IntegrationAccessToken({
     required this.accountId,
