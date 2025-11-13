@@ -6,167 +6,11 @@ import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
 
-class TestApp extends StatelessWidget {
-  const TestApp({required this.configuration, super.key});
-
-  final MeshConfiguration configuration;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Builder(
-        builder: (context) => Scaffold(
-          body: FilledButton(
-            onPressed: () =>
-                MeshSdk.show(context, configuration: configuration),
-            child: const Text('Start'),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class MockWebViewWidget extends PlatformWebViewWidget {
-  MockWebViewWidget({required PlatformWebViewController controller})
-    : super.implementation(
-        PlatformWebViewWidgetCreationParams(controller: controller),
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text('Mock WebView Widget');
-  }
-}
-
-class MockWebViewController extends PlatformWebViewController {
-  MockWebViewController()
-    : super.implementation(const PlatformWebViewControllerCreationParams());
-
-  Color? _backgroundColor;
-
-  @override
-  Future<void> setBackgroundColor(Color color) async {
-    _backgroundColor = color;
-  }
-
-  JavaScriptMode? _javaScriptMode;
-
-  @override
-  Future<void> setJavaScriptMode(JavaScriptMode javaScriptMode) async {
-    _javaScriptMode = javaScriptMode;
-  }
-
-  @override
-  Future<void> setOnConsoleMessage(
-    void Function(JavaScriptConsoleMessage consoleMessage) onConsoleMessage,
-  ) async {
-    // Do nothing
-  }
-
-  String? _javaScriptChannel;
-
-  @override
-  Future<void> addJavaScriptChannel(
-    JavaScriptChannelParams javaScriptChannelParams,
-  ) async {
-    if (_javaScriptChannel != null) {
-      throw StateError('JavaScript channel already exists');
-    }
-
-    _javaScriptChannel = javaScriptChannelParams.name;
-  }
-
-  @override
-  Future<void> setPlatformNavigationDelegate(
-    PlatformNavigationDelegate handler,
-  ) async {
-    // Do nothing
-  }
-
-  Uri? _requestUri;
-
-  @override
-  Future<void> loadRequest(LoadRequestParams params) async {
-    _requestUri = params.uri;
-  }
-
-  String? _lastJavaScript;
-
-  @override
-  Future<void> runJavaScript(String javaScript) async {
-    _lastJavaScript = javaScript;
-  }
-}
-
-class MockNavigationDelegate extends PlatformNavigationDelegate {
-  MockNavigationDelegate()
-    : super.implementation(const PlatformNavigationDelegateCreationParams());
-
-  @override
-  Future<void> setOnNavigationRequest(
-    NavigationRequestCallback onNavigationRequest,
-  ) async {
-    // Do nothing
-  }
-
-  @override
-  Future<void> setOnWebResourceError(
-    WebResourceErrorCallback onWebResourceError,
-  ) async {
-    // Do nothing
-  }
-
-  @override
-  Future<void> setOnUrlChange(UrlChangeCallback onUrlChange) async {
-    // Do nothing
-  }
-
-  @override
-  Future<void> setOnHttpAuthRequest(
-    HttpAuthRequestCallback onHttpAuthRequest,
-  ) async {
-    // Do nothing
-  }
-
-  @override
-  Future<void> setOnHttpError(HttpResponseErrorCallback onHttpError) async {
-    // Do nothing
-  }
-}
-
-class MockWebViewPlatform extends WebViewPlatform {
-  MockWebViewPlatform({
-    required this.webViewController,
-    required this.navigationDelegate,
-    required this.mockWebViewWidget,
-  });
-
-  final PlatformWebViewController webViewController;
-  final PlatformNavigationDelegate navigationDelegate;
-  final PlatformWebViewWidget mockWebViewWidget;
-
-  @override
-  PlatformWebViewController createPlatformWebViewController(
-    PlatformWebViewControllerCreationParams params,
-  ) {
-    return webViewController;
-  }
-
-  @override
-  PlatformNavigationDelegate createPlatformNavigationDelegate(
-    PlatformNavigationDelegateCreationParams params,
-  ) {
-    return navigationDelegate;
-  }
-
-  @override
-  PlatformWebViewWidget createPlatformWebViewWidget(
-    PlatformWebViewWidgetCreationParams params,
-  ) {
-    return mockWebViewWidget;
-  }
-}
+import 'mock/app.dart';
+import 'mock/navigation_delegate.dart';
+import 'mock/web_view.dart';
+import 'mock/web_view_controller.dart';
+import 'mock/web_view_widget.dart';
 
 void main() {
   MeshErrorType? errorType;
@@ -236,7 +80,7 @@ void main() {
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
-      expect(webViewController._requestUri, Uri.parse('$rawUrl?lng=en'));
+      expect(webViewController.requestUri, Uri.parse('$rawUrl?lng=en'));
     });
 
     testWidgets('Language param is used', (tester) async {
@@ -251,7 +95,28 @@ void main() {
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
-      expect(webViewController._requestUri, Uri.parse('$rawUrl?lng=de'));
+      expect(webViewController.requestUri, Uri.parse('$rawUrl?lng=de'));
+    });
+  });
+
+  group('Domain Whitelist', () {
+    testWidgets('Domain whitelist is enabled by default', (tester) async {
+      const rawUrl = 'https://test_linktoken';
+      final linkToken = base64Encode(utf8.encode(rawUrl));
+      final configuration = MeshConfiguration(
+        linkToken: linkToken,
+        onError: (error) => errorType = error,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), 'https://google.com');
+      await tester.tap(find.byType(FilledButton));
+
+      expect(configuration.isDomainWhitelistEnabled, true);
+      expect(errorType, null);
     });
   });
 
@@ -265,12 +130,12 @@ void main() {
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
-      expect(webViewController._backgroundColor, Colors.transparent);
-      expect(webViewController._javaScriptMode, JavaScriptMode.unrestricted);
-      expect(webViewController._javaScriptChannel, 'JSBridge');
-      expect(webViewController._requestUri, Uri.parse('$rawUrl?lng=en'));
+      expect(webViewController.backgroundColor, Colors.transparent);
+      expect(webViewController.javaScriptMode, JavaScriptMode.unrestricted);
+      expect(webViewController.javaScriptChannel, 'JSBridge');
+      expect(webViewController.requestUri, Uri.parse('$rawUrl?lng=en'));
       expect(
-        webViewController._lastJavaScript,
+        webViewController.lastJavaScript,
         "window.meshSdkPlatform='flutter';"
         "window.meshSdkVersion='0.0.1';",
       );
@@ -298,7 +163,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        webViewController._lastJavaScript,
+        webViewController.lastJavaScript,
         "window.meshSdkPlatform='flutter';"
         "window.meshSdkVersion='0.0.1';"
         'window.integrationAccessTokens=[{'
