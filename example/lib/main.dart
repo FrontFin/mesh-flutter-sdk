@@ -103,11 +103,24 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
+    // Handle the result
     switch (result) {
       case MeshSuccess():
         print('Mesh link finished successfully');
       case MeshError():
         print('Mesh link error: ${result.type}');
     }
+
+    // Alternatively, use `when` method
+    result.when(
+      success: (success) {
+        final payload = success.payload;
+        print('Mesh link success: ${payload.integration.name}');
+      },
+      error: (error) {
+        final errorType = error.type;
+        print('Mesh link error: $errorType');
+      },
+    );
   }
 }

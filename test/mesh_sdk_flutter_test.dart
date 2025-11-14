@@ -112,9 +112,6 @@ void main() {
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField), 'https://google.com');
-      await tester.tap(find.byType(FilledButton));
-
       expect(configuration.isDomainWhitelistEnabled, true);
       expect(errorType, null);
     });

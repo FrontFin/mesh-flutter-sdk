@@ -4,7 +4,6 @@ class MockNavigationDelegate extends PlatformNavigationDelegate {
   MockNavigationDelegate()
     : super.implementation(const PlatformNavigationDelegateCreationParams());
 
-
   @override
   Future<void> setOnNavigationRequest(
     NavigationRequestCallback onNavigationRequest,

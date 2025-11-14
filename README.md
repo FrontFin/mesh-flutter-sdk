@@ -12,7 +12,29 @@ file:
 
 ```yaml
 dependencies:
-  mesh_sdk: <latest_version>
+  mesh_sdk_flutter: <latest_version>
+```
+
+### Localization
+
+Mesh SDK uses the `flutter_localizations` package for localization.
+
+For it to work, you need to add `MeshLocalizations.localizationsDelegates`
+to your `MaterialApp.localizationsDelegates`, like so:
+
+```dart
+import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
+
+@override
+Widget build(BuildContext context) {
+  return MaterialApp(
+    localizationsDelegates: [
+      ...
+      MeshLocalizations.localizationsDelegates,
+    ],
+    
+  );
+}
 ```
 
 ### Get Link Token
@@ -87,7 +109,8 @@ Here's what you can configure in the `MeshConfiguration`:
 | `language`                 | `String`                                   |          | Language, defaults to "en".                                                                            |
 | `isDomainWhitelistEnabled` | `bool`                                     |          | If domain should be checked against our whitelist. Defaults to `true`.                                 |
 | `integrationAccessTokens`  | `List<IntegrationAccessToken>`             |          | List of cached `IntegrationAccessToken`s that you can pass, so users don't need to connect every time. |
-| `onExit`                   | `ValueChanged<MeshErrorType>?`             |          | Exit callback with a `MeshErrorType` that describes the error.                                         |
+| `onError`                  | `ValueChanged<MeshErrorType>?`             |          | Error callback with a `MeshErrorType` that describes the error.                                        |
+| `onSuccess`                | `ValueChanged<MeshSuccess>?`               |          | Success callback with `SuccessPayload` that contains more info about the transfer or integration.      |
 | `onEvent`                  | `ValueChanged<MeshEvent>?`                 |          | Callback for when an event is triggered.                                                               |
 | `onIntegrationConnected`   | `ValueChanged<IntegrationConnectedEvent>?` |          | Callback for when an integration is connected. Use this to store the access token.                     |
 | `onTransferFinished`       | `ValueChanged<TransferFinishedEvent>?`     |          | Callback for when a crypto transfer is executed.                                                       |
