@@ -34,6 +34,26 @@ bool isWhitelistedOrigin(String url) {
   }
 }
 
+bool isExternallyOpenedOrigin(String url) {
+  try {
+    if (url == 'about:blank') {
+      return false;
+    }
+
+    return _externallyOpenedOrigins.any((origin) {
+      if (origin.startsWith('https://')) {
+        // Full URL, e.g. "https://link.trustwallet.com"
+        return url.startsWith(origin);
+      }
+
+      logger.severe('Invalid externally opened origin format: $origin');
+      return false;
+    });
+  } catch (e) {
+    return false;
+  }
+}
+
 const _whitelistedOrigins = [
   '*.meshconnect.com',
   '*.getfront.com',
@@ -67,4 +87,13 @@ const _whitelistedOrigins = [
   'https://ramp.revolut.codes',
   'https://sso.revolut.codes',
   'https://ramp.revolut.com',
+];
+
+const _externallyOpenedOrigins = [
+  'https://link.trustwallet.com',
+  'https://appopener.meshconnect.com',
+  'https://coinbase.com',
+  'https://www.coinbase.com',
+  'https://login.coinbase.com',
+  'https://api.cb-device-intelligence.com',
 ];
