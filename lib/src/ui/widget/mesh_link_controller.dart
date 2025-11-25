@@ -124,14 +124,17 @@ class MeshLinkController {
           },
           onNavigationRequest: (navigation) {
             logger.info('Navigation request: ${navigation.url}');
+            final uri = Uri.parse(navigation.url);
             if (configuration.isDomainWhitelistEnabled &&
                 !isWhitelistedOrigin(navigation.url)) {
-              logger.severe('Blocked navigation to: ${navigation.url}');
-              onError(MeshErrorType.blockedNavigation);
+              logger.info(
+                'URL not whitelisted, opening in external browser: '
+                '${navigation.url}',
+              );
+
+              _launchExternalUri(uri, isApp: true);
               return NavigationDecision.prevent;
             }
-
-            final uri = Uri.parse(navigation.url);
 
             switch (uri.scheme) {
               case 'itms-appss':
