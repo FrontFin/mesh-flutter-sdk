@@ -19,10 +19,7 @@ class MeshLinkNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const iconColor = iconColorDark;
-    final backgroundColor = switch (brightness) {
-      Brightness.light => navBarColorLight,
-      Brightness.dark => navBarColorDark,
-    };
+    final backgroundColor = getNavBarColor(brightness);
 
     return ColoredBox(
       color: backgroundColor,

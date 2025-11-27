@@ -5,6 +5,11 @@ const navBarColorDark = Color(0xFF1E1E24);
 const navBarColorLight = Color(0xFFFBFBFB);
 const iconColorDark = Colors.white;
 
+Color getNavBarColor(Brightness brightness) => switch (brightness) {
+  Brightness.light => navBarColorLight,
+  Brightness.dark => navBarColorDark,
+};
+
 /// This will update the system bar brightness.
 ///
 /// Call this whenever Mesh Link brightness is changed.

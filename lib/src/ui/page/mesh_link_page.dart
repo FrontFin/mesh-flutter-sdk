@@ -7,6 +7,7 @@ import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_internal_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
 import 'package:mesh_sdk_flutter/src/ui/dialog/exit_dialog.dart';
+import 'package:mesh_sdk_flutter/src/ui/theme.dart';
 import 'package:mesh_sdk_flutter/src/ui/widget/mesh_link_controller.dart';
 import 'package:mesh_sdk_flutter/src/ui/widget/mesh_link_nav_bar.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -56,14 +57,16 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
       },
     );
 
-    unawaited(
-      _controller.init(context).then((_) {
-        if (mounted) {
-          // Update the UI
-          setState(() {});
-        }
-      }),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(
+        _controller.init(context).then((_) {
+          if (mounted) {
+            // Update the UI
+            setState(() {});
+          }
+        }),
+      );
+    });
   }
 
   @override
@@ -89,6 +92,10 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
       }
     }
 
+    final backgroundColor = _controller.isInitialized
+        ? getNavBarColor(_controller.brightness)
+        : Colors.transparent;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -112,7 +119,7 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
         _showCloseDialog(context);
       },
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: backgroundColor,
         body: SafeArea(child: body),
       ),
     );
