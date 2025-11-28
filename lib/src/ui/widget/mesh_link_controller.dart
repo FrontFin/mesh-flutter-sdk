@@ -193,9 +193,7 @@ class MeshLinkController {
           .map((e) => e.toJson())
           .toList();
 
-      stringBuffer.write(
-        'window.integrationAccessTokens=${json.encode(tokensJson)};',
-      );
+      stringBuffer.write('window.accessTokens=${json.encode(tokensJson)};');
     }
 
     await controller.runJavaScript(stringBuffer.toString());
