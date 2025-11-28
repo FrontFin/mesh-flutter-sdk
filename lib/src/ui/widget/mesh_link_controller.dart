@@ -131,7 +131,7 @@ class MeshLinkController {
                 'Externally opened origin, opening in external browser: '
                 '${navigation.url}',
               );
-              _launchExternalUri(uri, isApp: true);
+              _launchExternalUri(uri, isApp: false);
               return NavigationDecision.prevent;
             }
 
@@ -289,7 +289,7 @@ class MeshLinkController {
         uri,
         mode: isApp
             ? LaunchMode.externalApplication
-            : LaunchMode.platformDefault,
+            : LaunchMode.inAppBrowserView,
       ),
     );
   }
