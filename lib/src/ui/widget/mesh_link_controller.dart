@@ -179,24 +179,6 @@ class MeshLinkController {
 
     await controller.loadRequest(uri);
 
-    final packageInfo = await PackageInfo.fromPlatform();
-    final sdkVersion = packageInfo.version;
-
-    final stringBuffer = StringBuffer(
-      "window.meshSdkPlatform='flutter';"
-      "window.meshSdkVersion='$sdkVersion';",
-    );
-
-    final integrationAccessTokens = configuration.integrationAccessTokens;
-    if (integrationAccessTokens.isNotEmpty) {
-      final tokensJson = integrationAccessTokens
-          .map((e) => e.toJson())
-          .toList();
-
-      stringBuffer.write('window.accessTokens=${json.encode(tokensJson)};');
-    }
-
-    await controller.runJavaScript(stringBuffer.toString());
     _webViewController = controller;
   }
 
@@ -257,6 +239,10 @@ class MeshLinkController {
     final event = MeshEvent.fromJson(json);
     if (event != null) {
       logger.info('Event received: ${event.runtimeType}');
+      if (event is LoadedEvent) {
+        unawaited(_onLoaded());
+      }
+
       onEvent(event);
       return;
     }
@@ -290,5 +276,26 @@ class MeshLinkController {
             : LaunchMode.inAppBrowserView,
       ),
     );
+  }
+
+  Future<void> _onLoaded() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    final sdkVersion = packageInfo.version;
+
+    final stringBuffer = StringBuffer(
+      "window.meshSdkPlatform='flutter';"
+      "window.meshSdkVersion='$sdkVersion';",
+    );
+
+    final integrationAccessTokens = configuration.integrationAccessTokens;
+    if (integrationAccessTokens.isNotEmpty) {
+      final tokensJson = integrationAccessTokens
+          .map((e) => e.toJson())
+          .toList();
+
+      stringBuffer.write('window.accessTokens=${json.encode(tokensJson)};');
+    }
+
+    await _webViewController!.runJavaScript(stringBuffer.toString());
   }
 }
