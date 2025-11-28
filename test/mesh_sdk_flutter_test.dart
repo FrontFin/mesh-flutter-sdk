@@ -163,7 +163,7 @@ void main() {
         webViewController.lastJavaScript,
         "window.meshSdkPlatform='flutter';"
         "window.meshSdkVersion='0.0.1';"
-        'window.integrationAccessTokens=[{'
+        'window.accessTokens=[{'
         '"accountId":"id",'
         '"accountName":"name",'
         '"accessToken":"token",'
