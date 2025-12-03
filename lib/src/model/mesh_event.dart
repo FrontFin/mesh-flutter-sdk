@@ -61,6 +61,34 @@ sealed class MeshEvent {
         'gasIncreaseWarning' => const GasIncreaseWarningEvent(),
         'executeFundingStep' when isPayloadMap =>
           ExecuteFundingStepEvent.fromJson(payload),
+        'integrationMfaEntered' => IntegrationMfaEnteredEvent(
+          rawPayload: payload,
+        ),
+        'integrationOAuthStarted' => IntegrationOAuthStartedEvent(
+          rawPayload: payload,
+        ),
+        'integrationAccountSelectionRequired' =>
+          IntegrationAccountSelectionRequiredEvent(rawPayload: payload),
+        'transferAssetSelected' => TransferAssetSelectedEvent(
+          rawPayload: payload,
+        ),
+        'transferNetworkSelected' => TransferNetworkSelectedEvent(
+          rawPayload: payload,
+        ),
+        'transferAmountEntered' => TransferAmountEnteredEvent(
+          rawPayload: payload,
+        ),
+        'transferMfaRequired' => TransferMfaRequiredEvent(rawPayload: payload),
+        'transferMfaEntered' => TransferMfaEnteredEvent(rawPayload: payload),
+        'transferKycRequired' => TransferKycRequiredEvent(rawPayload: payload),
+        'connectionDeclined' => ConnectionDeclinedEvent(rawPayload: payload),
+        'transferConfigureError' => TransferConfigureErrorEvent(
+          rawPayload: payload,
+        ),
+        'connectionUnavailable' => ConnectionUnavailableEvent(
+          rawPayload: payload,
+        ),
+        'transferDeclined' => TransferDeclinedEvent(rawPayload: payload),
         _ => null,
       };
     } catch (e, s) {
@@ -313,4 +341,82 @@ class ExecuteFundingStepEvent extends MeshEvent {
   final String cryptocurrencyFundingOptionType;
   final String status;
   final String? errorMessage;
+}
+
+class IntegrationMfaEnteredEvent extends MeshEvent {
+  const IntegrationMfaEnteredEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class IntegrationOAuthStartedEvent extends MeshEvent {
+  const IntegrationOAuthStartedEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class IntegrationAccountSelectionRequiredEvent extends MeshEvent {
+  const IntegrationAccountSelectionRequiredEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class TransferAssetSelectedEvent extends MeshEvent {
+  const TransferAssetSelectedEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class TransferNetworkSelectedEvent extends MeshEvent {
+  const TransferNetworkSelectedEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class TransferAmountEnteredEvent extends MeshEvent {
+  const TransferAmountEnteredEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class TransferMfaRequiredEvent extends MeshEvent {
+  const TransferMfaRequiredEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class TransferMfaEnteredEvent extends MeshEvent {
+  const TransferMfaEnteredEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class TransferKycRequiredEvent extends MeshEvent {
+  const TransferKycRequiredEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class ConnectionDeclinedEvent extends MeshEvent {
+  const ConnectionDeclinedEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class TransferConfigureErrorEvent extends MeshEvent {
+  const TransferConfigureErrorEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class ConnectionUnavailableEvent extends MeshEvent {
+  const ConnectionUnavailableEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
+}
+
+class TransferDeclinedEvent extends MeshEvent {
+  const TransferDeclinedEvent({required this.rawPayload});
+
+  final dynamic rawPayload;
 }
