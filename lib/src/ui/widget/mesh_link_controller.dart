@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mesh_sdk_flutter/src/model/link_style.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
@@ -109,9 +110,9 @@ class MeshLinkController {
             }
 
             final newUri = Uri.parse(newUrl);
-            if (newUri.host.endsWith('.app.link') ||
-                newUri.host == 'apps.apple.com') {
-              // App redirect - ignore.
+            if (_isAppUrlChange(newUrl)) {
+              logger.info('app redirect: $newUri');
+              _launchExternalUri(newUri, isApp: true);
               return;
             }
 
@@ -141,25 +142,13 @@ class MeshLinkController {
               return NavigationDecision.prevent;
             }
 
-            switch (uri.scheme) {
-              case 'itms-appss':
-                logger.info('Opening App Store link: $uri');
-                _launchExternalUri(uri, isApp: true);
-                return NavigationDecision.prevent;
-
-              case 'market':
-                logger.info('Opening Play Store link: $uri');
-                _launchExternalUri(uri, isApp: true);
-                return NavigationDecision.prevent;
-
-              case 'intent':
-                logger.info('Opening Android intent link: $uri');
-                _launchExternalUri(uri, isApp: true);
-                return NavigationDecision.prevent;
-
-              default:
-                return NavigationDecision.navigate;
+            if (_isAppUrlChange(navigation.url)) {
+              logger.info('Opening app link: $uri');
+              _launchExternalUri(uri, isApp: true);
+              return NavigationDecision.prevent;
             }
+
+            return NavigationDecision.navigate;
           },
           onHttpError: (error) {
             logger.warning(
@@ -297,5 +286,24 @@ class MeshLinkController {
     }
 
     await _webViewController!.runJavaScript(stringBuffer.toString());
+  }
+
+  bool _isAppUrlChange(String url) {
+    final uri = Uri.parse(url);
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      if (url.startsWith('https://solflare.com/ul/v1/browse') ||
+          uri.host == 'market' ||
+          uri.host == 'intent') {
+        return true;
+      }
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      if (uri.host == 'apps.apple.com' || uri.host == 'itms-appss') {
+        return true;
+      }
+    }
+
+    return uri.host.endsWith('.app.link');
   }
 }
