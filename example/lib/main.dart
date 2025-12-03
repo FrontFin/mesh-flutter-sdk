@@ -92,7 +92,7 @@ class _HomePageState extends State<HomePage> {
           print('Mesh exit: $errorType');
         },
         onSuccess: (payload) {
-          print('Mesh success: ${payload.integration.name}');
+          print('Mesh success: ${payload.page}');
         },
         onIntegrationConnected: (integration) {
           print('Integration connected: $integration');
@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
     result.when(
       success: (success) {
         final payload = success.payload;
-        print('Mesh link success: ${payload.integration.name}');
+        print('Mesh link success: ${payload.page}');
       },
       error: (error) {
         final errorType = error.type;

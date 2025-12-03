@@ -1,6 +1,7 @@
 import 'package:mesh_sdk_flutter/src/mesh_sdk_flutter.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
 import 'package:mesh_sdk_flutter/src/model/success/success.dart';
+import 'package:mesh_sdk_flutter/src/util/logger.dart';
 
 /// Represents the result of [MeshSdk.show].
 /// This can either be a [MeshSuccess] or a [MeshError].
@@ -13,15 +14,17 @@ sealed class MeshResult {
     final type = json['type'] as String?;
     final payload = json['payload'];
 
-    return switch (type) {
-      'close' when payload is Map<String, dynamic> => MeshSuccess(
-        payload: TransferSuccessPayload.fromJson(payload),
-      ),
-      'done' when payload is Map<String, dynamic> => MeshSuccess(
-        payload: IntegrationSuccessPayload.fromJson(payload),
-      ),
-      _ => null,
-    };
+    try {
+      return switch (type) {
+        'close' || 'done' when payload is Map<String, dynamic> => MeshSuccess(
+          payload: SuccessPayload.fromJson(payload),
+        ),
+        _ => null,
+      };
+    } catch (e, s) {
+      logger.severe('Error parsing MeshResult from JSON: $json', e, s);
+      return null;
+    }
   }
 
   R when<R>({
