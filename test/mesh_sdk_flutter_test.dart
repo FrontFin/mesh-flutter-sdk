@@ -389,4 +389,140 @@ void main() {
       expect(event.amountInFiat, 50.5);
     });
   });
+
+  group('onIntegrationConnected Callback', () {
+    testWidgets('is called with DelayedAuthPayload', (tester) async {
+      IntegrationConnectedEvent? event;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onIntegrationConnected: (e) => event = e,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage('''
+        {
+          "type": "delayedAuthentication",
+          "payload": {
+            "brokerType": "robinhood",
+            "refreshToken": "token-123",
+            "brokerName": "Robinhood",
+            "brokerBrandInfo": {"brokerLogo": "https://logo.url"}
+          }
+        }''');
+      await tester.pumpAndSettle();
+
+      expect(event, isNotNull);
+      expect(event!.payload, isA<DelayedAuthPayload>());
+      final payload = event!.payload as DelayedAuthPayload;
+      expect(payload.brokerType, 'robinhood');
+      expect(payload.refreshToken, 'token-123');
+      expect(payload.brokerName, 'Robinhood');
+    });
+
+    testWidgets('is called with AccessTokenPayload', (tester) async {
+      IntegrationConnectedEvent? event;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onIntegrationConnected: (e) => event = e,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage('''
+        {
+          "type": "brokerageAccountAccessToken",
+          "payload": {
+            "accountTokens": [
+              {
+                "account": {
+                  "accountId": "acc-123",
+                  "accountName": "Main Account"
+                },
+                "accessToken": "access-token-xyz"
+              }
+            ],
+            "brokerBrandInfo": {"brokerLogo": null},
+            "brokerType": "coinbase",
+            "brokerName": "Coinbase"
+          }
+        }''');
+      await tester.pumpAndSettle();
+
+      expect(event, isNotNull);
+      expect(event!.payload, isA<AccessTokenPayload>());
+      final payload = event!.payload as AccessTokenPayload;
+      expect(payload.brokerType, 'coinbase');
+      expect(payload.brokerName, 'Coinbase');
+      expect(payload.accountTokens, hasLength(1));
+      expect(payload.accountTokens.first.accessToken, 'access-token-xyz');
+    });
+  });
+
+  group('onTransferFinished Callback', () {
+    testWidgets('is called with success payload', (tester) async {
+      TransferFinishedEvent? event;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onTransferFinished: (e) => event = e,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage('''
+        {
+          "type": "transferFinished",
+          "payload": {
+            "status": "success",
+            "txId": "tx-123",
+            "fromAddress": "0xfrom",
+            "toAddress": "0xto",
+            "symbol": "ETH",
+            "amount": 1.5,
+            "networkId": "ethereum"
+          }
+        }''');
+      await tester.pumpAndSettle();
+
+      expect(event, isNotNull);
+      expect(event!.payload, isA<TransferFinishedSuccessPayload>());
+      final payload = event!.payload as TransferFinishedSuccessPayload;
+      expect(payload.txId, 'tx-123');
+      expect(payload.symbol, 'ETH');
+      expect(payload.amount, 1.5);
+    });
+
+    testWidgets('is called with error payload', (tester) async {
+      TransferFinishedEvent? event;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onTransferFinished: (e) => event = e,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage('''
+        {
+          "type": "transferFinished",
+          "payload": {
+            "status": "error",
+            "errorMessage": "Transfer failed: insufficient funds"
+          }
+        }''');
+      await tester.pumpAndSettle();
+
+      expect(event, isNotNull);
+      expect(event!.payload, isA<TransferFinishedErrorPayload>());
+      final payload = event!.payload as TransferFinishedErrorPayload;
+      expect(payload.errorMessage, 'Transfer failed: insufficient funds');
+    });
+  });
 }
