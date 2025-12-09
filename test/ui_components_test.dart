@@ -52,9 +52,13 @@ void main() {
     testWidgets('exit button calls onConfirm and dismisses', (tester) async {
       var confirmCalled = false;
 
-      await tester.pumpWidget(buildTestApp(onConfirm: () {
-        confirmCalled = true;
-      }));
+      await tester.pumpWidget(
+        buildTestApp(
+          onConfirm: () {
+            confirmCalled = true;
+          },
+        ),
+      );
       await tester.tap(find.text('Show Dialog'));
       await tester.pumpAndSettle();
 
