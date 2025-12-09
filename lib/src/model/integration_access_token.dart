@@ -1,4 +1,4 @@
-import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
+import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
 
 /// Represents an access token for a specific integration.
 ///

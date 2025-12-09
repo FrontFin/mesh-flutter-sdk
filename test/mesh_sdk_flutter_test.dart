@@ -13,6 +13,9 @@ import 'mock/web_view_controller.dart';
 import 'mock/web_view_widget.dart';
 
 void main() {
+  const rawUrl = 'https://test_linktoken';
+  late String validLinkToken;
+
   MeshErrorType? errorType;
   late MockWebViewController webViewController;
   late MockNavigationDelegate navigationDelegate;
@@ -29,6 +32,7 @@ void main() {
   });
 
   setUp(() {
+    validLinkToken = base64Encode(utf8.encode(rawUrl));
     errorType = null;
     webViewController = MockWebViewController();
     navigationDelegate = MockNavigationDelegate();
@@ -72,9 +76,7 @@ void main() {
 
   group('Language', () {
     testWidgets('Default language param is "en"', (tester) async {
-      const rawUrl = 'https://test_linktoken';
-      final linkToken = base64Encode(utf8.encode(rawUrl));
-      final configuration = MeshConfiguration(linkToken: linkToken);
+      final configuration = MeshConfiguration(linkToken: validLinkToken);
 
       await tester.pumpWidget(TestApp(configuration: configuration));
       await tester.tap(find.byType(FilledButton));
@@ -84,10 +86,8 @@ void main() {
     });
 
     testWidgets('Language param is used', (tester) async {
-      const rawUrl = 'https://test_linktoken';
-      final linkToken = base64Encode(utf8.encode(rawUrl));
       final configuration = MeshConfiguration(
-        linkToken: linkToken,
+        linkToken: validLinkToken,
         language: 'de',
       );
 
@@ -101,10 +101,8 @@ void main() {
 
   group('Domain Whitelist', () {
     testWidgets('Domain whitelist is enabled by default', (tester) async {
-      const rawUrl = 'https://test_linktoken';
-      final linkToken = base64Encode(utf8.encode(rawUrl));
       final configuration = MeshConfiguration(
-        linkToken: linkToken,
+        linkToken: validLinkToken,
         onError: (error) => errorType = error,
       );
 
@@ -119,9 +117,7 @@ void main() {
 
   group('WebView', () {
     testWidgets('WebViewController is initialized', (tester) async {
-      const rawUrl = 'https://test_linktoken';
-      final linkToken = base64Encode(utf8.encode(rawUrl));
-      final configuration = MeshConfiguration(linkToken: linkToken);
+      final configuration = MeshConfiguration(linkToken: validLinkToken);
 
       await tester.pumpWidget(TestApp(configuration: configuration));
       await tester.tap(find.byType(FilledButton));
@@ -145,10 +141,8 @@ void main() {
     });
 
     testWidgets('Integration access tokens are passed to JS', (tester) async {
-      const rawUrl = 'https://test_linktoken';
-      final linkToken = base64Encode(utf8.encode(rawUrl));
       final configuration = MeshConfiguration(
-        linkToken: linkToken,
+        linkToken: validLinkToken,
         integrationAccessTokens: const [
           IntegrationAccessToken(
             accountId: 'id',
@@ -180,6 +174,219 @@ void main() {
         '"brokerName":"brokerName"'
         '}];',
       );
+    });
+  });
+
+  group('Callbacks', () {
+    testWidgets('onEvent is called for events', (tester) async {
+      MeshEvent? receivedEvent;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onEvent: (event) => receivedEvent = event,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      // Simulate an integrationSelected event from JS
+      webViewController.simulateJsMessage('''
+          {
+            "type": "integrationSelected",
+            "payload": {
+              "integrationType": "robinhood",
+              "integrationName":"Robinhood"
+              }
+            }
+        ''');
+      await tester.pumpAndSettle();
+
+      expect(receivedEvent, isA<IntegrationSelectedEvent>());
+      final event = receivedEvent! as IntegrationSelectedEvent;
+      expect(event.type, 'robinhood');
+      expect(event.name, 'Robinhood');
+    });
+
+    testWidgets('onEvent is called for LoadedEvent', (tester) async {
+      MeshEvent? receivedEvent;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onEvent: (event) => receivedEvent = event,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage('{"type":"loaded","payload":{}}');
+      await tester.pumpAndSettle();
+
+      expect(receivedEvent, isA<LoadedEvent>());
+    });
+
+    testWidgets('onSuccess is called on done event', (tester) async {
+      SuccessPayload? payload;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onSuccess: (p) => payload = p,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage('''
+        {
+          "type": "done",
+          "payload": {
+            "page": "done",
+            "selectedIntegration": {
+              "id": "123",
+              "name": "Test Integration"
+              }
+            }
+          }''');
+      await tester.pumpAndSettle();
+
+      expect(payload, isA<IntegrationSuccessPayload>());
+      final success = payload! as IntegrationSuccessPayload;
+      expect(success.page, 'done');
+      expect(success.integration.id, '123');
+      expect(success.integration.name, 'Test Integration');
+    });
+
+    testWidgets('onSuccess is called with TransferSuccessPayload', (
+      tester,
+    ) async {
+      SuccessPayload? payload;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onSuccess: (p) => payload = p,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage('''
+        {
+          "type": "done",
+          "payload": {
+            "page": "transferComplete",
+            "selectedIntegration": {
+              "id":"456",
+              "name":"Coinbase"
+            },
+            "transfer": {
+              "amount": 100.5,
+              "symbol":"ETH",
+              "transactionId":
+              "tx-abc"
+            }
+          }
+        }''');
+      await tester.pumpAndSettle();
+
+      expect(payload, isA<TransferSuccessPayload>());
+      final success = payload! as TransferSuccessPayload;
+      expect(success.page, 'transferComplete');
+      expect(success.integration.name, 'Coinbase');
+      expect(success.transfer.amount, 100.5);
+      expect(success.transfer.symbol, 'ETH');
+      expect(success.transfer.transactionId, 'tx-abc');
+    });
+
+    testWidgets('onError is called with userCancelled on close', (
+      tester,
+    ) async {
+      MeshErrorType? error;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onError: (e) => error = e,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage(
+        '{"type":"close","payload":{"page":"closed"}}',
+      );
+      await tester.pumpAndSettle();
+
+      // Close triggers onSuccess, not onError
+      expect(error, isNull);
+    });
+
+    testWidgets('multiple events trigger onEvent multiple times', (
+      tester,
+    ) async {
+      final events = <MeshEvent>[];
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onEvent: events.add,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage('{"type":"loaded","payload":{}}');
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage(
+        '{"type":"credentialsEntered","payload":{}}',
+      );
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage(
+        '{"type":"transferStarted","payload":{}}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(events, hasLength(3));
+      expect(events[0], isA<LoadedEvent>());
+      expect(events[1], isA<CredentialsEnteredEvent>());
+      expect(events[2], isA<TransferStartedEvent>());
+    });
+
+    testWidgets('onEvent receives TransferPreviewedEvent with full payload', (
+      tester,
+    ) async {
+      MeshEvent? receivedEvent;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onEvent: (event) => receivedEvent = event,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage('''
+        {
+          "type": "transferPreviewed",
+          "payload": {
+            "amount": 50.5,
+            "symbol": "USDC",
+            "toAddress": "0xabc",
+            "networkId": "polygon",
+            "previewId": "preview-123",
+            "networkName": "Polygon",
+            "amountInFiat": 50.5
+          }
+        }''');
+      await tester.pumpAndSettle();
+
+      expect(receivedEvent, isA<TransferPreviewedEvent>());
+      final event = receivedEvent! as TransferPreviewedEvent;
+      expect(event.amount, 50.5);
+      expect(event.symbol, 'USDC');
+      expect(event.toAddress, '0xabc');
+      expect(event.networkId, 'polygon');
+      expect(event.previewId, 'preview-123');
+      expect(event.networkName, 'Polygon');
+      expect(event.amountInFiat, 50.5);
     });
   });
 }

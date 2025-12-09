@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
 import 'package:mesh_sdk_flutter/src/model/integration/integration_connected_payload.dart';
+import 'package:mesh_sdk_flutter/src/model/integration_access_token.dart';
+import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
+import 'package:mesh_sdk_flutter/src/model/success/success.dart';
 import 'package:mesh_sdk_flutter/src/model/transfer/transfer_finished_payload.dart';
 
 const _defaultLanguage = 'en';
