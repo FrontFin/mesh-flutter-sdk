@@ -6,6 +6,13 @@ class MockWebViewController extends PlatformWebViewController {
   MockWebViewController()
     : super.implementation(const PlatformWebViewControllerCreationParams());
 
+  void Function(JavaScriptMessage)? _onMessageReceived;
+
+  /// Simulates receiving a JavaScript message through the JSBridge channel.
+  void simulateJsMessage(String message) {
+    _onMessageReceived?.call(JavaScriptMessage(message: message));
+  }
+
   Color? _backgroundColor;
 
   Color? get backgroundColor => _backgroundColor;
@@ -44,6 +51,7 @@ class MockWebViewController extends PlatformWebViewController {
     }
 
     _javaScriptChannel = javaScriptChannelParams.name;
+    _onMessageReceived = javaScriptChannelParams.onMessageReceived;
   }
 
   @override

@@ -131,6 +131,11 @@ void main() {
       expect(webViewController.javaScriptMode, JavaScriptMode.unrestricted);
       expect(webViewController.javaScriptChannel, 'JSBridge');
       expect(webViewController.requestUri, Uri.parse('$rawUrl?lng=en'));
+
+      // Simulate the "loaded" event from JS to trigger _onLoaded()
+      webViewController.simulateJsMessage('{"type":"loaded","payload":{}}');
+      await tester.pumpAndSettle();
+
       expect(
         webViewController.lastJavaScript,
         "window.meshSdkPlatform='flutter';"
@@ -157,6 +162,10 @@ void main() {
 
       await tester.pumpWidget(TestApp(configuration: configuration));
       await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      // Simulate the "loaded" event from JS to trigger _onLoaded()
+      webViewController.simulateJsMessage('{"type":"loaded","payload":{}}');
       await tester.pumpAndSettle();
 
       expect(
