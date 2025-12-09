@@ -89,6 +89,10 @@ sealed class MeshEvent {
           rawPayload: payload,
         ),
         'transferDeclined' => TransferDeclinedEvent(rawPayload: payload),
+        'linkTransferQRGenerated' when isPayloadMap =>
+          LinkTransferQrGeneratedEvent.fromJson(payload),
+        'methodSelected' when isPayloadMap =>
+          HomePageMethodSelectedEvent.fromJson(payload),
         _ => null,
       };
     } catch (e, s) {
@@ -419,4 +423,59 @@ class TransferDeclinedEvent extends MeshEvent {
   const TransferDeclinedEvent({required this.rawPayload});
 
   final dynamic rawPayload;
+}
+
+class LinkTransferQrGeneratedEvent extends MeshEvent {
+  const LinkTransferQrGeneratedEvent({
+    required this.token,
+    required this.network,
+    required this.toAddress,
+    required this.qrUrl,
+  });
+
+  factory LinkTransferQrGeneratedEvent.fromJson(Map<String, dynamic> json) {
+    return LinkTransferQrGeneratedEvent(
+      token: json['token'] as String?,
+      network: json['network'] as String?,
+      toAddress: json['toAddress'] as String?,
+      qrUrl: json['qrUrl'] as String?,
+    );
+  }
+
+  final String? token;
+  final String? network;
+  final String? toAddress;
+  final String? qrUrl;
+}
+
+enum HomePageMethod {
+  embedded('embedded'),
+  manual('manual'),
+  buy('buy');
+
+  const HomePageMethod(this.id);
+
+  final String id;
+
+  static HomePageMethod fromString(String value) {
+    return HomePageMethod.values.firstWhere(
+      (e) => e.id == value,
+      orElse: () {
+        logger.warning('Unknown HomePageMethod: $value');
+        return HomePageMethod.embedded;
+      },
+    );
+  }
+}
+
+class HomePageMethodSelectedEvent extends MeshEvent {
+  const HomePageMethodSelectedEvent({required this.method});
+
+  factory HomePageMethodSelectedEvent.fromJson(Map<String, dynamic> json) {
+    return HomePageMethodSelectedEvent(
+      method: HomePageMethod.fromString(json['method'] as String),
+    );
+  }
+
+  final HomePageMethod method;
 }
