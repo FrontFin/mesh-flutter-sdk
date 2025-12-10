@@ -113,7 +113,7 @@ class MeshLinkController {
             final newUri = Uri.parse(newUrl);
             if (_isAppUrlChange(newUrl)) {
               logger.info('app redirect: $newUri');
-              _launchExternalUri(newUri, isApp: true);
+              unawaited(_launchExternalUri(newUri, isApp: true));
               return;
             }
 
@@ -133,7 +133,7 @@ class MeshLinkController {
                 'Externally opened origin, opening in external browser: '
                 '${navigation.url}',
               );
-              _launchExternalUri(uri, isApp: false);
+              unawaited(_launchExternalUri(uri, isApp: false));
               return NavigationDecision.prevent;
             }
 
@@ -145,7 +145,7 @@ class MeshLinkController {
 
             if (_isAppUrlChange(navigation.url)) {
               logger.info('Opening app link: $uri');
-              _launchExternalUri(uri, isApp: true);
+              unawaited(_launchExternalUri(uri, isApp: true));
               return NavigationDecision.prevent;
             }
 
