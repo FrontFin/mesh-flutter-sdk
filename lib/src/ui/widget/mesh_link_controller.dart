@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mesh_sdk_flutter/src/model/link_style.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
@@ -249,7 +250,7 @@ class MeshLinkController {
     logger.warning('Unexpected JS message: $json');
   }
 
-  void _launchExternalUri(Uri uri, {required bool isApp}) {
+  Future<void> _launchExternalUri(Uri uri, {required bool isApp}) async {
     if (_isExternalAppOpened) {
       logger.warning('External app already opened, ignoring: $uri');
       unawaited(goBack());
@@ -257,14 +258,24 @@ class MeshLinkController {
     }
 
     _isExternalAppOpened = true;
-    unawaited(
-      launchUrl(
-        uri,
-        mode: isApp
-            ? LaunchMode.externalApplication
-            : LaunchMode.inAppBrowserView,
-      ),
-    );
+    if (!isApp) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      return;
+    }
+
+    try {
+      // Try launching in external non-browser app
+      await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
+    } on PlatformException catch (e) {
+      if (e.code == 'ACTIVITY_NOT_FOUND') {
+        // If it fails, try browser app
+        logger.info('Activity not found. Trying external app...');
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+
+      rethrow;
+    }
   }
 
   Future<void> _onLoaded() async {
@@ -293,6 +304,7 @@ class MeshLinkController {
     if (defaultTargetPlatform == TargetPlatform.android) {
       if (url.startsWith('https://solflare.com/ul/v1/browse/') ||
           url.startsWith('https://phantom.com/ul/browse/') ||
+          uri.scheme == 'exodus' ||
           uri.host == 'market' ||
           uri.host == 'intent') {
         return true;
