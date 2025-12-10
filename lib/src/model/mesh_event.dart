@@ -155,7 +155,7 @@ class TransferPreviewedEvent extends MeshEvent {
     final feeJson = json['estimatedNetworkGasFee'];
 
     return TransferPreviewedEvent(
-      amount: (json['amount'] as num).toDouble(),
+      amount: (json['amount'] as num?)?.toDouble(),
       symbol: json['symbol'] as String,
       toAddress: json['toAddress'] as String,
       networkId: json['networkId'] as String,
@@ -168,7 +168,7 @@ class TransferPreviewedEvent extends MeshEvent {
     );
   }
 
-  final double amount;
+  final double? amount;
   final String symbol;
   final String toAddress;
   final String networkId;
