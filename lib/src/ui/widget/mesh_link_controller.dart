@@ -18,6 +18,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+const _activityNotFoundCode = 'ACTIVITY_NOT_FOUND';
+
 /// A controller for managing the Mesh Link web view.
 /// This uses [WebViewController] and adds our own logic on top.
 class MeshLinkController {
@@ -267,13 +269,28 @@ class MeshLinkController {
       // Try launching in external non-browser app
       await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
     } on PlatformException catch (e) {
-      if (e.code == 'ACTIVITY_NOT_FOUND') {
+      if (e.code == _activityNotFoundCode) {
         // If it fails, try browser app
-        logger.info('Activity not found. Trying external app...');
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-        return;
+        try {
+          logger.info('Activity not found. Trying external app...');
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+          return;
+        } on PlatformException catch (e) {
+          // If it fails, try store link
+          if (e.code == _activityNotFoundCode) {
+            logger.info('External app not found. Trying store link...');
+            final storeUrl = getStoreUriFromAppUri(uri);
+            if (storeUrl != null) {
+              logger.info('Store link found. Opening...');
+              _isExternalAppOpened = false;
+              unawaited(_launchExternalUri(storeUrl, isApp: true));
+              return;
+            }
+          }
+        }
       }
 
+      _isExternalAppOpened = false;
       rethrow;
     }
   }

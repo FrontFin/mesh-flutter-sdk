@@ -54,6 +54,14 @@ bool isExternallyOpenedOrigin(String url) {
   }
 }
 
+Uri? getStoreUriFromAppUri(Uri uri) {
+  if (uri.scheme == _exodusSchema) {
+    return Uri.parse(_exodusPlayStoreUrl);
+  }
+
+  return null;
+}
+
 const _whitelistedOrigins = [
   '*.meshconnect.com',
   '*.getfront.com',
@@ -97,3 +105,7 @@ const _externallyOpenedOrigins = [
   'https://login.coinbase.com',
   'https://api.cb-device-intelligence.com',
 ];
+
+const _exodusSchema = 'exodus';
+const _exodusPlayStoreUrl =
+    'https://play.google.com/store/apps/details?id=exodusmovement.exodus';
