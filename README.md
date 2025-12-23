@@ -32,7 +32,6 @@ Widget build(BuildContext context) {
       ...
       MeshLocalizations.localizationsDelegates,
     ],
-    
   );
 }
 ```
