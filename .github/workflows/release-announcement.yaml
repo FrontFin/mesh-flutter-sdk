@@ -28,7 +28,7 @@ jobs:
               - type: "header"
                 text:
                   type: "plain_text"
-                  text: ":flutter: Flutter SDK Release: ${{ github.event.release.tag_name}}"
+                  text: ":flutter: Flutter SDK Release: ${{ github.event.release.tag_name }}"
                   emoji: true
               - type: "section"
                 text:
