@@ -59,6 +59,26 @@ class MeshLinkController {
     await _webViewController?.runJavaScript('window.history.go(-1)');
   }
 
+  /// Resolves the language to pass as [lng]. When [language] is "system",
+  /// uses the device (platform) locale so the Link UI follows the system language
+  /// even if the host app only supports a subset of locales.
+  static String _resolveLanguage(BuildContext context, String language) {
+    if (language == 'system') {
+      final locale = WidgetsBinding.instance.platformDispatcher.locale;
+      return locale.languageCode;
+    }
+    return language;
+  }
+
+  /// Converts [ThemeMode] to the [th] query param value used by the link URL.
+  static String _themeToQueryParam(ThemeMode theme) {
+    return switch (theme) {
+      ThemeMode.light => 'light',
+      ThemeMode.dark => 'dark',
+      ThemeMode.system => 'system',
+    };
+  }
+
   /// Initialize the controller using [configuration].
   /// This will parse the [MeshConfiguration.linkToken],
   /// initialize the [WebViewController] with all the callbacks, configuration,
@@ -67,12 +87,18 @@ class MeshLinkController {
     try {
       final url = String.fromCharCodes(base64Decode(configuration.linkToken));
       final parsedUri = Uri.parse(url);
-      final uri = parsedUri.replace(
-        queryParameters: {
-          ...parsedUri.queryParameters,
-          'lng': configuration.language,
-        },
-      );
+      final lng = _resolveLanguage(context, configuration.language);
+      final queryParams = <String, String>{
+        ...parsedUri.queryParameters,
+        'lng': lng,
+      };
+      if (configuration.displayFiatCurrency != null) {
+        queryParams['fiatCur'] = configuration.displayFiatCurrency!;
+      }
+      if (configuration.theme != null) {
+        queryParams['th'] = _themeToQueryParam(configuration.theme!);
+      }
+      final uri = parsedUri.replace(queryParameters: queryParams);
 
       await _initWebViewController(uri);
       if (!context.mounted) {
@@ -175,18 +201,25 @@ class MeshLinkController {
   }
 
   void _initStyle(BuildContext context, Uri uri) {
-    final linkStyleParam = uri.queryParameters['link_style'];
-    final linkStyleString = linkStyleParam == null
-        ? null
-        : base64Decode(linkStyleParam);
-    final linkStyleJson = linkStyleString == null
-        ? null
-        : json.decode(utf8.decode(linkStyleString));
-    final linkStyle = linkStyleJson is Map<String, dynamic>
-        ? LinkStyle.fromJson(linkStyleJson)
-        : LinkStyle.fromJson(const {});
+    // Prefer theme from configuration (th param) over link_style from token.
+    final ThemeMode themeMode;
+    if (configuration.theme != null) {
+      themeMode = configuration.theme!;
+    } else {
+      final linkStyleParam = uri.queryParameters['link_style'];
+      final linkStyleString = linkStyleParam == null
+          ? null
+          : base64Decode(linkStyleParam);
+      final linkStyleJson = linkStyleString == null
+          ? null
+          : json.decode(utf8.decode(linkStyleString));
+      final linkStyle = linkStyleJson is Map<String, dynamic>
+          ? LinkStyle.fromJson(linkStyleJson)
+          : LinkStyle.fromJson(const {});
+      themeMode = linkStyle.theme;
+    }
 
-    final brightness = switch (linkStyle.theme) {
+    final brightness = switch (themeMode) {
       ThemeMode.light => Brightness.light,
       ThemeMode.dark => Brightness.dark,
       ThemeMode.system => MediaQuery.platformBrightnessOf(context),

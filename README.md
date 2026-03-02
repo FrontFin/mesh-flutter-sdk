@@ -102,17 +102,19 @@ See full example app [here](https://github.com/FrontFin/mesh-flutter-sdk/tree/ma
 
 Here's what you can configure in the `MeshConfiguration`:
 
-| Parameter                  | Type                                       | Required | description                                                                                            |
-|----------------------------|--------------------------------------------|----------|--------------------------------------------------------------------------------------------------------|
-| `linkToken`                | `String`                                   | ✅        | Link token obtained from the backend.                                                                  |
-| `language`                 | `String`                                   |          | Language, defaults to "en".                                                                            |
-| `isDomainWhitelistEnabled` | `bool`                                     |          | If domain should be checked against our whitelist. Defaults to `true`.                                 |
-| `integrationAccessTokens`  | `List<IntegrationAccessToken>`             |          | List of cached `IntegrationAccessToken`s that you can pass, so users don't need to connect every time. |
-| `onError`                  | `ValueChanged<MeshErrorType>?`             |          | Error callback with a `MeshErrorType` that describes the error.                                        |
-| `onSuccess`                | `ValueChanged<MeshSuccess>?`               |          | Success callback with `SuccessPayload` that contains more info about the transfer or integration.      |
-| `onEvent`                  | `ValueChanged<MeshEvent>?`                 |          | Callback for when an event is triggered.                                                               |
-| `onIntegrationConnected`   | `ValueChanged<IntegrationConnectedEvent>?` |          | Callback for when an integration is connected. Use this to store the access token.                     |
-| `onTransferFinished`       | `ValueChanged<TransferFinishedEvent>?`     |          | Callback for when a crypto transfer is executed.                                                       |
+| Parameter                  | Type                                       | Required | description                                                                                                     |
+| -------------------------- | ------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `linkToken`                | `String`                                   | ✅       | Link token obtained from the backend.                                                                           |
+| `language`                 | `String`                                   |          | Language for the Link UI (e.g. `"en"`, `"ru"`). Use `"system"` to follow the device locale. Defaults to `"en"`. |
+| `displayFiatCurrency`      | `String?`                                  |          | Fiat currency code for displaying amounts in Link UI (e.g. `"USD"`). Passed as `fiatCur` in the link URL.       |
+| `theme`                    | `ThemeMode?`                               |          | Link UI theme (`ThemeMode.light`, `ThemeMode.dark`, or `ThemeMode.system`). Passed as `th` in the link URL.     |
+| `isDomainWhitelistEnabled` | `bool`                                     |          | If domain should be checked against our whitelist. Defaults to `true`.                                          |
+| `integrationAccessTokens`  | `List<IntegrationAccessToken>`             |          | List of cached `IntegrationAccessToken`s that you can pass, so users don't need to connect every time.          |
+| `onError`                  | `ValueChanged<MeshErrorType>?`             |          | Error callback with a `MeshErrorType` that describes the error.                                                 |
+| `onSuccess`                | `ValueChanged<MeshSuccess>?`               |          | Success callback with `SuccessPayload` that contains more info about the transfer or integration.               |
+| `onEvent`                  | `ValueChanged<MeshEvent>?`                 |          | Callback for when an event is triggered.                                                                        |
+| `onIntegrationConnected`   | `ValueChanged<IntegrationConnectedEvent>?` |          | Callback for when an integration is connected. Use this to store the access token.                              |
+| `onTransferFinished`       | `ValueChanged<TransferFinishedEvent>?`     |          | Callback for when a crypto transfer is executed.                                                                |
 
 ### Whitelist
 
@@ -120,3 +122,13 @@ See the full list of whitelisted
 origins [here](https://github.com/FrontFin/mesh-flutter-sdk/blob/main/lib/src/util/constants.dart#L37).
 
 To disable the whitelist check, set `isDomainWhitelistEnabled: false` in the `MeshConfiguration`.
+
+### System language, fiat currency, and theme
+
+To adapt the Link UI to the user's device settings, use:
+
+- **`language: 'system'`** — Uses the device/app locale for the Link UI (same behavior as the Web SDK).
+- **`displayFiatCurrency`** — e.g. `'USD'` to show fiat equivalents in the Link UI (sent as `fiatCur` in the link URL).
+- **`theme`** — e.g. `ThemeMode.system` to follow device light/dark mode (sent as `th` in the link URL).
+
+These map to the same Link URL parameters (`lng`, `fiatCur`, `th`) as the [Web SDK](https://docs.meshconnect.com/guides/web-sdk).
