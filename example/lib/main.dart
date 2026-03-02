@@ -35,17 +35,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _textController = TextEditingController();
 
-  void _onButtonPressed() {
-    final linkToken = _textController.text.trim();
-    if (linkToken.isNotEmpty) {
-      unawaited(_showMeshLinkPage(linkToken));
-      _textController.clear();
-      setState(() {});
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final linkToken = _textController.text.trim();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Mesh Example App')),
       body: SafeArea(
@@ -68,7 +61,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 32),
                 FilledButton(
-                  onPressed: _onButtonPressed,
+                  onPressed: linkToken.isEmpty
+                      ? null
+                      : () => _showMeshLinkPage(linkToken),
                   child: const Text('Start'),
                 ),
               ],
@@ -80,6 +75,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _showMeshLinkPage(String linkToken) async {
+    // Clear TextField
+    _textController.clear();
+    setState(() {});
+
+    // Show MeshSdk
     final result = await MeshSdk.show(
       context,
       configuration: MeshConfiguration(
