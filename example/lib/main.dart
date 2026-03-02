@@ -1,4 +1,6 @@
 // ignore_for_file: avoid_print
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
 
@@ -12,6 +14,8 @@ class MeshExampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      locale: const Locale('fr'), // non-supported locale should fallback to en
+      supportedLocales: MeshLocalizations.supportedLocales,
       localizationsDelegates: MeshLocalizations.localizationsDelegates,
       theme: ThemeData.from(
         colorScheme: const ColorScheme.dark(primary: Color(0xFFFAFF6E)),
@@ -31,10 +35,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _textController = TextEditingController();
 
+  void _onButtonPressed() {
+    final linkToken = _textController.text.trim();
+    if (linkToken.isNotEmpty) {
+      unawaited(_showMeshLinkPage(linkToken));
+      _textController.clear();
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final linkToken = _textController.text.trim();
-
     return Scaffold(
       appBar: AppBar(title: const Text('Mesh Example App')),
       body: SafeArea(
@@ -57,9 +68,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 32),
                 FilledButton(
-                  onPressed: linkToken.isEmpty
-                      ? null
-                      : () => _showMeshLinkPage(linkToken),
+                  onPressed: _onButtonPressed,
                   child: const Text('Start'),
                 ),
               ],
