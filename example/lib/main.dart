@@ -12,6 +12,7 @@ class MeshExampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      supportedLocales: MeshLocalizations.supportedLocales,
       localizationsDelegates: MeshLocalizations.localizationsDelegates,
       theme: ThemeData.from(
         colorScheme: const ColorScheme.dark(primary: Color(0xFFFAFF6E)),
@@ -71,6 +72,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _showMeshLinkPage(String linkToken) async {
+    // Clear TextField
+    _textController.clear();
+    setState(() {});
+
+    // Show MeshSdk
     final result = await MeshSdk.show(
       context,
       configuration: MeshConfiguration(

@@ -6,6 +6,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'mesh_localizations_en.dart';
+import 'mesh_localizations_es.dart';
+import 'mesh_localizations_pt.dart';
 
 // ignore_for_file: type=lint
 
@@ -92,7 +94,11 @@ abstract class MeshLocalizations {
       ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('en')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en'),
+    Locale('es'),
+    Locale('pt'),
+  ];
 
   /// No description provided for @exitDialogTitle.
   ///
@@ -132,7 +138,7 @@ class _MeshLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en'].contains(locale.languageCode);
+      <String>['en', 'es', 'pt'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_MeshLocalizationsDelegate old) => false;
@@ -143,6 +149,10 @@ MeshLocalizations lookupMeshLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return MeshLocalizationsEn();
+    case 'es':
+      return MeshLocalizationsEs();
+    case 'pt':
+      return MeshLocalizationsPt();
   }
 
   throw FlutterError(
