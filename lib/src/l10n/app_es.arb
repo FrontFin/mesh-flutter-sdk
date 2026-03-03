@@ -1,0 +1,6 @@
+{
+  "exitDialogTitle": "¿Estás seguro de que quieres salir?",
+  "exitDialogMessage": "Tu progreso se perderá.",
+  "exit": "Salir",
+  "cancel": "Cancelar"
+}

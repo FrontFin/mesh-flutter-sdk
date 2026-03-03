@@ -7,16 +7,17 @@ import 'package:mesh_sdk_flutter/src/ui/widget/mesh_link_nav_bar.dart';
 
 void main() {
   group('ExitDialog', () {
-    Widget buildTestApp({required VoidCallback onConfirm}) {
+    Widget buildTestApp({VoidCallback? onConfirm, Locale? locale}) {
       return MaterialApp(
         localizationsDelegates: MeshLocalizations.localizationsDelegates,
         supportedLocales: MeshLocalizations.supportedLocales,
+        locale: locale,
         home: Scaffold(
           body: Builder(
             builder: (context) => FilledButton(
               onPressed: () => showDialog<void>(
                 context: context,
-                builder: (_) => ExitDialog(onConfirm: onConfirm),
+                builder: (_) => ExitDialog(onConfirm: onConfirm ?? () {}),
               ),
               child: const Text('Show Dialog'),
             ),
@@ -26,7 +27,7 @@ void main() {
     }
 
     testWidgets('renders title and message', (tester) async {
-      await tester.pumpWidget(buildTestApp(onConfirm: () {}));
+      await tester.pumpWidget(buildTestApp());
       await tester.tap(find.text('Show Dialog'));
       await tester.pumpAndSettle();
 
@@ -36,8 +37,41 @@ void main() {
       expect(find.text('Cancel'), findsOneWidget);
     });
 
+    testWidgets('renders title and message, fall back to `en`', (tester) async {
+      await tester.pumpWidget(buildTestApp(locale: const Locale('ww')));
+      await tester.tap(find.text('Show Dialog'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Are you sure you want to exit?'), findsOneWidget);
+      expect(find.text('Your progress will be lost.'), findsOneWidget);
+      expect(find.text('Exit'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
+    });
+
+    testWidgets('renders title and message in `es`', (tester) async {
+      await tester.pumpWidget(buildTestApp(locale: const Locale('es')));
+      await tester.tap(find.text('Show Dialog'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('¿Estás seguro de que quieres salir?'), findsOneWidget);
+      expect(find.text('Tu progreso se perderá.'), findsOneWidget);
+      expect(find.text('Salir'), findsOneWidget);
+      expect(find.text('Cancelar'), findsOneWidget);
+    });
+
+    testWidgets('renders title and message in `pt`', (tester) async {
+      await tester.pumpWidget(buildTestApp(locale: const Locale('pt')));
+      await tester.tap(find.text('Show Dialog'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Tem certeza de que deseja sair?'), findsOneWidget);
+      expect(find.text('Seu progresso será perdido.'), findsOneWidget);
+      expect(find.text('Sair'), findsOneWidget);
+      expect(find.text('Cancelar'), findsOneWidget);
+    });
+
     testWidgets('cancel button dismisses dialog', (tester) async {
-      await tester.pumpWidget(buildTestApp(onConfirm: () {}));
+      await tester.pumpWidget(buildTestApp());
       await tester.tap(find.text('Show Dialog'));
       await tester.pumpAndSettle();
 
