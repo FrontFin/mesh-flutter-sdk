@@ -80,11 +80,8 @@ class _HomePageState extends State<HomePage> {
     final result = await MeshSdk.show(
       context,
       configuration: MeshConfiguration(
-        // Use 'system' to follow device locale, or e.g. 'en', 'ru'
         language: 'system',
-        // Fiat currency for displaying amounts in Link UI (e.g. 'USD', 'EUR')
         displayFiatCurrency: 'USD',
-        // Follow device light/dark mode, or use ThemeMode.light / ThemeMode.dark
         theme: ThemeMode.system,
         integrationAccessTokens: const [
           IntegrationAccessToken(
