@@ -1,6 +1,4 @@
 // ignore_for_file: avoid_print
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
 

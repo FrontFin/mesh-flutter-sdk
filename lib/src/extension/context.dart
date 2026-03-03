@@ -8,7 +8,11 @@ extension BuildContextX on BuildContext {
     if (l10n != null) {
       return l10n;
     }
-    final locale = Localizations.localeOf(this);
+    final locale = Localizations.maybeLocaleOf(this);
+    if (locale == null) {
+      // No locale could be determined; fall back to default English.
+      return MeshLocalizationsEn('en');
+    }
     final isSupported = MeshLocalizations.supportedLocales.any(
       (supported) => supported.languageCode == locale.languageCode,
     );
@@ -19,6 +23,7 @@ extension BuildContextX on BuildContext {
         'MeshLocalizations.delegate?',
       );
     }
+    // No supported locale found; fall back to default English.
     return MeshLocalizationsEn('en');
   }
 }

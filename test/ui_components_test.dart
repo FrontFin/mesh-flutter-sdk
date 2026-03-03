@@ -37,7 +37,7 @@ void main() {
       expect(find.text('Cancel'), findsOneWidget);
     });
 
-    testWidgets('renders title and message, fallbacks to `en`', (tester) async {
+    testWidgets('renders title and message, fall back to `en`', (tester) async {
       await tester.pumpWidget(buildTestApp(locale: const Locale('ww')));
       await tester.tap(find.text('Show Dialog'));
       await tester.pumpAndSettle();
