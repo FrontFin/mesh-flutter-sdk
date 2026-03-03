@@ -4,6 +4,21 @@ import 'package:mesh_sdk_flutter/src/l10n/mesh_localizations_en.dart';
 
 extension BuildContextX on BuildContext {
   MeshLocalizations get l10n {
-    return MeshLocalizations.of(this) ?? MeshLocalizationsEn('en');
+    final l10n = MeshLocalizations.of(this);
+    if (l10n != null) {
+      return l10n;
+    }
+    final locale = Localizations.localeOf(this);
+    final isSupported = MeshLocalizations.supportedLocales.any(
+      (supported) => supported.languageCode == locale.languageCode,
+    );
+    if (isSupported) {
+      throw Exception(
+        'MeshLocalizations for locale `${locale.languageCode}` is supported '
+        'but not available. Did you forget to register '
+        'MeshLocalizations.delegate?',
+      );
+    }
+    return MeshLocalizationsEn('en');
   }
 }

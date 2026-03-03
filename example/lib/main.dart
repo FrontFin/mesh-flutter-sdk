@@ -14,7 +14,6 @@ class MeshExampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      locale: const Locale('fr'), // non-supported locale should fallback to en
       supportedLocales: MeshLocalizations.supportedLocales,
       localizationsDelegates: MeshLocalizations.localizationsDelegates,
       theme: ThemeData.from(
