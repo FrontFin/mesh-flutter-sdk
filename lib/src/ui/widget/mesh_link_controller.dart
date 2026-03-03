@@ -59,9 +59,9 @@ class MeshLinkController {
     await _webViewController?.runJavaScript('window.history.go(-1)');
   }
 
-  /// Resolves the language to pass as [lng]. When [language] is "system",
-  /// uses the device (platform) locale so the Link UI follows the system language
-  /// even if the host app only supports a subset of locales.
+  /// Resolves the language to pass as `lng`. When `language` is "system",
+  /// uses the device (platform) locale so the Link UI follows the system
+  /// language even if the host app only supports a subset of locales.
   static String _resolveLanguage(BuildContext context, String language) {
     if (language == 'system') {
       final locale = WidgetsBinding.instance.platformDispatcher.locale;
@@ -70,7 +70,7 @@ class MeshLinkController {
     return language;
   }
 
-  /// Converts [ThemeMode] to the [th] query param value used by the link URL.
+  /// Converts [ThemeMode] to the `th` query param value used by the link URL.
   static String _themeToQueryParam(ThemeMode theme) {
     return switch (theme) {
       ThemeMode.light => 'light',
@@ -79,10 +79,10 @@ class MeshLinkController {
     };
   }
 
-  /// Initialize the controller using [configuration].
-  /// This will parse the [MeshConfiguration.linkToken],
-  /// initialize the [WebViewController] with all the callbacks, configuration,
-  /// and additional JavaScript code, and initialize the style.
+  /// Initialize the controller using [configuration]. This will parse
+  /// [MeshConfiguration.linkToken], initialize the [WebViewController] with
+  /// all the callbacks, configuration, and additional JavaScript code, and
+  /// initialize the style.
   Future<void> init(BuildContext context) async {
     try {
       final url = String.fromCharCodes(base64Decode(configuration.linkToken));

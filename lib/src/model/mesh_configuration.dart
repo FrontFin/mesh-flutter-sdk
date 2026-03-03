@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mesh_sdk_flutter/src/model/integration/integration_connected_payload.dart';
 import 'package:mesh_sdk_flutter/src/model/integration_access_token.dart';
@@ -33,11 +32,12 @@ class MeshConfiguration {
   final String language;
 
   /// Fiat currency code for displaying crypto amounts in Link UI (e.g. "USD").
-  /// Passed as [fiatCur] in the link URL. When null, the link token default is used.
+  /// Passed as `fiatCur` in the link URL. When null, the link token default
+  /// is used.
   final String? displayFiatCurrency;
 
-  /// Link UI theme. When set, passed as [th] in the link URL and used for native chrome.
-  /// When null, theme from the link token (link_style) is used.
+  /// Link UI theme. When set, passed as `th` in the link URL and used for
+  /// native chrome. When null, theme from the link token (link_style) is used.
   final ThemeMode? theme;
 
   /// Whether to check domains against our whitelist. Defaults to true.
