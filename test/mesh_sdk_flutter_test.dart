@@ -97,6 +97,105 @@ void main() {
 
       expect(webViewController.requestUri, Uri.parse('$rawUrl?lng=de'));
     });
+
+    testWidgets('language: "system" resolves to platform locale', (
+      tester,
+    ) async {
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        language: 'system',
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      final expectedLng =
+          WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+      expect(
+        webViewController.requestUri?.queryParameters['lng'],
+        expectedLng,
+      );
+      expect(webViewController.requestUri?.path, Uri.parse(rawUrl).path);
+    });
+  });
+
+  group('URL query parameters', () {
+    testWidgets('displayFiatCurrency adds fiatCur to request URI', (
+      tester,
+    ) async {
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        displayFiatCurrency: 'EUR',
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(webViewController.requestUri?.queryParameters['lng'], 'en');
+      expect(webViewController.requestUri?.queryParameters['fiatCur'], 'EUR');
+    });
+
+    testWidgets('theme adds th=light to request URI', (tester) async {
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        theme: ThemeMode.light,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(webViewController.requestUri?.queryParameters['th'], 'light');
+    });
+
+    testWidgets('theme adds th=dark to request URI', (tester) async {
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        theme: ThemeMode.dark,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(webViewController.requestUri?.queryParameters['th'], 'dark');
+    });
+
+    testWidgets('theme adds th=system to request URI', (tester) async {
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        theme: ThemeMode.system,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(webViewController.requestUri?.queryParameters['th'], 'system');
+    });
+
+    testWidgets('configuration theme (th) takes precedence over link_style', (
+      tester,
+    ) async {
+      final linkStyleJson = '{"th":"dark"}';
+      final linkStyleEncoded = base64Encode(utf8.encode(linkStyleJson));
+      final urlWithLinkStyle =
+          'https://test_linktoken?link_style=$linkStyleEncoded';
+      final tokenWithLinkStyle = base64Encode(utf8.encode(urlWithLinkStyle));
+
+      final configuration = MeshConfiguration(
+        linkToken: tokenWithLinkStyle,
+        theme: ThemeMode.light,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(webViewController.requestUri?.queryParameters['th'], 'light');
+    });
   });
 
   group('Domain Whitelist', () {

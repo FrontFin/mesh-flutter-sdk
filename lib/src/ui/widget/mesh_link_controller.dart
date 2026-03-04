@@ -62,7 +62,7 @@ class MeshLinkController {
   /// Resolves the language to pass as `lng`. When `language` is "system",
   /// uses the device (platform) locale so the Link UI follows the system
   /// language even if the host app only supports a subset of locales.
-  static String _resolveLanguage(BuildContext context, String language) {
+  static String _resolveLanguage(String language) {
     if (language == 'system') {
       final locale = WidgetsBinding.instance.platformDispatcher.locale;
       return locale.languageCode;
@@ -87,7 +87,7 @@ class MeshLinkController {
     try {
       final url = String.fromCharCodes(base64Decode(configuration.linkToken));
       final parsedUri = Uri.parse(url);
-      final lng = _resolveLanguage(context, configuration.language);
+      final lng = _resolveLanguage(configuration.language);
       final queryParams = <String, String>{
         ...parsedUri.queryParameters,
         'lng': lng,
@@ -207,12 +207,12 @@ class MeshLinkController {
       themeMode = configuration.theme!;
     } else {
       final linkStyleParam = uri.queryParameters['link_style'];
-      final linkStyleString = linkStyleParam == null
+      final linkStyleBytes = linkStyleParam == null
           ? null
           : base64Decode(linkStyleParam);
-      final linkStyleJson = linkStyleString == null
+      final linkStyleJson = linkStyleBytes == null
           ? null
-          : json.decode(utf8.decode(linkStyleString));
+          : json.decode(utf8.decode(linkStyleBytes));
       final linkStyle = linkStyleJson is Map<String, dynamic>
           ? LinkStyle.fromJson(linkStyleJson)
           : LinkStyle.fromJson(const {});
