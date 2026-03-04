@@ -87,11 +87,9 @@ const _whitelistedOrigins = [
   'https://front-b2b-api-test.azurewebsites.net',
   'https://web.getfront.com',
   'https://web.meshconnect.com',
-  'https://applink.robinhood.com',
   'https://m.stripe.network',
   'https://js.stripe.com',
   'https://app.usercentrics.eu',
-  'robinhood://',
   'https://ramp.revolut.codes',
   'https://sso.revolut.codes',
   'https://ramp.revolut.com',
@@ -106,6 +104,7 @@ const _externallyOpenedOrigins = [
   'https://api.cb-device-intelligence.com',
   'https://sandbox.meshconnect.com/authorize/Coinbase',
   'https://wallet.uphold.com',
+  'https://applink.robinhood.com',
 ];
 
 const _exodusSchema = 'exodus';
