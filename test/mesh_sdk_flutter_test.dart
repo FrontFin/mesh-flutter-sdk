@@ -176,7 +176,7 @@ void main() {
     testWidgets('configuration theme (th) takes precedence over link_style', (
       tester,
     ) async {
-      final linkStyleJson = '{"th":"dark"}';
+      const linkStyleJson = '{"th":"dark"}';
       final linkStyleEncoded = base64Encode(utf8.encode(linkStyleJson));
       final urlWithLinkStyle =
           'https://test_linktoken?link_style=$linkStyleEncoded';
