@@ -105,6 +105,7 @@ const _externallyOpenedOrigins = [
   'https://sandbox.meshconnect.com/authorize/Coinbase',
   'https://wallet.uphold.com',
   'https://applink.robinhood.com',
+  'https://go.rabby.io/mobile',
 ];
 
 const _exodusSchema = 'exodus';
