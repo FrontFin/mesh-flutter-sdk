@@ -104,6 +104,8 @@ const _externallyOpenedOrigins = [
   'https://www.coinbase.com',
   'https://login.coinbase.com',
   'https://api.cb-device-intelligence.com',
+  'https://sandbox.meshconnect.com/authorize/Coinbase',
+  'https://wallet.uphold.com',
 ];
 
 const _exodusSchema = 'exodus';
