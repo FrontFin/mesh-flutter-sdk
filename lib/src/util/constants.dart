@@ -95,20 +95,25 @@ const _whitelistedOrigins = [
   'https://ramp.revolut.com',
 ];
 
+// dart format off
 const _externallyOpenedOrigins = [
-  'https://link.trustwallet.com',
+  'https://link.trustwallet.com',   // Trust Wallet
+  'https://wallet.uphold.com',      // Uphold
+  'https://applink.robinhood.com',  // Robinhood Connect
+  'https://go.rabby.io/mobile',     // Rabby
+  'https://app.binance.com',        // Binance Connect
+  'https://web3.okx.com',           // Okx
+  'https://metamask.app.link',      // MetaMask
+  'https://phantom.app',            // Phantom
+  'https://solflare.com',           // Solflare
+  'https://coinbase.com',           // Coinbase
+  'https://www.coinbase.com',       // Coinbase
+  'https://login.coinbase.com',     // Coinbase
+  'https://sandbox.meshconnect.com/authorize/Coinbase', // Coinbase on Sandbox
   'https://appopener.meshconnect.com',
-  'https://coinbase.com',
-  'https://www.coinbase.com',
-  'https://login.coinbase.com',
   'https://api.cb-device-intelligence.com',
-  'https://sandbox.meshconnect.com/authorize/Coinbase',
-  'https://wallet.uphold.com',
-  'https://applink.robinhood.com',
-  'https://go.rabby.io/mobile',
-  'https://app.binance.com',
-  'https://web3.okx.com',
 ];
+// dart format on
 
 const _exodusSchema = 'exodus';
 const _exodusPlayStoreUrl =

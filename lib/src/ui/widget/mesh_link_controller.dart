@@ -318,10 +318,9 @@ class MeshLinkController {
 
   bool _isAppUrlChange(String url) {
     final uri = Uri.parse(url);
+
     if (defaultTargetPlatform == TargetPlatform.android) {
-      if (url.startsWith('https://solflare.com/ul/v1/browse/') ||
-          url.startsWith('https://phantom.com/ul/browse/') ||
-          uri.scheme == 'exodus' ||
+      if (uri.scheme == 'exodus' ||
           uri.host == 'market' ||
           uri.host == 'intent') {
         return true;
