@@ -107,6 +107,7 @@ const _externallyOpenedOrigins = [
   'https://applink.robinhood.com',
   'https://go.rabby.io/mobile',
   'https://app.binance.com',
+  'https://web3.okx.com',
 ];
 
 const _exodusSchema = 'exodus';
