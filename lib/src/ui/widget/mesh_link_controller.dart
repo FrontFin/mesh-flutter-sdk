@@ -60,7 +60,7 @@ class MeshLinkController {
     await _webViewController?.runJavaScript('window.history.go(-1)');
   }
 
-  /// Initialize the controller using [configuration]. 
+  /// Initialize the controller using [configuration].
   Future<void> init(BuildContext context) async {
     try {
       final uri = buildLinkUri(configuration);
@@ -313,5 +313,4 @@ class MeshLinkController {
 
     await _webViewController!.runJavaScript(stringBuffer.toString());
   }
-
 }
