@@ -27,17 +27,17 @@ class MeshConfiguration {
   /// To get a link token, use Mesh API.
   final String linkToken;
 
-  /// Language code for the Mesh Link. Defaults to "en".
-  /// Use "system" to follow the device/app locale (consistent with Web SDK).
+  
+  /// Link UI language. Supported: 'en', 'es', 'pt'. If not passed, defaults to
+  /// 'en'.
   final String language;
 
-  /// Fiat currency code for displaying crypto amounts in Link UI (e.g. "USD").
-  /// Passed as `fiatCur` in the link URL. When null, the link token default
-  /// is used.
+  /// The currency to display a fiat equivalent of the crypto amount in Link UI.
+  /// Passed as `fiatCur` in the link URL.
+  /// Default: 'USD'
   final String? displayFiatCurrency;
 
-  /// Link UI theme. When set, passed as `th` in the link URL and used for
-  /// native chrome. When null, theme from the link token (link_style) is used.
+  /// Link UI theme. Possible values: 'dark', 'light' and 'system'.
   final ThemeMode? theme;
 
   /// Whether to check domains against our whitelist. Defaults to true.
