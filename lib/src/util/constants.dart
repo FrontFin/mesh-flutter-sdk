@@ -106,6 +106,7 @@ const _externallyOpenedOrigins = [
   'https://wallet.uphold.com',
   'https://applink.robinhood.com',
   'https://go.rabby.io/mobile',
+  'https://app.binance.com',
 ];
 
 const _exodusSchema = 'exodus';
