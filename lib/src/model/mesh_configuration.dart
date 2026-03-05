@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:mesh_sdk_flutter/src/model/integration/integration_connected_payload.dart';
 import 'package:mesh_sdk_flutter/src/model/integration_access_token.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
@@ -13,6 +13,8 @@ class MeshConfiguration {
   const MeshConfiguration({
     required this.linkToken,
     this.language = _defaultLanguage,
+    this.displayFiatCurrency,
+    this.theme,
     this.isDomainWhitelistEnabled = true,
     this.integrationAccessTokens = const [],
     this.onSuccess,
@@ -25,8 +27,17 @@ class MeshConfiguration {
   /// To get a link token, use Mesh API.
   final String linkToken;
 
-  /// Language code for the Mesh Link. Defaults to "en".
+  /// Link UI language. Supported: 'en', 'es', 'pt'. If not passed, defaults to
+  /// 'en'.
   final String language;
+
+  /// The currency to display a fiat equivalent of the crypto amount in Link UI.
+  /// Passed as `fiatCur` in the link URL.
+  /// Default: 'USD'
+  final String? displayFiatCurrency;
+
+  /// Link UI theme. Possible values: 'dark', 'light' and 'system'.
+  final ThemeMode? theme;
 
   /// Whether to check domains against our whitelist. Defaults to true.
   final bool isDomainWhitelistEnabled;
