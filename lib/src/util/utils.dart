@@ -16,7 +16,7 @@ bool isAppUrlChange(String url) {
   }
 
   if (defaultTargetPlatform == TargetPlatform.iOS) {
-    if (uri.host == 'apps.apple.com' || uri.host == 'itms-appss') {
+    if (uri.host == 'apps.apple.com' || uri.scheme == 'itms-apps') {
       return true;
     }
   }

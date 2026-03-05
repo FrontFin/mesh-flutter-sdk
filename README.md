@@ -75,7 +75,7 @@ Future<void> _showMeshLinkPage(String linkToken) async {
       onEvent: (event) {
         print('Mesh event: $event');
       },
-      onExit: (errorType) {
+      onError: (errorType) {
         print('Mesh exit: $errorType');
       },
       onIntegrationConnected: (integration) {
@@ -105,13 +105,13 @@ Here's what you can configure in the `MeshConfiguration`:
 | Parameter                  | Type                                       | Required | description                                                                                                     |
 | -------------------------- | ------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------- |
 | `linkToken`                | `String`                                   | ✅       | Link token obtained from the backend.                                                                           |
-| `language`                 | `String`                                   |          | Language for the Link UI (e.g. `"en"`, `"ru"`). Use `"system"` to follow the device locale. Defaults to `"en"`. |
+| `language`                 | `String`                                   |          | Link UI language. Supported: `"en"`, `"es"`, `"pt"`. Use `"system"` to follow the device locale. Defaults to `"en"`. |
 | `displayFiatCurrency`      | `String?`                                  |          | Fiat currency code for displaying amounts in Link UI (e.g. `"USD"`). Passed as `fiatCur` in the link URL.       |
 | `theme`                    | `ThemeMode?`                               |          | Link UI theme (`ThemeMode.light`, `ThemeMode.dark`, or `ThemeMode.system`). Passed as `th` in the link URL.     |
 | `isDomainWhitelistEnabled` | `bool`                                     |          | If domain should be checked against our whitelist. Defaults to `true`.                                          |
 | `integrationAccessTokens`  | `List<IntegrationAccessToken>`             |          | List of cached `IntegrationAccessToken`s that you can pass, so users don't need to connect every time.          |
 | `onError`                  | `ValueChanged<MeshErrorType>?`             |          | Error callback with a `MeshErrorType` that describes the error.                                                 |
-| `onSuccess`                | `ValueChanged<MeshSuccess>?`               |          | Success callback with `SuccessPayload` that contains more info about the transfer or integration.               |
+| `onSuccess`                | `ValueChanged<SuccessPayload>?`            |          | Callback when the Mesh Link completes successfully. See [SuccessPayload] for details (transfer/integration info).  |
 | `onEvent`                  | `ValueChanged<MeshEvent>?`                 |          | Callback for when an event is triggered.                                                                        |
 | `onIntegrationConnected`   | `ValueChanged<IntegrationConnectedEvent>?` |          | Callback for when an integration is connected. Use this to store the access token.                              |
 | `onTransferFinished`       | `ValueChanged<TransferFinishedEvent>?`     |          | Callback for when a crypto transfer is executed.                                                                |
