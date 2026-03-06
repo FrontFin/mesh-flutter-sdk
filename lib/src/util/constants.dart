@@ -16,18 +16,7 @@ bool isWhitelistedOrigin(String url) {
         return host.endsWith(root) && host.length > root.length;
       }
 
-      if (origin.startsWith('https://')) {
-        // Full URL, e.g. "https://meshconnect.com"
-        return url.startsWith(origin);
-      }
-
-      if (origin.endsWith('://')) {
-        // Custom scheme, e.g. "robinhood://"
-        return url.startsWith(origin);
-      }
-
-      logger.severe('Invalid origin format: $origin');
-      return false;
+      return url.startsWith(origin);
     });
   } catch (e) {
     return false;
