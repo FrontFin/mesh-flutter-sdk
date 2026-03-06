@@ -87,6 +87,7 @@ const _whitelistedOrigins = [
   'https://front-b2b-api-test.azurewebsites.net',
   'https://web.getfront.com',
   'https://web.meshconnect.com',
+  'https://applink.robinhood.com',
   'https://m.stripe.network',
   'https://js.stripe.com',
   'https://app.usercentrics.eu',
@@ -99,7 +100,6 @@ const _whitelistedOrigins = [
 const _externallyOpenedOrigins = [
   'https://link.trustwallet.com',   // Trust Wallet
   'https://wallet.uphold.com',      // Uphold
-  'https://applink.robinhood.com',  // Robinhood Connect
   'https://go.rabby.io/mobile',     // Rabby
   'https://app.binance.com',        // Binance Connect
   'https://web3.okx.com',           // Okx
