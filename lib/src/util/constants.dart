@@ -101,6 +101,8 @@ const _externallyOpenedOrigins = [
   'https://sandbox.meshconnect.com/authorize/Coinbase', // Coinbase on Sandbox
   'https://appopener.meshconnect.com',
   'https://api.cb-device-intelligence.com',
+  'https://exodus.com/m'
+  //'exodus://'
 ];
 // dart format on
 
