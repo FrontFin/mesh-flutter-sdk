@@ -30,6 +30,12 @@ void main() {
         ),
         isTrue,
       );
+      expect(
+        isExternallyOpenedOrigin(
+          'https://exodus.com/m/wc?uri=wc%3A935389b9989400492b52a78a14f5a514',
+        ),
+        isTrue,
+      );
     });
 
     test('Returns false for about:blank', () {
