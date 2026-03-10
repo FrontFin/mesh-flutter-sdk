@@ -16,18 +16,7 @@ bool isWhitelistedOrigin(String url) {
         return host.endsWith(root) && host.length > root.length;
       }
 
-      if (origin.startsWith('https://')) {
-        // Full URL, e.g. "https://meshconnect.com"
-        return url.startsWith(origin);
-      }
-
-      if (origin.endsWith('://')) {
-        // Custom scheme, e.g. "robinhood://"
-        return url.startsWith(origin);
-      }
-
-      logger.severe('Invalid origin format: $origin');
-      return false;
+      return url.startsWith(origin);
     });
   } catch (e) {
     return false;
@@ -91,20 +80,30 @@ const _whitelistedOrigins = [
   'https://m.stripe.network',
   'https://js.stripe.com',
   'https://app.usercentrics.eu',
-  'robinhood://',
   'https://ramp.revolut.codes',
   'https://sso.revolut.codes',
   'https://ramp.revolut.com',
 ];
 
+// dart format off
 const _externallyOpenedOrigins = [
-  'https://link.trustwallet.com',
+  'https://link.trustwallet.com',   // Trust Wallet
+  'https://wallet.uphold.com',      // Uphold
+  'https://go.rabby.io/mobile',     // Rabby
+  'https://app.binance.com',        // Binance Connect
+  'https://web3.okx.com',           // Okx
+  'https://metamask.app.link',      // MetaMask
+  'https://phantom.app',            // Phantom
+  'https://solflare.com',           // Solflare
+  'https://coinbase.com',           // Coinbase
+  'https://www.coinbase.com',       // Coinbase
+  'https://login.coinbase.com',     // Coinbase
+  'https://sandbox.meshconnect.com/authorize/Coinbase', // Coinbase on Sandbox
   'https://appopener.meshconnect.com',
-  'https://coinbase.com',
-  'https://www.coinbase.com',
-  'https://login.coinbase.com',
   'https://api.cb-device-intelligence.com',
+  'https://exodus.com/m/',  // trailing slash to avoid matching e.g. /malicious
 ];
+// dart format on
 
 const _exodusSchema = 'exodus';
 const _exodusPlayStoreUrl =

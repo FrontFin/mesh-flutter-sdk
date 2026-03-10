@@ -130,15 +130,15 @@ class MeshLinkController {
               return NavigationDecision.prevent;
             }
 
-            if (configuration.isDomainWhitelistEnabled &&
-                !isWhitelistedOrigin(navigation.url)) {
-              logger.severe('Blocked navigation to: ${navigation.url}');
-              return NavigationDecision.prevent;
-            }
-
             if (isAppUrlChange(navigation.url)) {
               logger.info('Opening app link: $uri');
               unawaited(_launchExternalUri(uri, isApp: true));
+              return NavigationDecision.prevent;
+            }
+
+            if (configuration.isDomainWhitelistEnabled &&
+                !isWhitelistedOrigin(navigation.url)) {
+              logger.severe('Blocked navigation to: ${navigation.url}');
               return NavigationDecision.prevent;
             }
 

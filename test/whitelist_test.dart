@@ -17,12 +17,8 @@ void main() {
     });
 
     test('Returns true for wildcard origins', () {
-      expect(isWhitelistedOrigin('https://subdomain.meshconnect.com'), isTrue);
-      expect(isWhitelistedOrigin('https://subdomain.getfront.com'), isTrue);
-    });
-
-    test('returns true for custom schemes', () {
-      expect(isWhitelistedOrigin('robinhood://'), isTrue);
+      expect(isWhitelistedOrigin('https://preview1.meshconnect.com'), isTrue);
+      expect(isWhitelistedOrigin('https://preview2.getfront.com'), isTrue);
     });
 
     test('Returns true for about:blank', () {
