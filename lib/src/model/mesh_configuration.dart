@@ -27,12 +27,11 @@ class MeshConfiguration {
   /// To get a link token, use Mesh API.
   final String linkToken;
 
-  /// Link UI language. Supported: 'en', 'es', 'pt'. If not passed, defaults to
-  /// 'en'.
+  /// Link UI language. Supported: 'en', 'es', 'pt'.
+  /// Default: 'en'.
   final String language;
 
   /// The currency to display a fiat equivalent of the crypto amount in Link UI.
-  /// Passed as `fiatCur` in the link URL.
   /// Default: 'USD'
   final String? displayFiatCurrency;
 

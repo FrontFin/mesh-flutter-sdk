@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mesh_sdk_flutter/src/model/link_style.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
@@ -166,23 +165,7 @@ class MeshLinkController {
   }
 
   void _initStyle(BuildContext context, Uri uri) {
-    // Prefer theme from configuration (th param) over link_style from token.
-    final ThemeMode themeMode;
-    if (configuration.theme != null) {
-      themeMode = configuration.theme!;
-    } else {
-      final linkStyleParam = uri.queryParameters['link_style'];
-      final linkStyleBytes = linkStyleParam == null
-          ? null
-          : base64Decode(linkStyleParam);
-      final linkStyleJson = linkStyleBytes == null
-          ? null
-          : json.decode(utf8.decode(linkStyleBytes));
-      final linkStyle = linkStyleJson is Map<String, dynamic>
-          ? LinkStyle.fromJson(linkStyleJson)
-          : LinkStyle.fromJson(const {});
-      themeMode = linkStyle.theme;
-    }
+    final themeMode = getThemeModeFromUri(uri, configuration.theme);
 
     final brightness = switch (themeMode) {
       ThemeMode.light => Brightness.light,
