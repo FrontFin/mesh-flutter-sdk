@@ -10,10 +10,11 @@ import 'package:mesh_sdk_flutter/src/model/mesh_internal_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
 import 'package:mesh_sdk_flutter/src/model/success/success.dart';
 import 'package:mesh_sdk_flutter/src/ui/theme.dart';
+import 'package:mesh_sdk_flutter/src/util/app_url.dart';
 import 'package:mesh_sdk_flutter/src/util/constants.dart';
 import 'package:mesh_sdk_flutter/src/util/link_uri.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
-import 'package:mesh_sdk_flutter/src/util/utils.dart';
+import 'package:mesh_sdk_flutter/src/util/theme.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -165,9 +166,9 @@ class MeshLinkController {
   }
 
   void _initStyle(BuildContext context, Uri uri) {
-    final themeMode = getThemeModeFromUri(uri, configuration.theme);
+    final theme = resolveTheme(uri, configuration.theme);
 
-    final brightness = switch (themeMode) {
+    final brightness = switch (theme) {
       ThemeMode.light => Brightness.light,
       ThemeMode.dark => Brightness.dark,
       ThemeMode.system => MediaQuery.platformBrightnessOf(context),
