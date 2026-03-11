@@ -20,8 +20,9 @@ void main() {
       expect(result, isNot('system'));
     });
 
-    testWidgets('system returns the platform locale language code',
-        (tester) async {
+    testWidgets('system returns the platform locale language code', (
+      tester,
+    ) async {
       final platformLocale =
           tester.binding.platformDispatcher.locale.languageCode;
       expect(resolveLanguage('system'), platformLocale);

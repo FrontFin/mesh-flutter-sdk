@@ -13,11 +13,11 @@ MeshConfiguration _config({
   String? displayFiatCurrency,
   ThemeMode? theme,
 }) => MeshConfiguration(
-      linkToken: _encodeToken(url),
-      language: language,
-      displayFiatCurrency: displayFiatCurrency,
-      theme: theme,
-    );
+  linkToken: _encodeToken(url),
+  language: language,
+  displayFiatCurrency: displayFiatCurrency,
+  theme: theme,
+);
 
 void main() {
   group('buildLinkUri', () {

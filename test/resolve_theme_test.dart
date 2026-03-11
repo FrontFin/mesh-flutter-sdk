@@ -65,11 +65,13 @@ void main() {
     });
 
     group('no link_style param', () {
-      test('returns system when no link_style param and no configurationTheme',
-          () {
-        final uri = Uri.parse('https://example.com');
-        expect(resolveTheme(uri, null), ThemeMode.system);
-      });
+      test(
+        'returns system when no link_style param and no configurationTheme',
+        () {
+          final uri = Uri.parse('https://example.com');
+          expect(resolveTheme(uri, null), ThemeMode.system);
+        },
+      );
     });
   });
 }
