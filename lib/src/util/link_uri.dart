@@ -8,7 +8,7 @@ import 'package:mesh_sdk_flutter/src/util/language.dart';
 Uri buildLinkUri(MeshConfiguration configuration) {
   final url = String.fromCharCodes(base64Decode(configuration.linkToken));
   final parsedUri = Uri.parse(url);
-  final queryParams = parsedUri.queryParameters;
+  final queryParams = {...parsedUri.queryParameters};
 
   final lng = resolveLanguage(configuration.language);
   queryParams['lng'] = lng;
