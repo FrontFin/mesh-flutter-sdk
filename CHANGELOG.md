@@ -1,4 +1,8 @@
-# 1.0.0
+## 1.1.0
+
+- Enabling system language, fiat currency display, and theme selection through MeshConfiguration.
+
+## 1.0.0
 
 - Added additional externally opened urls to open native apps.
 

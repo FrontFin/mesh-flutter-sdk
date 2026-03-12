@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mesh_sdk_flutter/src/model/link_style.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
@@ -12,8 +10,11 @@ import 'package:mesh_sdk_flutter/src/model/mesh_internal_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
 import 'package:mesh_sdk_flutter/src/model/success/success.dart';
 import 'package:mesh_sdk_flutter/src/ui/theme.dart';
+import 'package:mesh_sdk_flutter/src/util/app_url.dart';
 import 'package:mesh_sdk_flutter/src/util/constants.dart';
+import 'package:mesh_sdk_flutter/src/util/link_uri.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
+import 'package:mesh_sdk_flutter/src/util/theme.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -60,19 +61,9 @@ class MeshLinkController {
   }
 
   /// Initialize the controller using [configuration].
-  /// This will parse the [MeshConfiguration.linkToken],
-  /// initialize the [WebViewController] with all the callbacks, configuration,
-  /// and additional JavaScript code, and initialize the style.
   Future<void> init(BuildContext context) async {
     try {
-      final url = String.fromCharCodes(base64Decode(configuration.linkToken));
-      final parsedUri = Uri.parse(url);
-      final uri = parsedUri.replace(
-        queryParameters: {
-          ...parsedUri.queryParameters,
-          'lng': configuration.language,
-        },
-      );
+      final uri = buildLinkUri(configuration);
 
       await _initWebViewController(uri);
       if (!context.mounted) {
@@ -113,7 +104,7 @@ class MeshLinkController {
             }
 
             final newUri = Uri.parse(newUrl);
-            if (_isAppUrlChange(newUrl)) {
+            if (isAppUrlChange(newUrl)) {
               logger.info('app redirect: $newUri');
               unawaited(_launchExternalUri(newUri, isApp: true));
               return;
@@ -139,7 +130,7 @@ class MeshLinkController {
               return NavigationDecision.prevent;
             }
 
-            if (_isAppUrlChange(navigation.url)) {
+            if (isAppUrlChange(navigation.url)) {
               logger.info('Opening app link: $uri');
               unawaited(_launchExternalUri(uri, isApp: true));
               return NavigationDecision.prevent;
@@ -175,18 +166,9 @@ class MeshLinkController {
   }
 
   void _initStyle(BuildContext context, Uri uri) {
-    final linkStyleParam = uri.queryParameters['link_style'];
-    final linkStyleString = linkStyleParam == null
-        ? null
-        : base64Decode(linkStyleParam);
-    final linkStyleJson = linkStyleString == null
-        ? null
-        : json.decode(utf8.decode(linkStyleString));
-    final linkStyle = linkStyleJson is Map<String, dynamic>
-        ? LinkStyle.fromJson(linkStyleJson)
-        : LinkStyle.fromJson(const {});
+    final theme = resolveTheme(uri, configuration.theme);
 
-    final brightness = switch (linkStyle.theme) {
+    final brightness = switch (theme) {
       ThemeMode.light => Brightness.light,
       ThemeMode.dark => Brightness.dark,
       ThemeMode.system => MediaQuery.platformBrightnessOf(context),
@@ -314,25 +296,5 @@ class MeshLinkController {
     }
 
     await _webViewController!.runJavaScript(stringBuffer.toString());
-  }
-
-  bool _isAppUrlChange(String url) {
-    final uri = Uri.parse(url);
-
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      if (uri.scheme == 'exodus' ||
-          uri.host == 'market' ||
-          uri.host == 'intent') {
-        return true;
-      }
-    }
-
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      if (uri.host == 'apps.apple.com' || uri.host == 'itms-appss') {
-        return true;
-      }
-    }
-
-    return uri.host.endsWith('.app.link');
   }
 }

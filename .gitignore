@@ -29,3 +29,8 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 /build/
 /coverage/
+
+# Example app / local
+example/node_modules/
+example/yarn.lock
+start_ios_simulator.sh

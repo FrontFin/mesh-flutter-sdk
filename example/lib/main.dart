@@ -80,7 +80,9 @@ class _HomePageState extends State<HomePage> {
     final result = await MeshSdk.show(
       context,
       configuration: MeshConfiguration(
-        language: 'en',
+        language: 'system',
+        displayFiatCurrency: 'USD',
+        theme: ThemeMode.system,
         integrationAccessTokens: const [
           IntegrationAccessToken(
             accessToken: 'token',
