@@ -83,7 +83,7 @@ lib/
       dialog/
         exit_confirmation_dialog.dart
     util/
-      link_uri.dart            # Builds the Link URL (base64 token + query params)
+      link_uri.dart            # Decodes base64 linkToken → full URL, merges query params
       constants.dart           # Domain whitelist + externally-opened origins
       language.dart            # Resolves 'system' locale to device language
       logger.dart              # Logging setup
@@ -113,10 +113,10 @@ MeshSdk.show(
 );
 ```
 
-The JS bridge injects into the WebView on init:
+On the `LoadedEvent`, the SDK runs JavaScript to inject context into the page:
 - `window.meshSdkPlatform = 'flutter'` — tells the web UI which SDK is hosting it
 - `window.meshSdkVersion = '<x.y.z>'` — enables backend compatibility checks
-- `window.accessTokens = '<json>'` — cached broker tokens for returning users (skips re-auth)
+- `window.accessTokens = [...]` — JSON array of cached broker tokens for returning users (skips re-auth); only set when `integrationAccessTokens` is non-empty
 
 ---
 
@@ -132,8 +132,8 @@ The Android SDK (`mesh-android-sdk`) does the same thing in Kotlin. The two SDKs
 
 `MeshLinkController` validates all navigation. This is a security boundary — it prevents the WebView from being navigated to malicious domains if the web UI is ever compromised.
 
-- **Whitelisted** (render in WebView): `meshconnect.com`, `walletconnect.org`, `okx.com`, `gemini.com`, `sandbox.coinbase.com`, `walletconnect.com`
-- **Externally opened** (via `url_launcher` → native wallet app): Trust Wallet, MetaMask, Phantom, Coinbase Wallet, OKX Wallet, Ledger Live, Exodus
+- **Whitelisted** (render in WebView): `*.meshconnect.com`, `*.getfront.com`, `*.walletconnect.com`, `*.walletconnect.org`, `*.walletlink.org`, `*.okx.com`, `*.gemini.com`, `*.hcaptcha.com`, `*.robinhood.com`, `*.google.com`, plus explicit URLs for Stripe, Usercentrics, and Revolut. See `lib/src/util/constants.dart` for the authoritative list.
+- **Externally opened** (via `url_launcher` → native app): Trust Wallet, Uphold, Rabby, Binance, OKX, MetaMask, Phantom, Solflare, Coinbase, Exodus. See `_externallyOpenedOrigins` in `constants.dart`.
 - **Everything else**: blocked
 
 Clients can disable the whitelist via `MeshConfiguration` for custom flows, but this is not recommended.

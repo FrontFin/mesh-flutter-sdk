@@ -25,7 +25,7 @@ The SDK hosts the **Mesh Link web UI** (from the `mesh-link` repo — a React ap
 
 1. Client's backend calls `POST /api/v1/linktoken` on the Mesh API → receives a short-lived, scoped link token.
 2. Client app passes the token to `MeshSdk.show()` with callback handlers.
-3. SDK builds a URL (`link.meshconnect.com?linkToken=<base64>`) and loads it in a WebView.
+3. SDK base64-decodes the token into a full URL, appends `lng`/`th`/`fiatCur` query params, and loads it in a WebView.
 4. User completes the flow (connects broker, selects asset/network/amount, executes transfer).
 5. SDK fires the appropriate Dart callback: `onIntegrationConnected`, `onTransferFinished`, `onSuccess`, or `onError`.
 6. Client app handles the result in its own UI.
@@ -79,8 +79,8 @@ Public surface that must stay backwards-compatible:
 
 `MeshLinkController` enforces a domain whitelist on all WebView navigation. This prevents the WebView from being used to load arbitrary content if the web UI is ever compromised.
 
-- **Whitelisted** (render in WebView): `meshconnect.com`, `walletconnect.org`, `okx.com`, `gemini.com`, `sandbox.coinbase.com`
-- **Externally opened** (launch native wallet app): Trust Wallet, MetaMask, Phantom, Coinbase Wallet, OKX Wallet, Ledger Live, Exodus
+- **Whitelisted** (render in WebView): `*.meshconnect.com`, `*.getfront.com`, `*.walletconnect.com`, `*.walletconnect.org`, `*.walletlink.org`, `*.okx.com`, `*.gemini.com`, `*.hcaptcha.com`, `*.robinhood.com`, `*.google.com`, plus Stripe, Usercentrics, and Revolut URLs. Authoritative list: `lib/src/util/constants.dart`.
+- **Externally opened** (launch native wallet app): Trust Wallet, Uphold, Rabby, Binance, OKX, MetaMask, Phantom, Solflare, Coinbase, Exodus. See `_externallyOpenedOrigins` in `constants.dart`.
 - **Everything else**: blocked
 
 ## Guardrails
