@@ -7,8 +7,7 @@ bool isAppUrlChange(String url) {
 
   // about:blank is used internally by WebViews and should not be treated
   // as an external app URL.
-  if (url == 'about:blank' ||
-      (uri.scheme == 'about' && uri.path == 'blank')) {
+  if (url == 'about:blank' || (uri.scheme == 'about' && uri.path == 'blank')) {
     return false;
   }
 

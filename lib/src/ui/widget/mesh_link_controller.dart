@@ -254,8 +254,10 @@ class MeshLinkController {
     _isExternalAppOpened = true;
     if (!isApp) {
       try {
-        final launched =
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
+        final launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
         if (!launched) {
           logger.info(
             'Launch of external application returned false for URI: $uri',
