@@ -2,11 +2,11 @@
 
 ## What this repo is
 
-The `mesh-flutter-sdk` is a Flutter package that Mesh's enterprise clients integrate into their mobile apps to offer crypto deposit, payment, and account-connection flows to their end users. Clients like **Kalshi, PayPal, Shift4, Stake.com, Uphold, and Kraken** ship this SDK in their own Flutter apps — their users never know they're interacting with Mesh.
+The `mesh-flutter-sdk` is a Flutter package that Mesh's enterprise clients integrate into their mobile apps to offer crypto deposit, payment, and account-connection flows to their end users. Client apps ship this SDK — their users never know they're interacting with Mesh.
 
 The SDK works by loading the **Mesh Link web UI** (a React app hosted at `link.meshconnect.com`, built in the `mesh-link` repo) inside a `webview_flutter` WebView and bridging events back to the host app via Dart callbacks. The Flutter SDK's job is to host that web UI faithfully, handle native concerns (deep-linking to wallet apps, theming, localization), and expose a clean Dart API.
 
-**This SDK is in the critical path of real financial transactions.** When a user on Kalshi taps "Add Funds", this code runs. If it crashes, hangs, or delivers a broken UX, that user doesn't fund their account — Kalshi loses the transaction, and Mesh loses client trust. Treat every change accordingly.
+**This SDK is in the critical path of real financial transactions.** If it crashes, hangs, or delivers a broken UX, users can't fund their accounts — clients lose transactions and Mesh loses trust. Treat every change accordingly.
 
 ---
 
@@ -97,7 +97,7 @@ example/                       # Example Flutter app demonstrating integration
 
 ## SDK contract — do not break
 
-The SDK communicates with the Mesh Link web UI via a JavaScript bridge (`JSBridge` channel). **All client apps — Kalshi, PayPal, etc. — are wired against these exact callback signatures and payload field names.** Renaming or removing anything here is a breaking change that silently breaks production apps in the field.
+The SDK communicates with the Mesh Link web UI via a JavaScript bridge (`JSBridge` channel). **All client apps are wired against these exact callback signatures and payload field names.** Renaming or removing anything here is a breaking change that silently breaks production apps in the field.
 
 ```dart
 MeshSdk.show(

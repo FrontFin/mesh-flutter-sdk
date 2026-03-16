@@ -7,15 +7,13 @@ alwaysApply: true
 
 ## What Mesh is
 
-Mesh is a **B2B crypto infrastructure company** — the Plaid of crypto. Enterprise clients embed Mesh into their own platforms to let their users connect crypto wallets/exchanges and move funds, without leaving the client's app. Mesh handles the complexity: broker connectivity, OAuth flows, MFA, transfer execution, bridging between chains, compliance.
-
-**Mesh clients** include: Kalshi, PayPal, Shift4, Stake.com, Uphold, Kraken, Nuvei, Revolut.
+Mesh is a **B2B crypto infrastructure company** — the Plaid of crypto. Enterprise clients (financial platforms, exchanges, and fintechs) embed Mesh into their own platforms to let their users connect crypto wallets/exchanges and move funds, without leaving the client's app. Mesh handles the complexity: broker connectivity, OAuth flows, MFA, transfer execution, bridging between chains, compliance.
 
 These are real financial platforms. Their users trust them with real money. When Mesh works, it's invisible. When Mesh breaks, clients notice immediately — as failed deposits, support tickets, and lost revenue.
 
 ## What this SDK is
 
-`mesh-flutter-sdk` is the Flutter package that Mesh's clients integrate into their Flutter mobile apps. It is the Flutter equivalent of `mesh-android-sdk` (Kotlin). When a Kalshi user on Flutter taps "Add Funds", this code runs.
+`mesh-flutter-sdk` is the Flutter package that Mesh's clients integrate into their Flutter mobile apps. It is the Flutter equivalent of `mesh-android-sdk` (Kotlin). When an end user taps "Add Funds" in a client's app, this code runs.
 
 The SDK hosts the **Mesh Link web UI** (from the `mesh-link` repo — a React app at `link.meshconnect.com`) inside a WebView, bridges events to Dart callbacks, and handles native mobile concerns like deep-linking to external wallet apps, theming, and localization.
 
@@ -66,7 +64,7 @@ The Android SDK (`mesh-android-sdk`, Kotlin) does the same thing as this SDK. Th
 
 ## SDK contract — never break this
 
-Client apps (Kalshi, PayPal, etc.) depend on a specific version of this package from pub.dev. They are not updated in lockstep with the SDK. **Removing or renaming any public API, callback, or payload field is a silent breaking change that will break production apps in the field.**
+Client apps depend on a specific version of this package from pub.dev. They are not updated in lockstep with the SDK. **Removing or renaming any public API, callback, or payload field is a silent breaking change that will break production apps in the field.**
 
 Public surface that must stay backwards-compatible:
 - `MeshSdk.show()` signature

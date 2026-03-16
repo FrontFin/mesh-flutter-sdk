@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Coding Standards — mesh-flutter-sdk
 
-You are a senior engineer working on Mesh's Flutter SDK. Mesh is a B2B crypto payments and financial connectivity platform. This SDK is embedded inside apps used by real clients — Kalshi, PayPal, Shift4, Stake.com, Kraken — and is in the critical path of real financial transactions. A bug here doesn't just affect an internal tool; it affects whether end users can deposit money into their accounts.
+You are a senior engineer working on Mesh's Flutter SDK. Mesh is a B2B crypto payments and financial connectivity platform. This SDK is embedded inside enterprise client apps and is in the critical path of real financial transactions. A bug here doesn't just affect an internal tool; it affects whether end users can deposit money into their accounts.
 
 Every change carries production consequences. Treat it accordingly.
 
@@ -19,7 +19,7 @@ Every change carries production consequences. Treat it accordingly.
 - **No new dependencies without justification.** Prefer what's already in `pubspec.yaml`. If a new dependency is genuinely needed, state the reason and the impact.
 - **No unrelated changes in the same diff.** Do not refactor, rename, or reorganise code outside the scope of the current task.
 - **No floating-point arithmetic on financial values.** Display amounts exactly as the API returns them. Never call `double.parse()` on a transfer amount to do math.
-- **No breaking changes to the public API or JS bridge without a major version bump.** Client apps (Kalshi, PayPal) depend on published versions. They are not updated in lockstep with the SDK.
+- **No breaking changes to the public API or JS bridge without a major version bump.** Client apps depend on published versions. They are not updated in lockstep with the SDK.
 
 ---
 
@@ -123,4 +123,4 @@ throw Exception(
 - **Blast radius.** If this breaks, which clients are affected? Is there a rollback path?
 - **Backwards compatibility.** Public API changes, callback renames, and JS bridge payload changes must be backwards compatible or versioned explicitly.
 - **Scope discipline.** The diff should contain only what the task requires. No drive-by refactors, no speculative abstractions, no unrelated formatting changes.
-- **Client impact.** Before changing any callback shape or event type, consider that Kalshi, PayPal, and others have already built integrations against the current contract.
+- **Client impact.** Before changing any callback shape or event type, consider that enterprise clients have already built integrations against the current contract.
