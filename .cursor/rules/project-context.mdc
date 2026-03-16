@@ -77,7 +77,7 @@ Public surface that must stay backwards-compatible:
 
 `MeshLinkController` enforces a domain whitelist on all WebView navigation. This prevents the WebView from being used to load arbitrary content if the web UI is ever compromised.
 
-- **Whitelisted** (render in WebView): `*.meshconnect.com`, `*.getfront.com`, `*.walletconnect.com`, `*.walletconnect.org`, `*.walletlink.org`, `*.okx.com`, `*.gemini.com`, `*.hcaptcha.com`, `*.robinhood.com`, `*.google.com`, plus Stripe, Usercentrics, and Revolut URLs. Authoritative list: `lib/src/util/constants.dart`.
+- **Whitelisted** (render in WebView): wildcard and explicit origins covering Mesh, WalletConnect, OKX, Gemini, Robinhood, Google, hCaptcha, Stripe, Usercentrics, Revolut, and others. `lib/src/util/constants.dart` (`_whitelistedOrigins`) is the authoritative list — do not rely on any summary here.
 - **Externally opened** (launch native wallet app): Trust Wallet, Uphold, Rabby, Binance, OKX, MetaMask, Phantom, Solflare, Coinbase, Exodus. See `_externallyOpenedOrigins` in `constants.dart`.
 - **Everything else**: blocked
 

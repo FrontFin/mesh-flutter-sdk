@@ -72,7 +72,7 @@ lib/
       mesh_result.dart         # Sealed success/error union
       mesh_event.dart          # 30+ typed event classes (funnel analytics)
       success/                 # SuccessPayload sealed types
-      integration/             # IntegrationAccessToken (cached broker auth)
+      integration/             # IntegrationConnectedPayload, Account, AccountToken, BrandInfo
       transfer/                # Transfer-related models
     ui/
       page/
@@ -89,7 +89,7 @@ lib/
       logger.dart              # Logging setup
     l10n/                      # Generated localization delegates
     extension/                 # Dart extension methods
-test/                          # Unit tests (18 files)
+test/                          # 13 test files + test/mock/ helpers
 example/                       # Example Flutter app demonstrating integration
 ```
 
@@ -102,7 +102,7 @@ The SDK communicates with the Mesh Link web UI via a JavaScript bridge (`JSBridg
 ```dart
 MeshSdk.show(
   context,
-  MeshConfiguration(
+  configuration: MeshConfiguration(
     linkToken: token,           // from client's backend
     onIntegrationConnected: (payload) { ... },  // broker connected
     onTransferFinished: (payload) { ... },       // transfer done
@@ -132,7 +132,7 @@ The Android SDK (`mesh-android-sdk`) does the same thing in Kotlin. The two SDKs
 
 `MeshLinkController` validates all navigation. This is a security boundary — it prevents the WebView from being navigated to malicious domains if the web UI is ever compromised.
 
-- **Whitelisted** (render in WebView): `*.meshconnect.com`, `*.getfront.com`, `*.walletconnect.com`, `*.walletconnect.org`, `*.walletlink.org`, `*.okx.com`, `*.gemini.com`, `*.hcaptcha.com`, `*.robinhood.com`, `*.google.com`, plus explicit URLs for Stripe, Usercentrics, and Revolut. See `lib/src/util/constants.dart` for the authoritative list.
+- **Whitelisted** (render in WebView): wildcard and explicit origins covering Mesh, WalletConnect, OKX, Gemini, Robinhood, Google, hCaptcha, Stripe, Usercentrics, Revolut, and others. `lib/src/util/constants.dart` (`_whitelistedOrigins`) is the authoritative list — do not rely on any summary here.
 - **Externally opened** (via `url_launcher` → native app): Trust Wallet, Uphold, Rabby, Binance, OKX, MetaMask, Phantom, Solflare, Coinbase, Exodus. See `_externallyOpenedOrigins` in `constants.dart`.
 - **Everything else**: blocked
 
