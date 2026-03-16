@@ -274,9 +274,13 @@ class MeshLinkController {
             uri,
             mode: LaunchMode.externalApplication,
           );
-          if (launched) return;
+          if (launched) {
+            return;
+          }
         } on PlatformException catch (e2) {
-          if (e2.code != _activityNotFoundCode) rethrow;
+          if (e2.code != _activityNotFoundCode) {
+            rethrow;
+          }
         }
         final storeUrl = getStoreUriFromAppUri(uri);
         if (storeUrl != null) {
