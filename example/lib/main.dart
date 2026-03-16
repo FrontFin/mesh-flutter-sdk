@@ -1,6 +1,11 @@
 // ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
+
+final _router = GoRouter(
+  routes: [GoRoute(path: '/', builder: (context, state) => const HomePage())],
+);
 
 void main() {
   runApp(const MeshExampleApp());
@@ -11,13 +16,13 @@ class MeshExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: _router,
       supportedLocales: MeshLocalizations.supportedLocales,
       localizationsDelegates: MeshLocalizations.localizationsDelegates,
       theme: ThemeData.from(
         colorScheme: const ColorScheme.dark(primary: Color(0xFFFAFF6E)),
       ),
-      home: const HomePage(),
     );
   }
 }
