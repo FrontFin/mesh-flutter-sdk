@@ -34,3 +34,4 @@ migrate_working_dir/
 example/node_modules/
 example/yarn.lock
 start_ios_simulator.sh
+.env.local

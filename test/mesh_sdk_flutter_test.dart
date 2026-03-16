@@ -559,6 +559,65 @@ void main() {
     });
   });
 
+  group('Exit dialog', () {
+    testWidgets('confirming exit calls onError(userCancelled) and pops page', (
+      tester,
+    ) async {
+      MeshErrorType? errorType;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onError: (e) => errorType = e,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      // Trigger the exit dialog via showClose JS event
+      webViewController.simulateJsMessage(
+        '{"type":"showClose","payload":null}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsOneWidget);
+
+      // Tap Exit — this is where the context-shadowing bug would crash
+      await tester.tap(find.text('Exit'));
+      await tester.pumpAndSettle();
+
+      expect(errorType, MeshErrorType.userCancelled);
+      // Page is dismissed — FilledButton from TestApp is visible again
+      expect(find.byType(FilledButton), findsOneWidget);
+    });
+
+    testWidgets('cancelling exit dialog keeps page open', (tester) async {
+      MeshErrorType? errorType;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onError: (e) => errorType = e,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage(
+        '{"type":"showClose","payload":null}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsOneWidget);
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(errorType, isNull);
+      // WebView is still showing
+      expect(find.text('Mock WebView Widget'), findsOneWidget);
+    });
+  });
+
   group('onTransferFinished Callback', () {
     testWidgets('is called with success payload', (tester) async {
       TransferFinishedEvent? event;
