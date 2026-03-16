@@ -241,8 +241,8 @@ class MeshLinkController {
   /// Android: externalNonBrowserApplication to target a non-browser app.
   static LaunchMode get _appLinkLaunchMode =>
       defaultTargetPlatform == TargetPlatform.iOS
-          ? LaunchMode.platformDefault
-          : LaunchMode.externalNonBrowserApplication;
+      ? LaunchMode.platformDefault
+      : LaunchMode.externalNonBrowserApplication;
 
   Future<void> _launchExternalUri(Uri uri, {required bool isApp}) async {
     if (_isExternalAppOpened) {
