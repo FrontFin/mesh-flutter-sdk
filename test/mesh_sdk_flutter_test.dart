@@ -620,7 +620,8 @@ void main() {
 
   group('PopScope (back button / swipe-back)', () {
     testWidgets(
-      'back button at root shows exit dialog — confirming calls onError(userCancelled)',
+      'back button at root shows exit dialog — '
+          'confirming calls onError(userCancelled)',
       (tester) async {
         MeshErrorType? errorType;
         final configuration = MeshConfiguration(
