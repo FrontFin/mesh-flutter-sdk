@@ -70,6 +70,15 @@ class MockWebViewController extends PlatformWebViewController {
     _requestUri = params.uri;
   }
 
+  bool _canGoBack = false;
+
+  /// Controls what [canGoBack] returns in tests.
+  // ignore: avoid_setters_without_getters
+  set canGoBackResult(bool value) => _canGoBack = value;
+
+  @override
+  Future<bool> canGoBack() async => _canGoBack;
+
   String? _lastJavaScript;
 
   String? get lastJavaScript => _lastJavaScript;

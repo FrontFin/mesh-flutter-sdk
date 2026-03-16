@@ -618,6 +618,67 @@ void main() {
     });
   });
 
+  group('PopScope (back button / swipe-back)', () {
+    testWidgets(
+      'back button at root shows exit dialog — confirming calls onError(userCancelled)',
+      (tester) async {
+        MeshErrorType? errorType;
+        final configuration = MeshConfiguration(
+          linkToken: validLinkToken,
+          onError: (e) => errorType = e,
+        );
+
+        await tester.pumpWidget(TestApp(configuration: configuration));
+        await tester.tap(find.byType(FilledButton));
+        await tester.pumpAndSettle();
+
+        // canGoBack returns false — we're at the root page
+        webViewController.canGoBackResult = false;
+
+        // Simulate Android back button / iOS swipe-back
+        await tester.binding.handlePopRoute();
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsOneWidget);
+
+        await tester.tap(find.text('Exit'));
+        await tester.pumpAndSettle();
+
+        expect(errorType, MeshErrorType.userCancelled);
+        expect(find.byType(FilledButton), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'back button at root shows exit dialog — cancelling keeps page open',
+      (tester) async {
+        MeshErrorType? errorType;
+        final configuration = MeshConfiguration(
+          linkToken: validLinkToken,
+          onError: (e) => errorType = e,
+        );
+
+        await tester.pumpWidget(TestApp(configuration: configuration));
+        await tester.tap(find.byType(FilledButton));
+        await tester.pumpAndSettle();
+
+        webViewController.canGoBackResult = false;
+
+        await tester.binding.handlePopRoute();
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsOneWidget);
+
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsNothing);
+        expect(errorType, isNull);
+        expect(find.text('Mock WebView Widget'), findsOneWidget);
+      },
+    );
+  });
+
   group('onTransferFinished Callback', () {
     testWidgets('is called with success payload', (tester) async {
       TransferFinishedEvent? event;
