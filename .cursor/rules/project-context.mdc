@@ -1,0 +1,93 @@
+---
+description: Project context for the mesh-flutter-sdk — what Mesh is, who uses this SDK, and how it works
+alwaysApply: true
+---
+
+# Project Context — mesh-flutter-sdk
+
+## What Mesh is
+
+Mesh is a **B2B crypto infrastructure company** — the Plaid of crypto. Enterprise clients embed Mesh into their own platforms to let their users connect crypto wallets/exchanges and move funds, without leaving the client's app. Mesh handles the complexity: broker connectivity, OAuth flows, MFA, transfer execution, bridging between chains, compliance.
+
+**Mesh clients** include: Kalshi, PayPal, Shift4, Stake.com, Uphold, Kraken, Nuvei, Revolut.
+
+These are real financial platforms. Their users trust them with real money. When Mesh works, it's invisible. When Mesh breaks, clients notice immediately — as failed deposits, support tickets, and lost revenue.
+
+## What this SDK is
+
+`mesh-flutter-sdk` is the Flutter package that Mesh's clients integrate into their Flutter mobile apps. It is the Flutter equivalent of `mesh-android-sdk` (Kotlin). When a Kalshi user on Flutter taps "Add Funds", this code runs.
+
+The SDK hosts the **Mesh Link web UI** (from the `mesh-link` repo — a React app at `link.meshconnect.com`) inside a WebView, bridges events to Dart callbacks, and handles native mobile concerns like deep-linking to external wallet apps, theming, and localization.
+
+**The SDK is in the critical path of financial transactions.** Every friction point in the SDK directly impacts client conversion rates. A crash or hang means a user doesn't fund their account.
+
+## How a client session works
+
+1. Client's backend calls `POST /api/v1/linktoken` on the Mesh API → receives a short-lived, scoped link token.
+2. Client app passes the token to `MeshSdk.show()` with callback handlers.
+3. SDK builds a URL (`link.meshconnect.com?linkToken=<base64>`) and loads it in a WebView.
+4. User completes the flow (connects broker, selects asset/network/amount, executes transfer).
+5. SDK fires the appropriate Dart callback: `onIntegrationConnected`, `onTransferFinished`, `onSuccess`, or `onError`.
+6. Client app handles the result in its own UI.
+
+The link token is opaque to the client — all product configuration (destination address, network, asset, limits, product mode) is encoded server-side when the token is issued.
+
+## Products
+
+| Mode | What happens | Terminal callback |
+|------|-------------|-------------------|
+| **Mesh Deposit** | User connects a broker/wallet → selects asset, network, amount → Mesh executes the transfer | `onTransferFinished` |
+| **Mesh Pay** | User pays with crypto at checkout — Mesh routes the payment | `onTransferFinished` |
+| **Mesh Verify** | User connects and verifies a portfolio/account (no transfer) | `onIntegrationConnected` |
+| **Manual Deposit** | User is shown a QR code + wallet address; sends funds from their own app | `onTransferFinished` |
+
+Product mode is determined by the link token. It does not change during a session.
+
+## Broker types
+
+| Type | Examples | How connection works in the WebView |
+|------|----------|--------------------------------------|
+| DeFi / web3 wallet | MetaMask, Phantom, Trust Wallet, OKX | SDK deep-links to native wallet app via `url_launcher` |
+| CEX OAuth | Coinbase, Gemini, Revolut | OAuth flow inside WebView |
+| CEX credentials | Robinhood, Kraken, Binance | Username + password + MFA inside WebView |
+| Hardware wallet | Ledger, Trezor | USB/Bluetooth (handled by web UI) |
+
+## Relationship with mesh-link (the web UI)
+
+The Flutter SDK is a thin native shell. The actual product UI lives in `mesh-link` — a React/TypeScript app that runs inside the WebView. The two repos evolve together:
+
+- The web UI sends JSON events over the `JSBridge` JavaScript channel → the SDK deserializes them into typed Dart classes and fires Dart callbacks.
+- The SDK injects `meshSdkPlatform` and `meshSdkVersion` into the web page on load so the web UI can adapt its behaviour per platform.
+- When mesh-link ships a new event type or payload field, the SDK may need to be updated to handle it — and vice versa.
+
+## Relationship with mesh-android-sdk
+
+The Android SDK (`mesh-android-sdk`, Kotlin) does the same thing as this SDK. The two should behave identically from a client's perspective — same callback names, same event types, same product flows. If you're adding a feature here, consider whether Android needs the same change.
+
+## SDK contract — never break this
+
+Client apps (Kalshi, PayPal, etc.) depend on a specific version of this package from pub.dev. They are not updated in lockstep with the SDK. **Removing or renaming any public API, callback, or payload field is a silent breaking change that will break production apps in the field.**
+
+Public surface that must stay backwards-compatible:
+- `MeshSdk.show()` signature
+- `MeshConfiguration` fields and callback signatures
+- `MeshEvent` subtypes and their fields
+- `SuccessPayload` subtypes and their fields
+- JS bridge message format (used by mesh-link)
+
+## Navigation and security
+
+`MeshLinkController` enforces a domain whitelist on all WebView navigation. This prevents the WebView from being used to load arbitrary content if the web UI is ever compromised.
+
+- **Whitelisted** (render in WebView): `meshconnect.com`, `walletconnect.org`, `okx.com`, `gemini.com`, `sandbox.coinbase.com`
+- **Externally opened** (launch native wallet app): Trust Wallet, MetaMask, Phantom, Coinbase Wallet, OKX Wallet, Ledger Live, Exodus
+- **Everything else**: blocked
+
+## Guardrails
+
+- No `dynamic` in Dart — use sealed classes, generics, or `Object?` + narrowing
+- No hardcoded UI strings — use `MeshLocalizations`
+- No `print()` — use the `logging` package
+- No floating-point arithmetic on financial values — pass through exactly as the API returns
+- No breaking changes to the public API or JS bridge without a major version bump
+- PR target is `main`
