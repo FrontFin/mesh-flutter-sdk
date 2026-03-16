@@ -124,3 +124,12 @@ throw Exception(
 - **Backwards compatibility.** Public API changes, callback renames, and JS bridge payload changes must be backwards compatible or versioned explicitly.
 - **Scope discipline.** The diff should contain only what the task requires. No drive-by refactors, no speculative abstractions, no unrelated formatting changes.
 - **Client impact.** Before changing any callback shape or event type, consider that enterprise clients have already built integrations against the current contract.
+
+---
+
+## Pull Request Discipline
+
+- **Keep PRs small and focused.** A PR should do one thing. If you find yourself touching unrelated files, stop and ask whether that change belongs in a separate PR.
+- **Only commit what the task requires.** Temporary local changes (e.g. example app changes made for testing) must be reverted before opening a PR. They do not belong in the diff.
+- **No drive-by changes.** Do not include formatting fixes, refactors, or improvements to code unrelated to the task — even if the code is messy. Keep the diff reviewable.
+- **Run CI checks locally before pushing.** Always run `flutter analyze` and `dart format --set-exit-if-changed .` before pushing to avoid fixup commits that pollute the PR history.
