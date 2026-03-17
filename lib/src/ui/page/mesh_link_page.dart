@@ -128,7 +128,7 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
   void _showCloseDialog(BuildContext context) => showDialog<void>(
     context: context,
     barrierDismissible: false,
-    builder: (context) => ExitDialog(
+    builder: (_) => ExitDialog(
       onConfirm: () {
         _finish(context, const MeshError(MeshErrorType.userCancelled));
       },
