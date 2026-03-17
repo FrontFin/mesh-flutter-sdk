@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
@@ -234,6 +235,15 @@ class MeshLinkController {
     logger.warning('Unexpected JS message: $json');
   }
 
+  /// Preferred mode for opening app deep links (custom URL schemes).
+  /// iOS: platformDefault so custom schemes (e.g. tronlinkoutside://) open the
+  /// registered app; externalNonBrowserApplication uses universal links only.
+  /// Android: externalNonBrowserApplication to target a non-browser app.
+  static LaunchMode get _appLinkLaunchMode =>
+      defaultTargetPlatform == TargetPlatform.iOS
+      ? LaunchMode.platformDefault
+      : LaunchMode.externalNonBrowserApplication;
+
   Future<void> _launchExternalUri(Uri uri, {required bool isApp}) async {
     if (_isExternalAppOpened) {
       logger.warning('External app already opened, ignoring: $uri');
@@ -243,35 +253,57 @@ class MeshLinkController {
 
     _isExternalAppOpened = true;
     if (!isApp) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      try {
+        final launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+        if (!launched) {
+          logger.info(
+            'Launch of external application returned false for URI: $uri',
+          );
+          _isExternalAppOpened = false;
+        }
+      } on PlatformException {
+        _isExternalAppOpened = false;
+        rethrow;
+      }
       return;
     }
 
     try {
-      // Try launching in external non-browser app
-      await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
+      var launched = await launchUrl(uri, mode: _appLinkLaunchMode);
+      if (!launched) {
+        logger.info('Launch returned false. Trying external application...');
+        launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+      if (!launched) {
+        _isExternalAppOpened = false;
+      }
     } on PlatformException catch (e) {
       if (e.code == _activityNotFoundCode) {
-        // If it fails, try browser app
         try {
           logger.info('Activity not found. Trying external app...');
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-          return;
-        } on PlatformException catch (e) {
-          // If it fails, try store link
-          if (e.code == _activityNotFoundCode) {
-            logger.info('External app not found. Trying store link...');
-            final storeUrl = getStoreUriFromAppUri(uri);
-            if (storeUrl != null) {
-              logger.info('Store link found. Opening...');
-              _isExternalAppOpened = false;
-              unawaited(_launchExternalUri(storeUrl, isApp: true));
-              return;
-            }
+          final launched = await launchUrl(
+            uri,
+            mode: LaunchMode.externalApplication,
+          );
+          if (launched) {
+            return;
+          }
+        } on PlatformException catch (e2) {
+          if (e2.code != _activityNotFoundCode) {
+            rethrow;
           }
         }
+        final storeUrl = getStoreUriFromAppUri(uri);
+        if (storeUrl != null) {
+          logger.info('External app not found. Trying store link...');
+          _isExternalAppOpened = false;
+          unawaited(_launchExternalUri(storeUrl, isApp: true));
+          return;
+        }
       }
-
       _isExternalAppOpened = false;
       rethrow;
     }
