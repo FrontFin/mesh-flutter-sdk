@@ -1,3 +1,8 @@
+## 1.1.1
+
+- Fixes a Flutter navigation bug caused by BuildContext shadowing in the close/exit dialog flow.
+
+
 ## 1.1.0
 
 - Enabling system language, fiat currency display, and theme selection through MeshConfiguration.
