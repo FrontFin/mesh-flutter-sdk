@@ -559,6 +559,59 @@ void main() {
     });
   });
 
+  group('Exit Dialog', () {
+    // Regression test for context shadowing bug: _showCloseDialog previously
+    // passed the dialog builder's context to _finish(), which caused
+    // Navigator.pop to resolve to the wrong navigator (e.g. go_router's root
+    // navigator) and crash with "no pages left to show".
+    testWidgets(
+      'confirming exit calls onError(userCancelled) and pops the page',
+      (tester) async {
+        MeshErrorType? error;
+        final configuration = MeshConfiguration(
+          linkToken: validLinkToken,
+          onError: (e) => error = e,
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: MeshLocalizations.localizationsDelegates,
+            supportedLocales: MeshLocalizations.supportedLocales,
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: FilledButton(
+                  onPressed: () =>
+                      MeshSdk.show(context, configuration: configuration),
+                  child: const Text('Open SDK'),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('Open SDK'));
+        await tester.pumpAndSettle();
+
+        // Trigger the close dialog via the JS bridge
+        webViewController.simulateJsMessage(
+          '{"type":"showClose","payload":null}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsOneWidget);
+
+        await tester.tap(find.text('Exit'));
+        await tester.pumpAndSettle();
+
+        // Callback must fire with the correct error type
+        expect(error, MeshErrorType.userCancelled);
+
+        // MeshLinkPage must be popped — host screen is visible again
+        expect(find.text('Open SDK'), findsOneWidget);
+      },
+    );
+  });
+
   group('onTransferFinished Callback', () {
     testWidgets('is called with success payload', (tester) async {
       TransferFinishedEvent? event;
