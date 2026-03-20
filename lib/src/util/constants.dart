@@ -29,15 +29,23 @@ bool isExternallyOpenedOrigin(String url) {
       return false;
     }
 
-    return _externallyOpenedOrigins.any((origin) {
+    // Allow OAuth redirect URLs open externally
+    if (_oAuthRedirectRegex.hasMatch(url)) {
+      return true;
+    }
+
+    for (final origin in _externallyOpenedOrigins) {
       if (origin.startsWith('https://')) {
         // Full URL, e.g. "https://link.trustwallet.com"
-        return url.startsWith(origin);
+        if (url.startsWith(origin)) {
+          return true;
+        }
+      } else {
+        logger.severe('Invalid externally opened origin format: $origin');
       }
+    }
 
-      logger.severe('Invalid externally opened origin format: $origin');
-      return false;
-    });
+    return false;
   } catch (e) {
     return false;
   }
@@ -62,6 +70,7 @@ const _whitelistedOrigins = [
   '*.hcaptcha.com',
   '*.robinhood.com',
   '*.google.com',
+  '*.local', // LocalCan
   'https://meshconnect.com',
   'https://getfront.com',
   'https://walletconnect.com',
@@ -104,6 +113,11 @@ const _externallyOpenedOrigins = [
   'https://exodus.com/m/',  // trailing slash to avoid matching e.g. /malicious
 ];
 // dart format on
+
+// Matches https://*.meshconnect.com/api/v1/catalog/oauth/redirect/*
+final _oAuthRedirectRegex = RegExp(
+  r'^https://[^.]+\.meshconnect\.com/api/v1/catalog/oauth/redirect/.*$',
+);
 
 const _exodusSchema = 'exodus';
 const _exodusPlayStoreUrl =
