@@ -280,7 +280,7 @@ class MeshLinkController {
   Future<void> _onLoaded() async {
     final stringBuffer = StringBuffer(
       "window.meshSdkPlatform='flutter';"
-      "window.meshSdkVersion='$packageVersion';",
+      "window.meshSdkVersion='$sdkVersion';",
     );
 
     final integrationAccessTokens = configuration.integrationAccessTokens;

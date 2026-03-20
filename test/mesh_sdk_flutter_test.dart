@@ -232,7 +232,7 @@ void main() {
       expect(
         webViewController.lastJavaScript,
         "window.meshSdkPlatform='flutter';"
-        "window.meshSdkVersion='$packageVersion';",
+        "window.meshSdkVersion='$sdkVersion';",
       );
       expect(find.text('Mock WebView Widget'), findsOneWidget);
     });
@@ -262,7 +262,7 @@ void main() {
       expect(
         webViewController.lastJavaScript,
         "window.meshSdkPlatform='flutter';"
-        "window.meshSdkVersion='$packageVersion';"
+        "window.meshSdkVersion='$sdkVersion';"
         'window.accessTokens=[{'
         '"accountId":"id",'
         '"accountName":"name",'
