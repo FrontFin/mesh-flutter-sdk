@@ -65,26 +65,29 @@ void main() {
         );
       });
 
-      test('Returns true for variable path prefix before /catalog/oauth/redirect/', () {
-        expect(
-          isExternallyOpenedOrigin(
-            'https://integration-api.meshconnect.com/api/v2/catalog/oauth/redirect/coinbase',
-          ),
-          isTrue,
-        );
-        expect(
-          isExternallyOpenedOrigin(
-            'https://integration-api.meshconnect.com/v3/catalog/oauth/redirect/coinbase',
-          ),
-          isTrue,
-        );
-        expect(
-          isExternallyOpenedOrigin(
-            'https://sandbox-api.meshconnect.com/some/nested/path/catalog/oauth/redirect/provider',
-          ),
-          isTrue,
-        );
-      });
+      test(
+        'Returns true for variable path prefix before /catalog/oauth/redirect/',
+        () {
+          expect(
+            isExternallyOpenedOrigin(
+              'https://integration-api.meshconnect.com/api/v2/catalog/oauth/redirect/coinbase',
+            ),
+            isTrue,
+          );
+          expect(
+            isExternallyOpenedOrigin(
+              'https://integration-api.meshconnect.com/v3/catalog/oauth/redirect/coinbase',
+            ),
+            isTrue,
+          );
+          expect(
+            isExternallyOpenedOrigin(
+              'https://sandbox-api.meshconnect.com/some/nested/path/catalog/oauth/redirect/provider',
+            ),
+            isTrue,
+          );
+        },
+      );
 
       test('Returns false when path does not match', () {
         expect(
