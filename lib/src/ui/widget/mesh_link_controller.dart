@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mesh_sdk_flutter/src/mesh_sdk_version.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
@@ -15,7 +16,6 @@ import 'package:mesh_sdk_flutter/src/util/constants.dart';
 import 'package:mesh_sdk_flutter/src/util/link_uri.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
 import 'package:mesh_sdk_flutter/src/util/theme.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -278,9 +278,6 @@ class MeshLinkController {
   }
 
   Future<void> _onLoaded() async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    final sdkVersion = packageInfo.version;
-
     final stringBuffer = StringBuffer(
       "window.meshSdkPlatform='flutter';"
       "window.meshSdkVersion='$sdkVersion';",

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
+import 'package:mesh_sdk_flutter/src/mesh_sdk_version.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
 
@@ -231,7 +232,7 @@ void main() {
       expect(
         webViewController.lastJavaScript,
         "window.meshSdkPlatform='flutter';"
-        "window.meshSdkVersion='0.0.1';",
+        "window.meshSdkVersion='$sdkVersion';",
       );
       expect(find.text('Mock WebView Widget'), findsOneWidget);
     });
@@ -261,7 +262,7 @@ void main() {
       expect(
         webViewController.lastJavaScript,
         "window.meshSdkPlatform='flutter';"
-        "window.meshSdkVersion='0.0.1';"
+        "window.meshSdkVersion='$sdkVersion';"
         'window.accessTokens=[{'
         '"accountId":"id",'
         '"accountName":"name",'

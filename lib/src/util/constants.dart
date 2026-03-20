@@ -29,15 +29,23 @@ bool isExternallyOpenedOrigin(String url) {
       return false;
     }
 
-    return _externallyOpenedOrigins.any((origin) {
+    // Allow OAuth redirect URLs open externally
+    if (_oAuthRedirectRegex.hasMatch(url)) {
+      return true;
+    }
+
+    for (final origin in _externallyOpenedOrigins) {
       if (origin.startsWith('https://')) {
         // Full URL, e.g. "https://link.trustwallet.com"
-        return url.startsWith(origin);
+        if (url.startsWith(origin)) {
+          return true;
+        }
+      } else {
+        logger.severe('Invalid externally opened origin format: $origin');
       }
+    }
 
-      logger.severe('Invalid externally opened origin format: $origin');
-      return false;
-    });
+    return false;
   } catch (e) {
     return false;
   }
@@ -51,6 +59,7 @@ Uri? getStoreUriFromAppUri(Uri uri) {
   return null;
 }
 
+// dart format off
 const _whitelistedOrigins = [
   '*.meshconnect.com',
   '*.getfront.com',
@@ -62,6 +71,8 @@ const _whitelistedOrigins = [
   '*.hcaptcha.com',
   '*.robinhood.com',
   '*.google.com',
+  '*.local',        // LocalCan (for development purposes)
+  '*.localcan.dev', // LocalCan Public URL (for development purposes)
   'https://meshconnect.com',
   'https://getfront.com',
   'https://walletconnect.com',
@@ -85,7 +96,6 @@ const _whitelistedOrigins = [
   'https://ramp.revolut.com',
 ];
 
-// dart format off
 const _externallyOpenedOrigins = [
   'https://link.trustwallet.com',   // Trust Wallet
   'https://wallet.uphold.com',      // Uphold
@@ -98,12 +108,17 @@ const _externallyOpenedOrigins = [
   'https://coinbase.com',           // Coinbase
   'https://www.coinbase.com',       // Coinbase
   'https://login.coinbase.com',     // Coinbase
+  'https://exodus.com/m/',          // Exodus
   'https://sandbox.meshconnect.com/authorize/Coinbase', // Coinbase on Sandbox
   'https://appopener.meshconnect.com',
   'https://api.cb-device-intelligence.com',
-  'https://exodus.com/m/',  // trailing slash to avoid matching e.g. /malicious
 ];
 // dart format on
+
+// Matches https://*.meshconnect.com/*/catalog/oauth/redirect/*
+final _oAuthRedirectRegex = RegExp(
+  r'^https://[^.]+\.meshconnect\.com/.+/catalog/oauth/redirect/.*$',
+);
 
 const _exodusSchema = 'exodus';
 const _exodusPlayStoreUrl =
