@@ -59,6 +59,7 @@ Uri? getStoreUriFromAppUri(Uri uri) {
   return null;
 }
 
+// dart format off
 const _whitelistedOrigins = [
   '*.meshconnect.com',
   '*.getfront.com',
@@ -70,7 +71,8 @@ const _whitelistedOrigins = [
   '*.hcaptcha.com',
   '*.robinhood.com',
   '*.google.com',
-  '*.local', // LocalCan
+  '*.local',        // LocalCan (for development purposes)
+  '*.localcan.dev', // LocalCan Public URL (for development purposes)
   'https://meshconnect.com',
   'https://getfront.com',
   'https://walletconnect.com',
@@ -94,7 +96,6 @@ const _whitelistedOrigins = [
   'https://ramp.revolut.com',
 ];
 
-// dart format off
 const _externallyOpenedOrigins = [
   'https://link.trustwallet.com',   // Trust Wallet
   'https://wallet.uphold.com',      // Uphold
@@ -107,16 +108,16 @@ const _externallyOpenedOrigins = [
   'https://coinbase.com',           // Coinbase
   'https://www.coinbase.com',       // Coinbase
   'https://login.coinbase.com',     // Coinbase
+  'https://exodus.com/m/',          // Exodus
   'https://sandbox.meshconnect.com/authorize/Coinbase', // Coinbase on Sandbox
   'https://appopener.meshconnect.com',
   'https://api.cb-device-intelligence.com',
-  'https://exodus.com/m/',  // trailing slash to avoid matching e.g. /malicious
 ];
 // dart format on
 
-// Matches https://*.meshconnect.com/api/v1/catalog/oauth/redirect/*
+// Matches https://*.meshconnect.com/*/catalog/oauth/redirect/*
 final _oAuthRedirectRegex = RegExp(
-  r'^https://[^.]+\.meshconnect\.com/api/v1/catalog/oauth/redirect/.*$',
+  r'^https://[^.]+\.meshconnect\.com/.+/catalog/oauth/redirect/.*$',
 );
 
 const _exodusSchema = 'exodus';
