@@ -108,3 +108,26 @@ const _externallyOpenedOrigins = [
 const _exodusSchema = 'exodus';
 const _exodusPlayStoreUrl =
     'https://play.google.com/store/apps/details?id=exodusmovement.exodus';
+
+/// Custom URL schemes that may leave the WebView (wallet deep links,
+/// App Store).
+/// Used by `isAppUrlChange` in app_url.dart.
+/// Extend when Mesh adds wallet integrations.
+const allowedCustomUrlSchemes = {
+  'tronlinkoutside',
+  'bitcoin',
+  'zengo',
+  'okx',
+  'uniswap',
+  'rainbow',
+  'bitkeep',
+  'ledgerlive',
+  'dfw',
+  'exodus',
+  'cbwallet',
+  'bnc',
+  'phantom',
+  'trust',
+  'metamask',
+  'itms-apps',
+};

@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mesh_sdk_flutter/src/util/app_url.dart';
+import 'package:mesh_sdk_flutter/src/util/constants.dart';
 
 void main() {
   group('isAppUrlChange', () {
-    group('internal WebView schemes', () {
+    group('internal WebView schemes (not in allowedCustomUrlSchemes)', () {
       test('returns false for about:blank', () {
         expect(isAppUrlChange('about:blank'), isFalse);
       });
@@ -23,6 +24,27 @@ void main() {
       });
     });
 
+    group('allowedCustomUrlSchemes', () {
+      test('returns true for every scheme in allowedCustomUrlSchemes', () {
+        for (final scheme in allowedCustomUrlSchemes) {
+          expect(
+            isAppUrlChange('$scheme://x'),
+            isTrue,
+            reason: 'scheme: $scheme',
+          );
+        }
+      });
+
+      test('matches schemes case-insensitively', () {
+        expect(isAppUrlChange('MetaMask://wc'), isTrue);
+        expect(isAppUrlChange('TRONLINKOUTSIDE://path'), isTrue);
+      });
+
+      test('returns false for scheme not in allowedCustomUrlSchemes', () {
+        expect(isAppUrlChange('myapp://open'), isFalse);
+      });
+    });
+
     group('custom URL schemes (wallet deep links)', () {
       test('returns true for tronlinkoutside scheme', () {
         expect(isAppUrlChange('tronlinkoutside://some/path'), isTrue);
@@ -30,10 +52,6 @@ void main() {
 
       test('returns true for metamask scheme', () {
         expect(isAppUrlChange('metamask://wc'), isTrue);
-      });
-
-      test('returns true for arbitrary custom scheme', () {
-        expect(isAppUrlChange('myapp://open'), isTrue);
       });
 
       test('returns true for exodus scheme', () {

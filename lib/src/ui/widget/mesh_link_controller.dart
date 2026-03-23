@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
@@ -235,15 +234,6 @@ class MeshLinkController {
     logger.warning('Unexpected JS message: $json');
   }
 
-  /// Preferred mode for opening app deep links (custom URL schemes).
-  /// iOS: platformDefault so custom schemes (e.g. tronlinkoutside://) open the
-  /// registered app; externalNonBrowserApplication uses universal links only.
-  /// Android: externalNonBrowserApplication to target a non-browser app.
-  static LaunchMode get _appLinkLaunchMode =>
-      defaultTargetPlatform == TargetPlatform.iOS
-      ? LaunchMode.platformDefault
-      : LaunchMode.externalNonBrowserApplication;
-
   Future<void> _launchExternalUri(Uri uri, {required bool isApp}) async {
     if (_isExternalAppOpened) {
       logger.warning('External app already opened, ignoring: $uri');
@@ -252,36 +242,19 @@ class MeshLinkController {
     }
 
     _isExternalAppOpened = true;
-    if (!isApp) {
-      try {
-        final launched = await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
-        if (!launched) {
-          logger.info(
-            'Launch of external application returned false for URI: $uri',
-          );
-          _isExternalAppOpened = false;
-        }
-      } on PlatformException {
-        _isExternalAppOpened = false;
-        rethrow;
-      }
-      return;
-    }
-
     try {
-      var launched = await launchUrl(uri, mode: _appLinkLaunchMode);
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
       if (!launched) {
-        logger.info('Launch returned false. Trying external application...');
-        launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-      if (!launched) {
+        logger.info(
+          'Launch of external application returned false for URI: $uri',
+        );
         _isExternalAppOpened = false;
       }
     } on PlatformException catch (e) {
-      if (e.code == _activityNotFoundCode) {
+      if (isApp && e.code == _activityNotFoundCode) {
         try {
           logger.info('Activity not found. Trying external app...');
           final launched = await launchUrl(
