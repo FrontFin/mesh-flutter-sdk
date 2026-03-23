@@ -29,7 +29,7 @@ bool isExternallyOpenedOrigin(String url) {
       return false;
     }
 
-    // Allow OAuth redirect URLs open externally
+    // Allow OAuth redirect URLs to open externally
     if (_oAuthRedirectRegex.hasMatch(url)) {
       return true;
     }

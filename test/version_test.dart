@@ -13,7 +13,7 @@ void main() {
     expect(
       sdkVersion,
       equals(match!.group(1)),
-      reason: 'packageVersion should match the version from pubspec.yaml',
+      reason: 'sdkVersion should match the version from pubspec.yaml',
     );
   });
 }
