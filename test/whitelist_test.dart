@@ -19,6 +19,8 @@ void main() {
     test('Returns true for wildcard origins', () {
       expect(isWhitelistedOrigin('https://preview1.meshconnect.com'), isTrue);
       expect(isWhitelistedOrigin('https://preview2.getfront.com'), isTrue);
+      expect(isWhitelistedOrigin('https://myapp.local'), isTrue);
+      expect(isWhitelistedOrigin('https://myapp.localcan.dev'), isTrue);
     });
 
     test('Returns true for about:blank', () {
