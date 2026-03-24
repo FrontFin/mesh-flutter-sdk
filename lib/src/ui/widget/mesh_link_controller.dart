@@ -243,7 +243,7 @@ class MeshLinkController {
     }
     logger.info('External app not found. Trying store link...');
     _isExternalAppOpened = false;
-    unawaited(_launchExternalUri(storeUrl, isApp: true));
+    unawaited(_launchExternalUri(storeUrl, isApp: false));
     return true;
   }
 
@@ -273,7 +273,6 @@ class MeshLinkController {
         _isExternalAppOpened = false;
         return;
       }
-      _isExternalAppOpened = false;
     } on PlatformException catch (e, s) {
       if (isApp && e.code == _activityNotFoundCode) {
         if (_tryStoreFallbackFromAppUri(uri)) {
