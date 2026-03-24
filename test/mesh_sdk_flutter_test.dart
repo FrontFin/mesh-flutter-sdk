@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
+import 'package:mesh_sdk_flutter/src/mesh_sdk_version.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
 
@@ -231,7 +232,7 @@ void main() {
       expect(
         webViewController.lastJavaScript,
         "window.meshSdkPlatform='flutter';"
-        "window.meshSdkVersion='0.0.1';",
+        "window.meshSdkVersion='$sdkVersion';",
       );
       expect(find.text('Mock WebView Widget'), findsOneWidget);
     });
@@ -261,7 +262,7 @@ void main() {
       expect(
         webViewController.lastJavaScript,
         "window.meshSdkPlatform='flutter';"
-        "window.meshSdkVersion='0.0.1';"
+        "window.meshSdkVersion='$sdkVersion';"
         'window.accessTokens=[{'
         '"accountId":"id",'
         '"accountName":"name",'
@@ -557,6 +558,59 @@ void main() {
       expect(payload.accountTokens, hasLength(1));
       expect(payload.accountTokens.first.accessToken, 'access-token-xyz');
     });
+  });
+
+  group('Exit Dialog', () {
+    // Regression test for context shadowing bug: _showCloseDialog previously
+    // passed the dialog builder's context to _finish(), which caused
+    // Navigator.pop to resolve to the wrong navigator (e.g. go_router's root
+    // navigator) and crash with "no pages left to show".
+    testWidgets(
+      'confirming exit calls onError(userCancelled) and pops the page',
+      (tester) async {
+        MeshErrorType? error;
+        final configuration = MeshConfiguration(
+          linkToken: validLinkToken,
+          onError: (e) => error = e,
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: MeshLocalizations.localizationsDelegates,
+            supportedLocales: MeshLocalizations.supportedLocales,
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: FilledButton(
+                  onPressed: () =>
+                      MeshSdk.show(context, configuration: configuration),
+                  child: const Text('Open SDK'),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('Open SDK'));
+        await tester.pumpAndSettle();
+
+        // Trigger the close dialog via the JS bridge
+        webViewController.simulateJsMessage(
+          '{"type":"showClose","payload":null}',
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(AlertDialog), findsOneWidget);
+
+        await tester.tap(find.text('Exit'));
+        await tester.pumpAndSettle();
+
+        // Callback must fire with the correct error type
+        expect(error, MeshErrorType.userCancelled);
+
+        // MeshLinkPage must be popped — host screen is visible again
+        expect(find.text('Open SDK'), findsOneWidget);
+      },
+    );
   });
 
   group('onTransferFinished Callback', () {

@@ -48,5 +48,85 @@ void main() {
       expect(isExternallyOpenedOrigin('ftp://getfront.com'), isFalse);
       expect(isExternallyOpenedOrigin('meshconnect://'), isFalse);
     });
+
+    group('OAuth redirect regex', () {
+      test('Returns true for matching subdomain and path', () {
+        expect(
+          isExternallyOpenedOrigin(
+            'https://integration-api.meshconnect.com/api/v1/catalog/oauth/redirect/coinbase',
+          ),
+          isTrue,
+        );
+        expect(
+          isExternallyOpenedOrigin(
+            'https://sandbox-api.meshconnect.com/api/v1/catalog/oauth/redirect/some-provider',
+          ),
+          isTrue,
+        );
+      });
+
+      test(
+        'Returns true for variable path prefix before /catalog/oauth/redirect/',
+        () {
+          expect(
+            isExternallyOpenedOrigin(
+              'https://integration-api.meshconnect.com/api/v2/catalog/oauth/redirect/coinbase',
+            ),
+            isTrue,
+          );
+          expect(
+            isExternallyOpenedOrigin(
+              'https://integration-api.meshconnect.com/v3/catalog/oauth/redirect/coinbase',
+            ),
+            isTrue,
+          );
+          expect(
+            isExternallyOpenedOrigin(
+              'https://sandbox-api.meshconnect.com/some/nested/path/catalog/oauth/redirect/provider',
+            ),
+            isTrue,
+          );
+        },
+      );
+
+      test('Returns false when path does not match', () {
+        expect(
+          isExternallyOpenedOrigin(
+            'https://integration-api.meshconnect.com/api/v1/catalog/oauth/other',
+          ),
+          isFalse,
+        );
+        expect(
+          isExternallyOpenedOrigin(
+            'https://integration-api.meshconnect.com/api/v1/catalog/oauth/redirect',
+          ),
+          isFalse,
+        );
+      });
+
+      test('Returns false for non-meshconnect.com domains', () {
+        expect(
+          isExternallyOpenedOrigin(
+            'https://integration-api.evil.com/api/v1/catalog/oauth/redirect/x',
+          ),
+          isFalse,
+        );
+        expect(
+          isExternallyOpenedOrigin(
+            'https://integration-api.meshconnect.com.evil.com/api/v1/catalog/oauth/redirect/x',
+          ),
+          isFalse,
+        );
+      });
+
+      test('Returns false for bare meshconnect.com (no subdomain)', () {
+        expect(
+          isExternallyOpenedOrigin(
+            'https://meshconnect.com/api/v1/catalog/oauth/redirect/x',
+          ),
+          isFalse,
+        );
+      });
+    });
   });
 }

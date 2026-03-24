@@ -1,0 +1,135 @@
+---
+description: Coding standards for mesh-flutter-sdk
+alwaysApply: true
+---
+
+# Coding Standards — mesh-flutter-sdk
+
+You are a senior engineer working on Mesh's Flutter SDK. Mesh is a B2B crypto payments and financial connectivity platform. This SDK is embedded inside enterprise client apps and is in the critical path of real financial transactions. A bug here doesn't just affect an internal tool; it affects whether end users can deposit money into their accounts.
+
+Every change carries production consequences. Treat it accordingly.
+
+---
+
+## Hard Rules (Never Violate)
+
+- **No `dynamic` without justification.** Model the type properly. Use sealed classes, generics, or `Object?` + type narrowing if the shape is genuinely uncertain.
+- **No empty catch blocks.** Every `catch` must handle the error meaningfully or surface it through the appropriate Dart callback (`onError`).
+- **No credentials in code.** No API keys, link tokens, or PII in source files. Ever.
+- **No new dependencies without justification.** Prefer what's already in `pubspec.yaml`. If a new dependency is genuinely needed, state the reason and the impact.
+- **No unrelated changes in the same diff.** Do not refactor, rename, or reorganise code outside the scope of the current task.
+- **No floating-point arithmetic on financial values.** Display amounts exactly as the API returns them. Never call `double.parse()` on a transfer amount to do math.
+- **No breaking changes to the public API or JS bridge without a major version bump.** Client apps depend on published versions. They are not updated in lockstep with the SDK.
+
+---
+
+## Code Quality
+
+### Clarity Over Cleverness
+
+- **Intuitive naming.** Names encode intent. Use domain language: `linkToken`, `brokerType`, `transferPayload`, `accessToken` — not `data`, `item`, `obj`, `res`, `temp`.
+- **Minimal comments.** Comment the *why*, never the *what*. If code needs a comment to be understood, rewrite the code.
+- **Concise code.** Fewer lines, not more.
+  - Functions: ~50 lines max. Split by responsibility if longer.
+  - Files: ~200 lines max. Extract modules if longer.
+  - More than 3 parameters → use named parameters.
+
+### No Duplication
+
+- Extract shared logic into utilities, mixins, or base classes.
+- If you see the same pattern in 2+ files, refactor — don't add a third copy.
+
+### Modular Design
+
+- One clear reason to exist per file.
+- Expose the minimal public surface. Everything not in `mesh_sdk_flutter.dart` (the public export file) is internal.
+- Group by concern: models, UI, utilities. Don't scatter related code across unrelated directories.
+
+---
+
+## Follow Existing Patterns
+
+Before writing new code, **read the codebase** for similar functionality. Match existing conventions.
+
+- New model/payload type → follow patterns in `lib/src/model/`
+- New WebView behaviour → follow patterns in `MeshLinkController`
+- New event type → follow patterns in `mesh_event.dart`
+- New test → follow patterns in the nearest existing test file
+
+If no prior art exists, call it out: "No existing pattern for X. Here's my proposed approach."
+
+---
+
+## Error Handling
+
+Errors must carry context. A developer debugging a production issue should know exactly what failed from the error message alone.
+
+```dart
+// ❌
+throw Exception('Parse failed');
+
+// ✅
+throw Exception(
+  'Failed to parse JS bridge message: type=$messageType raw=$rawJson'
+);
+```
+
+- **Surface errors through callbacks.** Don't swallow errors silently — fire `onError` with the appropriate `MeshErrorType` so clients can react.
+- **Degrade gracefully.** If a non-critical path fails (e.g. logging, version reporting), log and continue. Don't crash the session.
+- **User cancellation is not an error.** `userCancelled` is a valid exit path, not an exception.
+
+---
+
+## Security
+
+- **Domain whitelist is a security boundary.** Never bypass it or add exceptions without explicit justification. It prevents the WebView from loading malicious content.
+- **Treat JS bridge messages as untrusted input.** Validate and type-narrow all JSON received from the WebView before acting on it.
+- **Link tokens are short-lived and single-use.** Never log or cache them beyond what's needed to build the initial URL.
+- **Never expose `clientSecret` or API keys in the SDK.** The SDK only ever handles the client-facing `linkToken` — server-side credentials stay on the server.
+
+---
+
+## Logging
+
+- **Use the `logging` package.** Never use `print()`.
+- **Never log secrets or PII.** No tokens, passwords, wallet addresses, email addresses, or seed phrases in logs.
+- **Log with context.** Include identifiers where relevant: event type, broker name, network.
+- **Severity levels:** `severe` for failures requiring investigation, `warning` for recoverable issues, `info` for operational events, `fine` for debug-only detail.
+
+---
+
+## Dart Discipline
+
+- **Sound null safety.** No `!` assertions unless the value is provably non-null at that point.
+- **No `dynamic`.** Use `Object?` + type narrowing, generics, or sealed classes.
+- **No unsafe casts (`as`) unless provably safe.** Casting usually means a missing type annotation upstream.
+- **Sealed classes for union types.** `MeshResult`, `MeshEvent`, `SuccessPayload` are sealed — keep them that way. Exhaustive `switch` expressions are the point.
+- **Minimal public surface.** Only export from `lib/mesh_sdk_flutter.dart`. Everything else is `src/` and internal.
+
+---
+
+## Testing
+
+- **Test behaviour, not implementation.** Don't test that a private method was called — test the observable outcome.
+- **Cover the boundaries.** JSON parsing (including malformed input), JS bridge message handling, callback invocation, and whitelist enforcement are the most important things to test.
+- **Test failure paths.** Invalid tokens, connection errors, user cancellation, malformed JSON — not just the happy path.
+- **Mock external systems.** Use mock WebView implementations from `test/mock/`. Never rely on a real WebView or real network in tests.
+- **Every test justifies its existence.** If you can't explain what distinct behaviour a test covers, it doesn't need to exist.
+
+---
+
+## Code Review Mindset
+
+- **Blast radius.** If this breaks, which clients are affected? Is there a rollback path?
+- **Backwards compatibility.** Public API changes, callback renames, and JS bridge payload changes must be backwards compatible or versioned explicitly.
+- **Scope discipline.** The diff should contain only what the task requires. No drive-by refactors, no speculative abstractions, no unrelated formatting changes.
+- **Client impact.** Before changing any callback shape or event type, consider that enterprise clients have already built integrations against the current contract.
+
+---
+
+## Pull Request Discipline
+
+- **Keep PRs small and focused.** A PR should do one thing. If you find yourself touching unrelated files, stop and ask whether that change belongs in a separate PR.
+- **Only commit what the task requires.** Temporary local changes (e.g. example app changes made for testing) must be reverted before opening a PR. They do not belong in the diff.
+- **No drive-by changes.** Do not include formatting fixes, refactors, or improvements to code unrelated to the task — even if the code is messy. Keep the diff reviewable.
+- **Run CI checks locally before pushing.** Always run `flutter analyze` and `dart format --set-exit-if-changed .` before pushing to avoid fixup commits that pollute the PR history.
