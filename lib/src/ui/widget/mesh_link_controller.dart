@@ -273,7 +273,8 @@ class MeshLinkController {
         _isExternalAppOpened = false;
         return;
       }
-      // Successful launch — reset so future deep links aren't permanently blocked.
+      // Successful launch — reset so future deep links
+      // aren't permanently blocked.
       // Without this reset the flag stays true indefinitely because prevented
       // WebView navigations never trigger the onUrlChange linkHost check.
       _isExternalAppOpened = false;
