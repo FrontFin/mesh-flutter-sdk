@@ -248,10 +248,7 @@ class MeshLinkController {
   }
 
   Future<bool> _launchExternalApplication(Uri uri) async {
-    final launched = await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
-    );
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched) {
       logger.info(
         'Launch of external application returned false for URI: $uri',
@@ -276,25 +273,15 @@ class MeshLinkController {
         _isExternalAppOpened = false;
         return;
       }
-    } on PlatformException catch (e) {
+    } on PlatformException catch (e, s) {
       if (isApp && e.code == _activityNotFoundCode) {
-        try {
-          logger.info('Activity not found. Trying external app...');
-          if (await _launchExternalApplication(uri)) {
-            return;
-          }
-        } on PlatformException catch (e2) {
-          if (e2.code != _activityNotFoundCode) {
-            _isExternalAppOpened = false;
-            rethrow;
-          }
-        }
         if (_tryStoreFallbackFromAppUri(uri)) {
           return;
         }
+      } else {
+        logger.severe('Unexpected platform error launching URI: $uri', e, s);
       }
       _isExternalAppOpened = false;
-      rethrow;
     }
   }
 

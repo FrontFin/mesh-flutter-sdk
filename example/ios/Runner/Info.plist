@@ -43,6 +43,7 @@
 		<string>phantom</string>
 		<string>trust</string>
 		<string>metamask</string>
+		<string>itms-apps</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

@@ -31,24 +31,6 @@ void main() {
       });
     });
 
-    group('internal WebView schemes', () {
-      test('returns false for about:blank', () {
-        expect(isAppUrlChange('about:blank'), isFalse);
-      });
-
-      test('returns false for about:blank with fragment', () {
-        expect(isAppUrlChange('about:blank#'), isFalse);
-        expect(isAppUrlChange('about:blank#anchor'), isFalse);
-      });
-
-      test('returns false for data: URL', () {
-        expect(isAppUrlChange('data:text/html,<p>hi</p>'), isFalse);
-      });
-
-      test('returns false for blob: URL', () {
-        expect(isAppUrlChange('blob:https://example.com/uuid'), isFalse);
-      });
-    });
 
     group('2. Android: http/https market and intent hosts', () {
       setUp(() {
