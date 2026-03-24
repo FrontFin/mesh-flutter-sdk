@@ -16,10 +16,12 @@ void main() {
         }
       });
 
-      test('itms-apps is not in allowedNativeSchemes (iOS-only, see iOS group)',
-          () {
-        expect(allowedNativeSchemes.contains('itms-apps'), isFalse);
-      });
+      test(
+        'itms-apps is not in allowedNativeSchemes (iOS-only, see iOS group)',
+        () {
+          expect(allowedNativeSchemes.contains('itms-apps'), isFalse);
+        },
+      );
 
       test('matches schemes case-insensitively', () {
         expect(isAppUrlChange('MetaMask://wc'), isTrue);
@@ -30,7 +32,6 @@ void main() {
         expect(isAppUrlChange('myapp://open'), isFalse);
       });
     });
-
 
     group('2. Android: http/https market and intent hosts', () {
       setUp(() {
@@ -49,49 +50,58 @@ void main() {
         expect(isAppUrlChange('https://intent/something'), isTrue);
       });
 
-      test('returns true for exodus custom scheme via allowedNativeSchemes', () {
-        expect(isAppUrlChange('exodus://open'), isTrue);
-      });
+      test(
+        'returns true for exodus custom scheme via allowedNativeSchemes',
+        () {
+          expect(isAppUrlChange('exodus://open'), isTrue);
+        },
+      );
 
       test('returns false for https://exodus.com (not market/intent)', () {
         expect(isAppUrlChange('https://exodus.com'), isFalse);
       });
     });
 
-    group('3. http/https: iOS App Store host, then .app.link (any platform)', () {
-      test('returns true for https://apps.apple.com on iOS', () {
-        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        addTearDown(() {
-          debugDefaultTargetPlatformOverride = null;
+    group(
+      '3. http/https: iOS App Store host, then .app.link (any platform)',
+      () {
+        test('returns true for https://apps.apple.com on iOS', () {
+          debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+          addTearDown(() {
+            debugDefaultTargetPlatformOverride = null;
+          });
+          expect(isAppUrlChange('https://apps.apple.com/app/id123'), isTrue);
         });
-        expect(isAppUrlChange('https://apps.apple.com/app/id123'), isTrue);
-      });
 
-      test('returns false for https://apps.apple.com on Android', () {
-        debugDefaultTargetPlatformOverride = TargetPlatform.android;
-        addTearDown(() {
-          debugDefaultTargetPlatformOverride = null;
+        test('returns false for https://apps.apple.com on Android', () {
+          debugDefaultTargetPlatformOverride = TargetPlatform.android;
+          addTearDown(() {
+            debugDefaultTargetPlatformOverride = null;
+          });
+          expect(isAppUrlChange('https://apps.apple.com/app/id123'), isFalse);
         });
-        expect(isAppUrlChange('https://apps.apple.com/app/id123'), isFalse);
-      });
 
-      test('returns true for host ending with .app.link', () {
-        expect(isAppUrlChange('https://foo.app.link'), isTrue);
-        expect(isAppUrlChange('https://sub.branch.app.link/path'), isTrue);
-      });
+        test('returns true for host ending with .app.link', () {
+          expect(isAppUrlChange('https://foo.app.link'), isTrue);
+          expect(isAppUrlChange('https://sub.branch.app.link/path'), isTrue);
+        });
 
-      test('returns false for host that only contains .app.link substring', () {
-        expect(isAppUrlChange('https://app.link.example.com'), isFalse);
-      });
+        test(
+          'returns false for host that only contains .app.link substring',
+          () {
+            expect(isAppUrlChange('https://app.link.example.com'), isFalse);
+          },
+        );
 
-      test('returns false for plain https URL', () {
-        expect(isAppUrlChange('https://example.com'), isFalse);
-      });
+        test('returns false for plain https URL', () {
+          expect(isAppUrlChange('https://example.com'), isFalse);
+        });
 
-      test('returns false for plain http URL', () {
-        expect(isAppUrlChange('http://example.com/path'), isFalse);
-      });
-    });
+        test('returns false for plain http URL', () {
+          expect(isAppUrlChange('http://example.com/path'), isFalse);
+        });
+      },
+    );
 
     group('4. iOS-only: itms-apps scheme (not in allowedNativeSchemes)', () {
       test('returns true for itms-apps on iOS', () {
