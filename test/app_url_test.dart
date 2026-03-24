@@ -5,7 +5,33 @@ import 'package:mesh_sdk_flutter/src/util/constants.dart';
 
 void main() {
   group('isAppUrlChange', () {
-    group('internal WebView schemes (not in allowedCustomUrlSchemes)', () {
+    group('1. allowedNativeSchemes (cross-platform wallet schemes)', () {
+      test('returns true for every scheme in allowedNativeSchemes', () {
+        for (final scheme in allowedNativeSchemes) {
+          expect(
+            isAppUrlChange('$scheme://x'),
+            isTrue,
+            reason: 'scheme: $scheme',
+          );
+        }
+      });
+
+      test('itms-apps is not in allowedNativeSchemes (iOS-only, see iOS group)',
+          () {
+        expect(allowedNativeSchemes.contains('itms-apps'), isFalse);
+      });
+
+      test('matches schemes case-insensitively', () {
+        expect(isAppUrlChange('MetaMask://wc'), isTrue);
+        expect(isAppUrlChange('TRONLINKOUTSIDE://path'), isTrue);
+      });
+
+      test('returns false for unknown custom scheme', () {
+        expect(isAppUrlChange('myapp://open'), isFalse);
+      });
+    });
+
+    group('internal WebView schemes', () {
       test('returns false for about:blank', () {
         expect(isAppUrlChange('about:blank'), isFalse);
       });
@@ -24,61 +50,7 @@ void main() {
       });
     });
 
-    group('allowedCustomUrlSchemes', () {
-      test('returns true for every scheme in allowedCustomUrlSchemes', () {
-        for (final scheme in allowedCustomUrlSchemes) {
-          expect(
-            isAppUrlChange('$scheme://x'),
-            isTrue,
-            reason: 'scheme: $scheme',
-          );
-        }
-      });
-
-      test('matches schemes case-insensitively', () {
-        expect(isAppUrlChange('MetaMask://wc'), isTrue);
-        expect(isAppUrlChange('TRONLINKOUTSIDE://path'), isTrue);
-      });
-
-      test('returns false for scheme not in allowedCustomUrlSchemes', () {
-        expect(isAppUrlChange('myapp://open'), isFalse);
-      });
-    });
-
-    group('custom URL schemes (wallet deep links)', () {
-      test('returns true for tronlinkoutside scheme', () {
-        expect(isAppUrlChange('tronlinkoutside://some/path'), isTrue);
-      });
-
-      test('returns true for metamask scheme', () {
-        expect(isAppUrlChange('metamask://wc'), isTrue);
-      });
-
-      test('returns true for exodus scheme', () {
-        expect(isAppUrlChange('exodus://some/path'), isTrue);
-      });
-    });
-
-    group('http and https', () {
-      test('returns false for plain https URL', () {
-        expect(isAppUrlChange('https://example.com'), isFalse);
-      });
-
-      test('returns false for plain http URL', () {
-        expect(isAppUrlChange('http://example.com/path'), isFalse);
-      });
-
-      test('returns true for host ending with .app.link', () {
-        expect(isAppUrlChange('https://foo.app.link'), isTrue);
-        expect(isAppUrlChange('https://sub.branch.app.link/path'), isTrue);
-      });
-
-      test('returns false for host that only contains .app.link', () {
-        expect(isAppUrlChange('https://app.link.example.com'), isFalse);
-      });
-    });
-
-    group('Android-specific', () {
+    group('2. Android: http/https market and intent hosts', () {
       setUp(() {
         debugDefaultTargetPlatformOverride = TargetPlatform.android;
       });
@@ -95,31 +67,95 @@ void main() {
         expect(isAppUrlChange('https://intent/something'), isTrue);
       });
 
-      test('returns true for exodus scheme', () {
-        expect(isAppUrlChange('https://exodus.com'), isFalse);
+      test('returns true for exodus custom scheme via allowedNativeSchemes', () {
         expect(isAppUrlChange('exodus://open'), isTrue);
+      });
+
+      test('returns false for https://exodus.com (not market/intent)', () {
+        expect(isAppUrlChange('https://exodus.com'), isFalse);
       });
     });
 
-    group('iOS-specific', () {
-      setUp(() {
+    group('3. http/https: iOS App Store host, then .app.link (any platform)', () {
+      test('returns true for https://apps.apple.com on iOS', () {
         debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      });
-
-      tearDown(() {
-        debugDefaultTargetPlatformOverride = null;
-      });
-
-      test('returns true for apps.apple.com host', () {
+        addTearDown(() {
+          debugDefaultTargetPlatformOverride = null;
+        });
         expect(isAppUrlChange('https://apps.apple.com/app/id123'), isTrue);
       });
 
-      test('returns true for itms-apps scheme', () {
+      test('returns false for https://apps.apple.com on Android', () {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        addTearDown(() {
+          debugDefaultTargetPlatformOverride = null;
+        });
+        expect(isAppUrlChange('https://apps.apple.com/app/id123'), isFalse);
+      });
+
+      test('returns true for host ending with .app.link', () {
+        expect(isAppUrlChange('https://foo.app.link'), isTrue);
+        expect(isAppUrlChange('https://sub.branch.app.link/path'), isTrue);
+      });
+
+      test('returns false for host that only contains .app.link substring', () {
+        expect(isAppUrlChange('https://app.link.example.com'), isFalse);
+      });
+
+      test('returns false for plain https URL', () {
+        expect(isAppUrlChange('https://example.com'), isFalse);
+      });
+
+      test('returns false for plain http URL', () {
+        expect(isAppUrlChange('http://example.com/path'), isFalse);
+      });
+    });
+
+    group('4. iOS-only: itms-apps scheme (not in allowedNativeSchemes)', () {
+      test('returns true for itms-apps on iOS', () {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        addTearDown(() {
+          debugDefaultTargetPlatformOverride = null;
+        });
         expect(isAppUrlChange('itms-apps://apps.apple.com/app/id123'), isTrue);
       });
 
-      test('returns false for regular https', () {
-        expect(isAppUrlChange('https://example.com'), isFalse);
+      test('returns false for itms-apps on Android', () {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        addTearDown(() {
+          debugDefaultTargetPlatformOverride = null;
+        });
+        expect(isAppUrlChange('itms-apps://apps.apple.com/app/id123'), isFalse);
+      });
+
+      test('returns false for itms-apps on macOS', () {
+        debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+        addTearDown(() {
+          debugDefaultTargetPlatformOverride = null;
+        });
+        expect(isAppUrlChange('itms-apps://apps.apple.com/app/id123'), isFalse);
+      });
+
+      test('matches itms-apps case-insensitively on iOS', () {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        addTearDown(() {
+          debugDefaultTargetPlatformOverride = null;
+        });
+        expect(isAppUrlChange('ITMS-Apps://apps.apple.com/x'), isTrue);
+      });
+    });
+
+    group('wallet deep links (examples)', () {
+      test('tronlinkoutside', () {
+        expect(isAppUrlChange('tronlinkoutside://some/path'), isTrue);
+      });
+
+      test('metamask', () {
+        expect(isAppUrlChange('metamask://wc'), isTrue);
+      });
+
+      test('exodus', () {
+        expect(isAppUrlChange('exodus://some/path'), isTrue);
       });
     });
   });

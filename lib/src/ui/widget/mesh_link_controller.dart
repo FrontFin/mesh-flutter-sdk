@@ -234,6 +234,32 @@ class MeshLinkController {
     logger.warning('Unexpected JS message: $json');
   }
 
+  /// Returns true if a store URL launch was scheduled ([_isExternalAppOpened]
+  /// is cleared first).
+  bool _tryStoreFallbackFromAppUri(Uri uri) {
+    final storeUrl = getStoreUriFromAppUri(uri);
+    if (storeUrl == null) {
+      return false;
+    }
+    logger.info('External app not found. Trying store link...');
+    _isExternalAppOpened = false;
+    unawaited(_launchExternalUri(storeUrl, isApp: true));
+    return true;
+  }
+
+  Future<bool> _launchExternalApplication(Uri uri) async {
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+    if (!launched) {
+      logger.info(
+        'Launch of external application returned false for URI: $uri',
+      );
+    }
+    return launched;
+  }
+
   Future<void> _launchExternalUri(Uri uri, {required bool isApp}) async {
     if (_isExternalAppOpened) {
       logger.warning('External app already opened, ignoring: $uri');
@@ -243,37 +269,27 @@ class MeshLinkController {
 
     _isExternalAppOpened = true;
     try {
-      final launched = await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
-      if (!launched) {
-        logger.info(
-          'Launch of external application returned false for URI: $uri',
-        );
+      if (!await _launchExternalApplication(uri)) {
+        if (isApp && _tryStoreFallbackFromAppUri(uri)) {
+          return;
+        }
         _isExternalAppOpened = false;
+        return;
       }
     } on PlatformException catch (e) {
       if (isApp && e.code == _activityNotFoundCode) {
         try {
           logger.info('Activity not found. Trying external app...');
-          final launched = await launchUrl(
-            uri,
-            mode: LaunchMode.externalApplication,
-          );
-          if (launched) {
+          if (await _launchExternalApplication(uri)) {
             return;
           }
         } on PlatformException catch (e2) {
           if (e2.code != _activityNotFoundCode) {
+            _isExternalAppOpened = false;
             rethrow;
           }
         }
-        final storeUrl = getStoreUriFromAppUri(uri);
-        if (storeUrl != null) {
-          logger.info('External app not found. Trying store link...');
-          _isExternalAppOpened = false;
-          unawaited(_launchExternalUri(storeUrl, isApp: true));
+        if (_tryStoreFallbackFromAppUri(uri)) {
           return;
         }
       }
