@@ -123,3 +123,24 @@ final _oAuthRedirectRegex = RegExp(
 const _exodusSchema = 'exodus';
 const _exodusPlayStoreUrl =
     'https://play.google.com/store/apps/details?id=exodusmovement.exodus';
+
+/// Native app URL schemes that may leave the WebView (wallet deep links).
+/// Used by `isAppUrlChange` in app_url.dart.
+/// Extend when Mesh adds wallet integrations.
+const allowedNativeSchemes = {
+  'tronlinkoutside',
+  'bitcoin',
+  'zengo',
+  'okx',
+  'uniswap',
+  'rainbow',
+  'bitkeep',
+  'ledgerlive',
+  'dfw',
+  'exodus',
+  'cbwallet',
+  'bnc',
+  'phantom',
+  'trust',
+  'metamask',
+};

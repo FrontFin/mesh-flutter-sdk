@@ -234,6 +234,29 @@ class MeshLinkController {
     logger.warning('Unexpected JS message: $json');
   }
 
+  /// Returns true if a store URL launch was scheduled ([_isExternalAppOpened]
+  /// is cleared first).
+  bool _tryStoreFallbackFromAppUri(Uri uri) {
+    final storeUrl = getStoreUriFromAppUri(uri);
+    if (storeUrl == null) {
+      return false;
+    }
+    logger.info('External app not found. Trying store link...');
+    _isExternalAppOpened = false;
+    unawaited(_launchExternalUri(storeUrl, isApp: false));
+    return true;
+  }
+
+  Future<bool> _launchExternalApplication(Uri uri) async {
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched) {
+      logger.info(
+        'Launch of external application returned false for URI: $uri',
+      );
+    }
+    return launched;
+  }
+
   Future<void> _launchExternalUri(Uri uri, {required bool isApp}) async {
     if (_isExternalAppOpened) {
       logger.warning('External app already opened, ignoring: $uri');
@@ -242,38 +265,23 @@ class MeshLinkController {
     }
 
     _isExternalAppOpened = true;
-    if (!isApp) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-      return;
-    }
-
     try {
-      // Try launching in external non-browser app
-      await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
-    } on PlatformException catch (e) {
-      if (e.code == _activityNotFoundCode) {
-        // If it fails, try browser app
-        try {
-          logger.info('Activity not found. Trying external app...');
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!await _launchExternalApplication(uri)) {
+        if (isApp && _tryStoreFallbackFromAppUri(uri)) {
           return;
-        } on PlatformException catch (e) {
-          // If it fails, try store link
-          if (e.code == _activityNotFoundCode) {
-            logger.info('External app not found. Trying store link...');
-            final storeUrl = getStoreUriFromAppUri(uri);
-            if (storeUrl != null) {
-              logger.info('Store link found. Opening...');
-              _isExternalAppOpened = false;
-              unawaited(_launchExternalUri(storeUrl, isApp: true));
-              return;
-            }
-          }
         }
+        _isExternalAppOpened = false;
+        return;
       }
-
+    } on PlatformException catch (e, s) {
+      if (isApp && e.code == _activityNotFoundCode) {
+        if (_tryStoreFallbackFromAppUri(uri)) {
+          return;
+        }
+      } else {
+        logger.severe('Unexpected platform error launching URI: $uri', e, s);
+      }
       _isExternalAppOpened = false;
-      rethrow;
     }
   }
 
