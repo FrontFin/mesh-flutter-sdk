@@ -28,7 +28,9 @@ import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
 @override
 Widget build(BuildContext context) {
   return MaterialApp(
-    localizationsDelegates: MeshLocalizations.localizationsDelegates,
+    localizationsDelegates: [
+      ...MeshLocalizations.localizationsDelegates,
+    ],
   );
 }
 ```
