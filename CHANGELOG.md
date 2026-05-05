@@ -1,3 +1,7 @@
+## 1.1.3
+
+- Expose `tokenId` field in `AccountToken` entity, required for Mesh’s Managed Token system (MMT).
+
 ## 1.1.2
 
 - Enables opening Mesh OAuth redirect URLs in an external browser.
