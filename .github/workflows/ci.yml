@@ -1,0 +1,45 @@
+# This workflow runs on pull requests to the main branch and on demand. 
+# It checks code formatting, analyzes the code, and runs tests with coverage.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true    
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout 🎾
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter 🛠️
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - run: flutter --version
+
+      - name: Install dependencies 📦
+        run: flutter pub get
+
+      - name: Verify formatting 🧹
+        run: dart format -o none --set-exit-if-changed .
+
+      - name: Analyze project source 🔍
+        run: flutter analyze
+
+      - name: Run tests 🧪
+        run: flutter test --coverage
