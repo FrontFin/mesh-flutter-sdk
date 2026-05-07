@@ -83,15 +83,6 @@ class _HomePageState extends State<HomePage> {
         language: 'system',
         displayFiatCurrency: 'USD',
         theme: ThemeMode.system,
-        integrationAccessTokens: const [
-          IntegrationAccessToken(
-            accessToken: 'token',
-            accountId: 'id',
-            accountName: 'name',
-            brokerName: 'broker',
-            brokerType: 'type',
-          ),
-        ],
         linkToken: linkToken,
         onEvent: (event) {
           print('Mesh event: $event');
@@ -103,10 +94,10 @@ class _HomePageState extends State<HomePage> {
           print('Mesh success: ${payload.page}');
         },
         onIntegrationConnected: (integration) {
-          print('Integration connected: $integration');
+          print('Mesh integration connected: $integration');
         },
         onTransferFinished: (transfer) {
-          print('Transfer finished: $transfer');
+          print('Mesh transfer finished: $transfer');
         },
       ),
     );

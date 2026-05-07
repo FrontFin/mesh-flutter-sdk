@@ -142,6 +142,7 @@ class MeshLinkController {
               return NavigationDecision.prevent;
             }
 
+            logger.fine('Navigate: $uri"');
             return NavigationDecision.navigate;
           },
           onHttpError: (error) {

@@ -92,6 +92,7 @@ void main() {
                 },
                 'accessToken': 'access-token-xyz',
                 'refreshToken': 'refresh-token-abc',
+                'tokenId': 'tid-xyz',
               },
             ],
             'brokerBrandInfo': {
@@ -120,6 +121,7 @@ void main() {
         final accountToken = payload.accountTokens.first;
         expect(accountToken.accessToken, 'access-token-xyz');
         expect(accountToken.refreshToken, 'refresh-token-abc');
+        expect(accountToken.tokenId, 'tid-xyz');
         expect(accountToken.account.accountId, 'acc-123');
         expect(accountToken.account.accountName, 'Main Account');
         expect(accountToken.account.fund, 1000.0);

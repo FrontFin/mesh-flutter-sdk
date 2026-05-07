@@ -540,7 +540,8 @@ void main() {
                   "accountId": "acc-123",
                   "accountName": "Main Account"
                 },
-                "accessToken": "access-token-xyz"
+                "accessToken": "access-token-xyz",
+                "tokenId": "tid-xyz"
               }
             ],
             "brokerBrandInfo": {"brokerLogo": null},
@@ -557,6 +558,7 @@ void main() {
       expect(payload.brokerName, 'Coinbase');
       expect(payload.accountTokens, hasLength(1));
       expect(payload.accountTokens.first.accessToken, 'access-token-xyz');
+      expect(payload.accountTokens.first.tokenId, 'tid-xyz');
     });
   });
 
