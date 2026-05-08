@@ -36,10 +36,10 @@ jobs:
 
           normalize_semver() {
             local s="$1"
-            s="${s#v}"
-            s="${s#.}"
+            s="${s//\"/}"
             s="${s#"${s%%[![:space:]]*}"}"
             s="${s%"${s##*[![:space:]]}"}"
+            s="${s#v}"
             echo "$s"
           }
 
