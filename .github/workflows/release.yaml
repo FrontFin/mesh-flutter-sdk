@@ -186,18 +186,12 @@ jobs:
 
           CHANGELOG_SECTION=$(awk -v version="## ${VERSION}" '$0 == version {found=1; next} found && /^## /{exit} found{print}' CHANGELOG.md)
 
-          if [[ -n "$PREV_TAG" ]]; then
-            COMPARE_LINE="**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${VERSION}"
-          else
-            COMPARE_LINE=""
-          fi
-
           cat > /tmp/release_notes.md << EOF
           ## What's Changed
 
           ${CHANGELOG_SECTION}
 
-          ${COMPARE_LINE}
+          **Full Changelog**: https://github.com/FrontFin/${{ github.repository }}/compare/${PREV_TAG}...${VERSION}
           EOF
 
           gh release create "$VERSION" \
