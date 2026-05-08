@@ -1,4 +1,4 @@
-# This workflow runs on pull requests to the main branch and on demand. 
+# This workflow runs on pull requests to the main branch and on demand.
 # It checks code formatting, analyzes the code, and runs tests with coverage.
 name: CI
 
