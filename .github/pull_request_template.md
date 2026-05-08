@@ -15,7 +15,7 @@
 
 Please tick the options you have done:
 
-- [ ] Self-reviewed and it meets ticket criteria
+- [ ] Performed a self-review, and it meets ticket criteria
 - [ ] Hard-to-understand areas are commented
 - [ ] Documentation updated where necessary
 - [ ] Tests added that prove the fix or feature works
