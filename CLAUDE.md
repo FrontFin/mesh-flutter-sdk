@@ -170,6 +170,13 @@ Clients can disable the whitelist via `MeshConfiguration` for custom flows, but 
 | `.github/workflows/ci.yml` | Pull request to `main` | Format check, static analysis, tests with coverage |
 | `.github/workflows/release.yaml` | Push to `main` or manual | Version check → CI → publish to pub.dev → git tag → GitHub release → Slack |
 
+### Pull requests
+
+When creating a PR, always use the template at `.github/pull_request_template.md`:
+- Fill in the **PR overview** with a Jira link and description of the changes
+- Tick the relevant **Type of change** boxes
+- Do not modify or remove the **Checklist** items
+
 ### Release flow
 
 1. Run `/bump-version` — increments `pubspec.yaml` version and prepends a `CHANGELOG.md` entry
