@@ -160,8 +160,22 @@ Clients can disable the whitelist via `MeshConfiguration` for custom flows, but 
 ## Publishing
 
 - Published to **pub.dev** as `mesh_sdk_flutter`
-- Version is in `pubspec.yaml` — bump before releasing
-- CI publishes automatically on `v*.*.*` tags via `.github/workflows/publish.yml`
+- Version is in `pubspec.yaml` — bump before releasing using `/bump-version`
+- See `RELEASE.md` for the full release process
+
+### GitHub workflows
+
+| File | Trigger | Purpose |
+|------|---------|---------|
+| `.github/workflows/ci.yml` | Pull request to `main` | Format check, static analysis, tests with coverage |
+| `.github/workflows/release.yaml` | Push to `main` or manual | Version check → CI → publish to pub.dev → git tag → GitHub release → Slack |
+
+### Release flow
+
+1. Run `/bump-version` — increments `pubspec.yaml` version and prepends a `CHANGELOG.md` entry
+2. Merge to `main` — `release.yaml` triggers automatically
+3. If `pubspec.yaml` version differs from the latest git tag, the workflow publishes to pub.dev, creates a `x.y.z` tag, creates a GitHub release, and posts a Slack announcement
+4. If the version is unchanged, the workflow exits silently — safe to merge non-release PRs to `main`
 
 ---
 

@@ -69,16 +69,14 @@ jobs:
           echo "Current version in pubspec.yaml: $VERSION"
           echo "Latest git tag: ${LATEST_TAG:-<none>}"
 
-          TAG_NAME="v${VERSION}"
-
           if [[ "$VERSION" == "$LATEST_TAG" ]]; then
             echo "No new version detected — skipping release"
             echo "new_version=false" >> "$GITHUB_OUTPUT"
           elif [[ -n "$LATEST_TAG" ]] && ! semver_gt "$VERSION" "$LATEST_TAG"; then
             echo "::error::version in pubspec.yaml ($VERSION) is not greater than the latest tag ($LATEST_TAG) — accidental downgrade?"
             exit 1
-          elif [[ -n "$(git tag -l "$TAG_NAME")" ]]; then
-            echo "::error::Tag $TAG_NAME already exists — bump the version in pubspec.yaml before releasing"
+          elif [[ -n "$(git tag -l "$VERSION")" ]]; then
+            echo "::error::Tag $VERSION already exists — bump the version in pubspec.yaml before releasing"
             exit 1
           else
             echo "New version detected: $VERSION (previous: ${LATEST_TAG:-<none>})"
