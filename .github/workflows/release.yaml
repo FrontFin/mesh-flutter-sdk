@@ -168,14 +168,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create git tag 🏷️
-        run: |
-          VERSION="${{ needs.check-version.outputs.version }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "$VERSION"
-          git push origin "$VERSION"
-
       - name: Create GitHub Release 🚀
         id: create_release
         env:
