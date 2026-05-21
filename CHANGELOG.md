@@ -1,3 +1,8 @@
+## 1.1.4
+
+### Fixed
+- `window.accessTokens` is now injected as a stringified JSON string so the Link UI can call `JSON.parse()` on it, matching the expected contract.
+
 ## 1.1.3
 
 - Expose `tokenId` field in `AccountToken` entity, required for Mesh’s Managed Token system (MMT).

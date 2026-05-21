@@ -297,7 +297,13 @@ class MeshLinkController {
           .map((e) => e.toJson())
           .toList();
 
-      stringBuffer.write('window.accessTokens=${json.encode(tokensJson)};');
+      // Double-encoded so the JS side receives a string, not an object.
+      // Link UI expects JSON.parse(window.accessTokens) to work.
+      final tokensJsonString = json.encode(tokensJson);
+      stringBuffer.write(
+        'window.accessTokens=${json.encode(tokensJsonString)};',
+      );
+      logger.info('Injecting ${tokensJson.length} accessToken(s)');
     }
 
     await _webViewController!.runJavaScript(stringBuffer.toString());

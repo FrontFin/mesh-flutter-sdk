@@ -263,13 +263,12 @@ void main() {
         webViewController.lastJavaScript,
         "window.meshSdkPlatform='flutter';"
         "window.meshSdkVersion='$sdkVersion';"
-        'window.accessTokens=[{'
-        '"accountId":"id",'
-        '"accountName":"name",'
-        '"accessToken":"token",'
-        '"brokerType":"brokerType",'
-        '"brokerName":"brokerName"'
-        '}];',
+        'window.accessTokens='
+        r'"[{\"accountId\":\"id\",'
+        r'\"accountName\":\"name\",'
+        r'\"accessToken\":\"token\",'
+        r'\"brokerType\":\"brokerType\",'
+        r'\"brokerName\":\"brokerName\"}]";',
       );
     });
   });
