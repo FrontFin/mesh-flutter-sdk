@@ -133,7 +133,12 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Create and push git tag 🏷️
+        # Must use a PAT (not GITHUB_TOKEN) so the tag push is treated as a real actor event
+        # and triggers the publish.yaml workflow. GITHUB_TOKEN-pushed events are suppressed
+        # by GitHub to prevent workflow loops.
+        env:
+          RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
         run: |
           VERSION="${{ needs.check-version.outputs.version }}"
           git tag "$VERSION"
-          git push origin "$VERSION"
+          git push "https://x-access-token:${RELEASE_PAT}@github.com/${{ github.repository }}.git" "$VERSION"
