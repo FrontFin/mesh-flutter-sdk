@@ -45,7 +45,7 @@ jobs:
         run: |
           VERSION="${{ github.ref_name }}"
           VERSION_NUM="${VERSION#v}"
-          PREV_TAG=$(git tag --sort=-v:refname | grep -v "^${VERSION}$" | head -n 1)
+          PREV_TAG=$(git tag -l 'v*' --sort=-v:refname | grep -v "^${VERSION}$" | head -n 1)
 
           if [[ -z "$PREV_TAG" ]]; then
             MESSAGE=":package: Release (no previous semver tag)"
