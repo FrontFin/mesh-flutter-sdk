@@ -5,7 +5,7 @@ name: Publish
 on:
   push:
     tags:
-      - '[0-9]*.[0-9]*.[0-9]*'
+      - 'v[0-9]*.[0-9]*.[0-9]*'
 
 jobs:
   validate-tag:
@@ -14,8 +14,8 @@ jobs:
       - name: Verify tag is strict semver 🔍
         run: |
           TAG="${{ github.ref_name }}"
-          if [[ ! "$TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Tag '$TAG' is not a valid MAJOR.MINOR.PATCH semver tag — skipping publish"
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag '$TAG' is not a valid vMAJOR.MINOR.PATCH semver tag — skipping publish"
             exit 1
           fi
 
@@ -44,13 +44,15 @@ jobs:
         id: meta
         run: |
           VERSION="${{ github.ref_name }}"
+          VERSION_NUM="${VERSION#v}"
           PREV_TAG=$(git tag --sort=-v:refname | grep -v "^${VERSION}$" | head -n 1)
 
           if [[ -z "$PREV_TAG" ]]; then
             MESSAGE=":package: Release (no previous semver tag)"
           else
-            IFS='.' read -r L_MAJOR L_MINOR L_PATCH <<< "$VERSION"
-            IFS='.' read -r P_MAJOR P_MINOR P_PATCH <<< "$PREV_TAG"
+            PREV_TAG_NUM="${PREV_TAG#v}"
+            IFS='.' read -r L_MAJOR L_MINOR L_PATCH <<< "$VERSION_NUM"
+            IFS='.' read -r P_MAJOR P_MINOR P_PATCH <<< "$PREV_TAG_NUM"
 
             if [[ "$L_MAJOR" -gt "$P_MAJOR" ]]; then
               MESSAGE=":exclamation: Major (breaking change)"
@@ -74,9 +76,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ github.ref_name }}"
+          VERSION_NUM="${VERSION#v}"
           PREV_TAG="${{ steps.meta.outputs.previous_tag }}"
 
-          CHANGELOG_SECTION=$(awk -v version="$VERSION" '$0 == "## " version {found=1; next} found && /^## /{exit} found{print}' CHANGELOG.md)
+          CHANGELOG_SECTION=$(awk -v version="$VERSION_NUM" '$0 == "## " version {found=1; next} found && /^## /{exit} found{print}' CHANGELOG.md)
 
           cat > /tmp/release_notes.md << EOF
           ## What's Changed
