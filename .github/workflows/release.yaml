@@ -42,7 +42,7 @@ jobs:
 
           VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
           VERSION=$(normalize_semver "$VERSION")
-          LATEST_RAW_TAG=$(git tag --sort=-v:refname | head -n 1)
+          LATEST_RAW_TAG=$(git tag -l 'v*' --sort=-v:refname | head -n 1)
           LATEST_TAG=$(normalize_semver "$LATEST_RAW_TAG")
 
           if [[ ! "$VERSION" =~ $SEMVER_RE ]]; then
