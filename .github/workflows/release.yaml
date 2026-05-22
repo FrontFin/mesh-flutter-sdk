@@ -131,14 +131,16 @@ jobs:
     steps:
       - name: Checkout 🎾
         uses: actions/checkout@v6
+        with:
+          # Must use a PAT (not GITHUB_TOKEN) so the tag push is treated as a real actor event
+          # and triggers the publish.yaml workflow. GITHUB_TOKEN-pushed events are suppressed
+          # by GitHub to prevent workflow loops.
+          # Passing the token here lets actions/checkout install a credential helper that
+          # supplies it at the HTTP layer — the token never appears in the remote URL.
+          token: ${{ secrets.RELEASE_PAT }}
 
       - name: Create and push git tag 🏷️
-        # Must use a PAT (not GITHUB_TOKEN) so the tag push is treated as a real actor event
-        # and triggers the publish.yaml workflow. GITHUB_TOKEN-pushed events are suppressed
-        # by GitHub to prevent workflow loops.
-        env:
-          RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
         run: |
           VERSION="${{ needs.check-version.outputs.version }}"
           git tag "$VERSION"
-          git push "https://x-access-token:${RELEASE_PAT}@github.com/${{ github.repository }}.git" "$VERSION"
+          git push origin "$VERSION"
