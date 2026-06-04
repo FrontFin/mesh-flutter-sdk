@@ -1,3 +1,8 @@
+## 1.2.0
+
+### Added
+- `pay.coinbase.com` is now opened in the external browser, enabling the Coinbase Pay ramp fallback flow to complete passkey 2FA on devices where it is not supported inside the WebView.
+
 ## 1.1.4
 
 ### Fixed
