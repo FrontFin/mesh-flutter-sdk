@@ -108,6 +108,7 @@ const _externallyOpenedOrigins = [
   'https://coinbase.com',           // Coinbase
   'https://www.coinbase.com',       // Coinbase
   'https://login.coinbase.com',     // Coinbase
+  'https://pay.coinbase.com',       // Coinbase Pay (ramp fallback)
   'https://exodus.com/m/',          // Exodus
   'https://sandbox.meshconnect.com/authorize/Coinbase', // Coinbase on Sandbox
   'https://appopener.meshconnect.com',

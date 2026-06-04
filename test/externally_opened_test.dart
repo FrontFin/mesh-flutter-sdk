@@ -25,6 +25,10 @@ void main() {
         isTrue,
       );
       expect(
+        isExternallyOpenedOrigin('https://pay.coinbase.com/something'),
+        isTrue,
+      );
+      expect(
         isExternallyOpenedOrigin(
           'https://api.cb-device-intelligence.com/something',
         ),
