@@ -323,10 +323,12 @@ class MeshLinkController {
       "document.addEventListener('click',function(e){\n"
       'var el=e.target;\n'
       "while(el&&el.tagName!='A'){el=el.parentElement;}\n"
-      "if(el&&el.target=='_blank'&&el.href\n"
-      "&&el.href.slice(0,11)!='javascript:'){\n"
+      "if(el&&el.target=='_blank'&&el.href){\n"
+      "var norm=(el.href||'').trim().toLowerCase();\n"
+      "if(norm.indexOf('javascript:')<0&&norm.indexOf('data:')<0){\n"
       'e.preventDefault();\n'
       'MeshNavigator.postMessage(el.href);\n'
+      '}\n'
       '}\n'
       '},true);\n'
       '}',
@@ -341,9 +343,13 @@ class MeshLinkController {
   /// intercepts these clicks in JS and routes them here via `MeshNavigator`.
   /// The same external-link logic used for same-window navigations applies.
   void _onBlankTargetNavigation(String url) {
+    url = url.trim();
     logger.info('Blank-target navigation: $url');
+    if (url.isEmpty) {
+      return;
+    }
     final uri = Uri.tryParse(url);
-    if (uri == null || url.isEmpty) {
+    if (uri == null) {
       return;
     }
 
@@ -371,16 +377,11 @@ class MeshLinkController {
       }
       logger.info('Opening external URL (blank-target): $url');
       unawaited(_launchExternalUri(uri, isApp: false));
-    } else if (uri.scheme.isNotEmpty && uri.scheme != 'data') {
-      if (configuration.isDomainWhitelistEnabled) {
-        logger.warning(
-          'Blocked blank-target navigation to unknown scheme '
-          '(add to allowedNativeSchemes to enable): $url',
-        );
-        return;
-      }
-      logger.info('Opening unknown scheme as app link (blank-target): $url');
-      unawaited(_launchExternalUri(uri, isApp: true));
+    } else {
+      logger.warning(
+        'Ignored blank-target navigation to unrecognised scheme '
+        '(add to allowedNativeSchemes to enable): $url',
+      );
     }
   }
 }
