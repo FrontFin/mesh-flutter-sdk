@@ -40,6 +40,17 @@ void main() {
         ),
         isTrue,
       );
+      expect(isExternallyOpenedOrigin('https://i.bybit.com/1TYabIso'), isTrue);
+      expect(
+        isExternallyOpenedOrigin('https://krak.app/request/abc123'),
+        isTrue,
+      );
+      expect(
+        isExternallyOpenedOrigin(
+          'https://js.crypto.com/sdk/payments/checkout/set_wallet?id=abc',
+        ),
+        isTrue,
+      );
     });
 
     test('Returns false for about:blank', () {

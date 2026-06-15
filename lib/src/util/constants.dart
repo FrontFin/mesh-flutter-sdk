@@ -113,6 +113,9 @@ const _externallyOpenedOrigins = [
   'https://sandbox.meshconnect.com/authorize/Coinbase', // Coinbase on Sandbox
   'https://appopener.meshconnect.com',
   'https://api.cb-device-intelligence.com',
+  'https://i.bybit.com',           // Bybit Pay
+  'https://krak.app',              // Kraken Pay
+  'https://js.crypto.com',         // Crypto.com Pay
 ];
 // dart format on
 
