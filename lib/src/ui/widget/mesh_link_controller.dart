@@ -91,6 +91,12 @@ class MeshLinkController {
           _onJsMessageReceived(jsMessage.message);
         },
       ),
+      controller.addJavaScriptChannel(
+        'MeshNavigator',
+        onMessageReceived: (jsMessage) {
+          _onBlankTargetNavigation(jsMessage.message);
+        },
+      ),
       controller.setNavigationDelegate(
         NavigationDelegate(
           onHttpAuthRequest: (navigation) {
@@ -306,6 +312,65 @@ class MeshLinkController {
       logger.info('Injecting ${tokensJson.length} accessToken(s)');
     }
 
+    // Intercept target="_blank" anchor clicks and route them through the
+    // MeshNavigator channel so the SDK can open them as app/browser links.
+    // webview_flutter does not expose an onCreateWindow callback, so
+    // target="_blank" taps are otherwise silently discarded.
+    // The guard prevents duplicate listeners across SPA page transitions.
+    stringBuffer.write(
+      'if(!window._meshBtBound){\n'
+      'window._meshBtBound=true;\n'
+      "document.addEventListener('click',function(e){\n"
+      'var el=e.target;\n'
+      "while(el&&el.tagName!='A'){el=el.parentElement;}\n"
+      "if(el&&el.target=='_blank'&&el.href\n"
+      "&&el.href.slice(0,11)!='javascript:'){\n"
+      'e.preventDefault();\n'
+      'MeshNavigator.postMessage(el.href);\n'
+      '}\n'
+      '},true);\n'
+      '}',
+    );
+
     await _webViewController!.runJavaScript(stringBuffer.toString());
+  }
+
+  /// Handles URLs that the web UI opened with `target="_blank"`.
+  ///
+  /// webview_flutter silently drops new-window creation requests, so the SDK
+  /// intercepts these clicks in JS and routes them here via `MeshNavigator`.
+  /// The same external-link logic used for same-window navigations applies.
+  void _onBlankTargetNavigation(String url) {
+    logger.info('Blank-target navigation: $url');
+    final uri = Uri.tryParse(url);
+    if (uri == null || url.isEmpty) {
+      return;
+    }
+
+    if (isExternallyOpenedOrigin(url)) {
+      logger.info('Externally opened origin (blank-target): $url');
+      unawaited(_launchExternalUri(uri, isApp: false));
+      return;
+    }
+
+    if (isAppUrlChange(url)) {
+      logger.info('Opening app link (blank-target): $url');
+      unawaited(_launchExternalUri(uri, isApp: true));
+      return;
+    }
+
+    // Any remaining target="_blank" URL is an explicit signal to leave the
+    // WebView — open HTTPS/HTTP in the external browser, unknown schemes as
+    // app deep links.
+    if (uri.scheme == 'https' || uri.scheme == 'http') {
+      logger.info('Opening external URL (blank-target): $url');
+      unawaited(_launchExternalUri(uri, isApp: false));
+      return;
+    }
+
+    if (uri.scheme.isNotEmpty && uri.scheme != 'data') {
+      logger.info('Opening unknown scheme as app link (blank-target): $url');
+      unawaited(_launchExternalUri(uri, isApp: true));
+    }
   }
 }

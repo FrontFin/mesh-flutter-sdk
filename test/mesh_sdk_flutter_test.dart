@@ -222,7 +222,10 @@ void main() {
 
       expect(webViewController.backgroundColor, Colors.transparent);
       expect(webViewController.javaScriptMode, JavaScriptMode.unrestricted);
-      expect(webViewController.javaScriptChannel, 'JSBridge');
+      expect(
+        webViewController.javaScriptChannels,
+        containsAll(['JSBridge', 'MeshNavigator']),
+      );
       expect(webViewController.requestUri, Uri.parse('$rawUrl?lng=en'));
 
       // Simulate the "loaded" event from JS to trigger _onLoaded()
@@ -231,8 +234,10 @@ void main() {
 
       expect(
         webViewController.lastJavaScript,
-        "window.meshSdkPlatform='flutter';"
-        "window.meshSdkVersion='$sdkVersion';",
+        startsWith(
+          "window.meshSdkPlatform='flutter';"
+          "window.meshSdkVersion='$sdkVersion';",
+        ),
       );
       expect(find.text('Mock WebView Widget'), findsOneWidget);
     });
@@ -261,14 +266,16 @@ void main() {
 
       expect(
         webViewController.lastJavaScript,
-        "window.meshSdkPlatform='flutter';"
-        "window.meshSdkVersion='$sdkVersion';"
-        'window.accessTokens='
-        r'"[{\"accountId\":\"id\",'
-        r'\"accountName\":\"name\",'
-        r'\"accessToken\":\"token\",'
-        r'\"brokerType\":\"brokerType\",'
-        r'\"brokerName\":\"brokerName\"}]";',
+        startsWith(
+          "window.meshSdkPlatform='flutter';"
+          "window.meshSdkVersion='$sdkVersion';"
+          'window.accessTokens='
+          r'"[{\"accountId\":\"id\",'
+          r'\"accountName\":\"name\",'
+          r'\"accessToken\":\"token\",'
+          r'\"brokerType\":\"brokerType\",'
+          r'\"brokerName\":\"brokerName\"}]";',
+        ),
       );
     });
   });
@@ -612,6 +619,50 @@ void main() {
         expect(find.text('Open SDK'), findsOneWidget);
       },
     );
+  });
+
+  group('Blank-target navigation (target="_blank" deep links)', () {
+    testWidgets('MeshNavigator channel is registered', (tester) async {
+      final configuration = MeshConfiguration(linkToken: validLinkToken);
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(webViewController.javaScriptChannels, contains('MeshNavigator'));
+    });
+
+    testWidgets('blank-target navigation does not throw', (tester) async {
+      final configuration = MeshConfiguration(linkToken: validLinkToken);
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(
+        () => webViewController.simulateBlankTargetNavigation('bybit://pay'),
+        returnsNormally,
+      );
+    });
+
+    testWidgets('lastJavaScript includes blank-target listener after loaded', (
+      tester,
+    ) async {
+      final configuration = MeshConfiguration(linkToken: validLinkToken);
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage('{"type":"loaded","payload":{}}');
+      await tester.pumpAndSettle();
+
+      expect(webViewController.lastJavaScript, contains('_meshBtBound'));
+      expect(
+        webViewController.lastJavaScript,
+        contains('MeshNavigator.postMessage'),
+      );
+    });
   });
 
   group('onTransferFinished Callback', () {

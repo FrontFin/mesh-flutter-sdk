@@ -44,6 +44,10 @@
 		<string>trust</string>
 		<string>metamask</string>
 		<string>itms-apps</string>
+		<string>bybit</string>
+		<string>cryptocom</string>
+		<string>krakenpay</string>
+		<string>cashapp</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

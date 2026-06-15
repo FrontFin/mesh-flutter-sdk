@@ -144,4 +144,9 @@ const allowedNativeSchemes = {
   'phantom',
   'trust',
   'metamask',
+  // Hosted-QR deposit / pay flows
+  'bybit',
+  'cryptocom',
+  'krakenpay',
+  'cashapp',
 };

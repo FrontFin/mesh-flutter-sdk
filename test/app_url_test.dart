@@ -150,5 +150,18 @@ void main() {
         expect(isAppUrlChange('exodus://some/path'), isTrue);
       });
     });
+
+    group('hosted-QR deposit / pay deep links', () {
+      test('bybit', () => expect(isAppUrlChange('bybit://pay'), isTrue));
+      test(
+        'cryptocom',
+        () => expect(isAppUrlChange('cryptocom://pay'), isTrue),
+      );
+      test(
+        'krakenpay',
+        () => expect(isAppUrlChange('krakenpay://pay'), isTrue),
+      );
+      test('cashapp', () => expect(isAppUrlChange('cashapp://pay'), isTrue));
+    });
   });
 }
