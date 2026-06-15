@@ -51,6 +51,10 @@ void main() {
         ),
         isTrue,
       );
+      expect(
+        isExternallyOpenedOrigin('https://cash.app/launch/abc123'),
+        isTrue,
+      );
     });
 
     test('Returns false for about:blank', () {

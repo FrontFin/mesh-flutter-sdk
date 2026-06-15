@@ -116,6 +116,7 @@ const _externallyOpenedOrigins = [
   'https://i.bybit.com',           // Bybit Pay
   'https://krak.app',              // Kraken Pay
   'https://js.crypto.com',         // Crypto.com Pay
+  'https://cash.app',              // Cash App Pay
 ];
 // dart format on
 
