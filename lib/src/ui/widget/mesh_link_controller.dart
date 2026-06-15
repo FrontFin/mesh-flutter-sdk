@@ -359,16 +359,26 @@ class MeshLinkController {
       return;
     }
 
-    // Any remaining target="_blank" URL is an explicit signal to leave the
-    // WebView — open HTTPS/HTTP in the external browser, unknown schemes as
-    // app deep links.
+    // Remaining target="_blank" URLs: respect the whitelist configuration so
+    // that this path cannot be used to bypass the same security boundary that
+    // same-window navigations enforce via onNavigationRequest.
     if (uri.scheme == 'https' || uri.scheme == 'http') {
+      if (configuration.isDomainWhitelistEnabled && !isWhitelistedOrigin(url)) {
+        logger.warning(
+          'Blocked blank-target navigation to non-whitelisted URL: $url',
+        );
+        return;
+      }
       logger.info('Opening external URL (blank-target): $url');
       unawaited(_launchExternalUri(uri, isApp: false));
-      return;
-    }
-
-    if (uri.scheme.isNotEmpty && uri.scheme != 'data') {
+    } else if (uri.scheme.isNotEmpty && uri.scheme != 'data') {
+      if (configuration.isDomainWhitelistEnabled) {
+        logger.warning(
+          'Blocked blank-target navigation to unknown scheme '
+          '(add to allowedNativeSchemes to enable): $url',
+        );
+        return;
+      }
       logger.info('Opening unknown scheme as app link (blank-target): $url');
       unawaited(_launchExternalUri(uri, isApp: true));
     }

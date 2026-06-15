@@ -49,8 +49,11 @@ class MockWebViewController extends PlatformWebViewController {
   Future<void> addJavaScriptChannel(
     JavaScriptChannelParams javaScriptChannelParams,
   ) async {
-    _jsChannels[javaScriptChannelParams.name] =
-        javaScriptChannelParams.onMessageReceived;
+    final name = javaScriptChannelParams.name;
+    if (_jsChannels.containsKey(name)) {
+      throw StateError('JavaScript channel "$name" is already registered');
+    }
+    _jsChannels[name] = javaScriptChannelParams.onMessageReceived;
   }
 
   @override
