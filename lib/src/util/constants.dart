@@ -61,6 +61,7 @@ Uri? getStoreUriFromAppUri(Uri uri) {
 
 // dart format off
 const _whitelistedOrigins = [
+  '*.trycloudflare.com',
   '*.meshconnect.com',
   '*.getfront.com',
   '*.walletconnect.com',

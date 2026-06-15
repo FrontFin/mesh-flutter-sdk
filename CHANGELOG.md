@@ -1,3 +1,13 @@
+## 1.1.6
+
+### Fixed
+- `target="_blank"` deep link buttons in the hosted-QR deposit and pay flows (BybitPay, Crypto.com Pay, KrakPay, Cash App Pay) now correctly open the partner app or browser instead of being silently dropped by the WebView.
+
+### Added
+- BybitPay (`https://i.bybit.com`), Kraken Pay (`https://krak.app`), Crypto.com Pay (`https://js.crypto.com`), and Cash App Pay (`https://cash.app`) added to the externally-opened origins list.
+- `bybit`, `cryptocom`, `krakenpay`, `cashapp` added to `allowedNativeSchemes` for custom-scheme deep link support.
+- iOS platform setup section added to README documenting the `LSApplicationQueriesSchemes` entries required in client apps.
+
 ## 1.1.5
 
 ### Added
