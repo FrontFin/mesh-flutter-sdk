@@ -355,13 +355,23 @@ class MeshLinkController {
 
     if (isExternallyOpenedOrigin(url)) {
       logger.info('Externally opened origin (blank-target): $url');
-      unawaited(_launchExternalUri(uri, isApp: false));
+      unawaited(
+        _launchExternalUri(
+          uri,
+          isApp: false,
+        ).then((_) => _isExternalAppOpened = false),
+      );
       return;
     }
 
     if (isAppUrlChange(url)) {
       logger.info('Opening app link (blank-target): $url');
-      unawaited(_launchExternalUri(uri, isApp: true));
+      unawaited(
+        _launchExternalUri(
+          uri,
+          isApp: true,
+        ).then((_) => _isExternalAppOpened = false),
+      );
       return;
     }
 
@@ -376,7 +386,12 @@ class MeshLinkController {
         return;
       }
       logger.info('Opening external URL (blank-target): $url');
-      unawaited(_launchExternalUri(uri, isApp: false));
+      unawaited(
+        _launchExternalUri(
+          uri,
+          isApp: false,
+        ).then((_) => _isExternalAppOpened = false),
+      );
     } else {
       logger.warning(
         'Ignored blank-target navigation to unrecognised scheme '
