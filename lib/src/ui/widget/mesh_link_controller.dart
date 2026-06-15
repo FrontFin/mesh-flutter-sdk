@@ -359,7 +359,7 @@ class MeshLinkController {
         _launchExternalUri(
           uri,
           isApp: false,
-        ).then((_) => _isExternalAppOpened = false),
+        ).whenComplete(() => _isExternalAppOpened = false),
       );
       return;
     }
@@ -370,7 +370,7 @@ class MeshLinkController {
         _launchExternalUri(
           uri,
           isApp: true,
-        ).then((_) => _isExternalAppOpened = false),
+        ).whenComplete(() => _isExternalAppOpened = false),
       );
       return;
     }
@@ -390,7 +390,7 @@ class MeshLinkController {
         _launchExternalUri(
           uri,
           isApp: false,
-        ).then((_) => _isExternalAppOpened = false),
+        ).whenComplete(() => _isExternalAppOpened = false),
       );
     } else {
       logger.warning(
