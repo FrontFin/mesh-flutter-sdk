@@ -6,16 +6,11 @@ class MockWebViewController extends PlatformWebViewController {
   MockWebViewController()
     : super.implementation(const PlatformWebViewControllerCreationParams());
 
-  final _jsChannels = <String, void Function(JavaScriptMessage)>{};
+  void Function(JavaScriptMessage)? _onMessageReceived;
 
   /// Simulates receiving a JavaScript message through the JSBridge channel.
   void simulateJsMessage(String message) {
-    _jsChannels['JSBridge']?.call(JavaScriptMessage(message: message));
-  }
-
-  /// Simulates a target="_blank" navigation via the MeshNavigator channel.
-  void simulateBlankTargetNavigation(String url) {
-    _jsChannels['MeshNavigator']?.call(JavaScriptMessage(message: url));
+    _onMessageReceived?.call(JavaScriptMessage(message: message));
   }
 
   Color? _backgroundColor;
@@ -43,17 +38,20 @@ class MockWebViewController extends PlatformWebViewController {
     // Do nothing
   }
 
-  Set<String> get javaScriptChannels => _jsChannels.keys.toSet();
+  String? _javaScriptChannel;
+
+  String? get javaScriptChannel => _javaScriptChannel;
 
   @override
   Future<void> addJavaScriptChannel(
     JavaScriptChannelParams javaScriptChannelParams,
   ) async {
-    final name = javaScriptChannelParams.name;
-    if (_jsChannels.containsKey(name)) {
-      throw StateError('JavaScript channel "$name" is already registered');
+    if (_javaScriptChannel != null) {
+      throw StateError('JavaScript channel already exists');
     }
-    _jsChannels[name] = javaScriptChannelParams.onMessageReceived;
+
+    _javaScriptChannel = javaScriptChannelParams.name;
+    _onMessageReceived = javaScriptChannelParams.onMessageReceived;
   }
 
   @override
