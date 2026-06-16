@@ -68,7 +68,7 @@ void main() {
       expect(isExternallyOpenedOrigin('meshconnect://'), isFalse);
     });
 
-    test('Returns false for lookalike domains (startsWith attack)', () {
+    test('Returns false for lookalike domains (host-prefix attack)', () {
       expect(
         isExternallyOpenedOrigin('https://i.bybit.com.evil.com/path'),
         isFalse,
@@ -79,6 +79,19 @@ void main() {
       );
       expect(
         isExternallyOpenedOrigin('https://link.trustwallet.com.evil.com/wc'),
+        isFalse,
+      );
+    });
+
+    test('Returns false for lookalike paths (path-prefix attack)', () {
+      expect(
+        isExternallyOpenedOrigin(
+          'https://sandbox.meshconnect.com/authorize/CoinbaseEvil',
+        ),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://go.rabby.io/mobileEvil/path'),
         isFalse,
       );
     });

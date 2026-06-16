@@ -52,10 +52,17 @@ bool isExternallyOpenedOrigin(String url) {
         continue;
       }
 
-      // If the origin specifies a path, the URL path must start with it.
+      // If the origin specifies a path, the URL path must match it exactly or
+      // be nested under it (segment boundary) to prevent path-prefix lookalikes
+      // e.g. /authorize/CoinbaseEvil matching /authorize/Coinbase.
       final originPath = originUri.path;
       if (originPath.isNotEmpty && originPath != '/') {
-        if (!urlUri.path.startsWith(originPath)) {
+        final urlPath = urlUri.path;
+        final normalizedOriginPath = originPath.endsWith('/')
+            ? originPath
+            : '$originPath/';
+        if (urlPath != originPath &&
+            !urlPath.startsWith(normalizedOriginPath)) {
           continue;
         }
       }
