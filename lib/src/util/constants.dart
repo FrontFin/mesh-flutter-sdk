@@ -34,15 +34,33 @@ bool isExternallyOpenedOrigin(String url) {
       return true;
     }
 
+    final urlUri = Uri.tryParse(url);
+    if (urlUri == null) {
+      return false;
+    }
+
     for (final origin in _externallyOpenedOrigins) {
-      if (origin.startsWith('https://')) {
-        // Full URL, e.g. "https://link.trustwallet.com"
-        if (url.startsWith(origin)) {
-          return true;
-        }
-      } else {
+      final originUri = Uri.tryParse(origin);
+      if (originUri == null) {
         logger.severe('Invalid externally opened origin format: $origin');
+        continue;
       }
+
+      // Compare scheme and host exactly to prevent lookalike attacks
+      // (e.g. https://i.bybit.com.evil.com matching https://i.bybit.com).
+      if (urlUri.scheme != originUri.scheme || urlUri.host != originUri.host) {
+        continue;
+      }
+
+      // If the origin specifies a path, the URL path must start with it.
+      final originPath = originUri.path;
+      if (originPath.isNotEmpty && originPath != '/') {
+        if (!urlUri.path.startsWith(originPath)) {
+          continue;
+        }
+      }
+
+      return true;
     }
 
     return false;
@@ -61,7 +79,6 @@ Uri? getStoreUriFromAppUri(Uri uri) {
 
 // dart format off
 const _whitelistedOrigins = [
-  '*.trycloudflare.com',
   '*.meshconnect.com',
   '*.getfront.com',
   '*.walletconnect.com',

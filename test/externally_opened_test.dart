@@ -68,6 +68,21 @@ void main() {
       expect(isExternallyOpenedOrigin('meshconnect://'), isFalse);
     });
 
+    test('Returns false for lookalike domains (startsWith attack)', () {
+      expect(
+        isExternallyOpenedOrigin('https://i.bybit.com.evil.com/path'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://cash.app.evil.com/launch/abc'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://link.trustwallet.com.evil.com/wc'),
+        isFalse,
+      );
+    });
+
     group('OAuth redirect regex', () {
       test('Returns true for matching subdomain and path', () {
         expect(

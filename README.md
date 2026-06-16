@@ -118,7 +118,7 @@ Here's what you can configure in the `MeshConfiguration`:
 ### Whitelist
 
 See the full list of whitelisted
-origins [here](https://github.com/FrontFin/mesh-flutter-sdk/blob/main/lib/src/util/constants.dart#L37).
+origins [here](https://github.com/FrontFin/mesh-flutter-sdk/blob/main/lib/src/util/constants.dart).
 
 To disable the whitelist check, set `isDomainWhitelistEnabled: false` in the `MeshConfiguration`.
 
