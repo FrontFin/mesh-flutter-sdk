@@ -136,7 +136,6 @@ const _externallyOpenedOrigins = [
   'https://pay.coinbase.com',       // Coinbase Pay (ramp fallback)
   'https://exodus.com/m/',          // Exodus
   'https://sandbox.meshconnect.com/authorize/Coinbase', // Coinbase on Sandbox
-  'https://appopener.meshconnect.com',
   'https://api.cb-device-intelligence.com',
   'https://i.bybit.com',           // Bybit Pay
   'https://krak.app',              // Kraken Pay
