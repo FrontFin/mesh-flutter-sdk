@@ -132,7 +132,7 @@ The Android SDK (`mesh-android-sdk`) does the same thing in Kotlin. The two SDKs
 
 `MeshLinkController` validates all navigation. This is a security boundary — it prevents the WebView from being navigated to malicious domains if the web UI is ever compromised.
 
-- **Whitelisted** (render in WebView): wildcard and explicit origins covering Mesh, WalletConnect, OKX, Gemini, Robinhood, Google, hCaptcha, Stripe, Usercentrics, Revolut, and others. `lib/src/util/constants.dart` (`_whitelistedOrigins`) is the authoritative list — do not rely on any summary here.
+- **Whitelisted** (render in WebView): wildcard and explicit origins covering Mesh, WalletConnect, OKX, Gemini, Robinhood, Google, hCaptcha, Stripe, Usercentrics, and others. `lib/src/util/constants.dart` (`_whitelistedOrigins`) is the authoritative list — do not rely on any summary here.
 - **Externally opened** (via `url_launcher` → native app): Trust Wallet, Uphold, Rabby, Binance, OKX, MetaMask, Phantom, Solflare, Coinbase, Exodus. See `_externallyOpenedOrigins` in `constants.dart`.
 - **Everything else**: blocked
 
