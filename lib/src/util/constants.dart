@@ -116,9 +116,6 @@ const _whitelistedOrigins = [
   'https://m.stripe.network',
   'https://js.stripe.com',
   'https://app.usercentrics.eu',
-  'https://ramp.revolut.codes',
-  'https://sso.revolut.codes',
-  'https://ramp.revolut.com',
 ];
 
 const _externallyOpenedOrigins = [
