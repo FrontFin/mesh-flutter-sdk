@@ -46,7 +46,7 @@ Product mode is determined by the link token. It does not change during a sessio
 | Type | Examples | How connection works in the WebView |
 |------|----------|--------------------------------------|
 | DeFi / web3 wallet | MetaMask, Phantom, Trust Wallet, OKX | SDK deep-links to native wallet app via `url_launcher` |
-| CEX OAuth | Coinbase, Gemini, Revolut | OAuth flow inside WebView |
+| CEX OAuth | Coinbase, Gemini | OAuth flow inside WebView |
 | CEX credentials | Robinhood, Kraken, Binance | Username + password + MFA inside WebView |
 | Hardware wallet | Ledger, Trezor | USB/Bluetooth (handled by web UI) |
 
@@ -77,7 +77,7 @@ Public surface that must stay backwards-compatible:
 
 `MeshLinkController` enforces a domain whitelist on all WebView navigation. This prevents the WebView from being used to load arbitrary content if the web UI is ever compromised.
 
-- **Whitelisted** (render in WebView): wildcard and explicit origins covering Mesh, WalletConnect, OKX, Gemini, Robinhood, Google, hCaptcha, Stripe, Usercentrics, Revolut, and others. `lib/src/util/constants.dart` (`_whitelistedOrigins`) is the authoritative list — do not rely on any summary here.
+- **Whitelisted** (render in WebView): wildcard and explicit origins covering Mesh, WalletConnect, OKX, Gemini, Robinhood, Google, hCaptcha, Stripe, Usercentrics, and others. `lib/src/util/constants.dart` (`_whitelistedOrigins`) is the authoritative list — do not rely on any summary here.
 - **Externally opened** (launch native wallet app): Trust Wallet, Uphold, Rabby, Binance, OKX, MetaMask, Phantom, Solflare, Coinbase, Exodus. See `_externallyOpenedOrigins` in `constants.dart`.
 - **Everything else**: blocked
 
