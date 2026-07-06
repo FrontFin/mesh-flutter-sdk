@@ -1,3 +1,8 @@
+## 1.1.7
+
+### Removed
+- Removed the hardcoded Revolut origins (`https://ramp.revolut.codes`, `https://sso.revolut.codes`, `https://ramp.revolut.com`) from the whitelisted origins list.
+
 ## 1.1.6
 
 ### Added
