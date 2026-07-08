@@ -691,7 +691,10 @@ class DefiWalletErrorEvent extends MeshEvent {
   });
 
   factory DefiWalletErrorEvent.fromJson(Map<String, dynamic> json) {
-    final details = json['details'] as Map<String, dynamic>? ?? {};
+    final detailsJson = json['details'];
+    final details = detailsJson is Map<String, dynamic>
+        ? detailsJson
+        : const <String, dynamic>{};
     return DefiWalletErrorEvent(
       integrationName: json['integrationName'] as String,
       errorType: json['errorType'] as String,
