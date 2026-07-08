@@ -116,9 +116,6 @@ const _whitelistedOrigins = [
   'https://m.stripe.network',
   'https://js.stripe.com',
   'https://app.usercentrics.eu',
-  'https://ramp.revolut.codes',
-  'https://sso.revolut.codes',
-  'https://ramp.revolut.com',
 ];
 
 const _externallyOpenedOrigins = [
@@ -136,7 +133,6 @@ const _externallyOpenedOrigins = [
   'https://pay.coinbase.com',       // Coinbase Pay (ramp fallback)
   'https://exodus.com/m/',          // Exodus
   'https://sandbox.meshconnect.com/authorize/Coinbase', // Coinbase on Sandbox
-  'https://appopener.meshconnect.com',
   'https://api.cb-device-intelligence.com',
   'https://i.bybit.com',           // Bybit Pay
   'https://krak.app',              // Kraken Pay

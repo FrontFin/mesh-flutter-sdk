@@ -1,4 +1,4 @@
-## 1.1.7
+## 1.1.8
 
 ### Added
 - Link v2 event support: events are now parsed from both the v1 nested `payload` and the v2 flat message shape.
@@ -8,6 +8,11 @@
 
 ### Fixed
 - Events with sparse payloads are no longer silently dropped, and `timeStamp` values sent as JSON doubles are parsed correctly instead of throwing.
+
+## 1.1.7
+
+### Removed
+- Removed the hardcoded Revolut origins (`https://ramp.revolut.codes`, `https://sso.revolut.codes`, `https://ramp.revolut.com`) from the whitelisted origins list.
 
 ## 1.1.6
 

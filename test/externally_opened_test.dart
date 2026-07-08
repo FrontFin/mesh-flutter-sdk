@@ -9,10 +9,6 @@ void main() {
         isTrue,
       );
       expect(
-        isExternallyOpenedOrigin('https://appopener.meshconnect.com/something'),
-        isTrue,
-      );
-      expect(
         isExternallyOpenedOrigin('https://coinbase.com/something'),
         isTrue,
       );
