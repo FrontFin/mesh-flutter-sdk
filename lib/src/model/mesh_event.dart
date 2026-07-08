@@ -39,7 +39,7 @@ sealed class MeshEvent {
           requestId: p['requestId'] as String?,
         ),
         'credentialsEntered' => const CredentialsEnteredEvent(),
-        'transferStarted' => TransferStartedEvent.fromJson(p, rawPayload: rawP),
+        'transferStarted' => TransferStartedEvent.fromJson(p),
         'transferPreviewed' => TransferPreviewedEvent.fromJson(p),
         'transferPreviewError' => TransferPreviewErrorEvent(
           errorMessage: p['errorMessage'] as String,
@@ -101,7 +101,6 @@ sealed class MeshEvent {
         'methodSelected' => HomePageMethodSelectedEvent.fromJson(p),
         'integrationMfaRequired' => IntegrationMfaRequiredEvent.fromJson(p),
         'defiWalletError' => DefiWalletErrorEvent.fromJson(p),
-        'paypalComplianceDeclined' => PaypalComplianceDeclinedEvent.fromJson(p),
         'homePageLoaded' => const HomePageLoadedEvent(),
         _ => null,
       };
@@ -202,33 +201,25 @@ class IntegrationConnectionErrorEvent extends MeshEvent {
 }
 
 class TransferStartedEvent extends MeshEvent {
-  const TransferStartedEvent({
-    this.integrationName,
-    this.integrationType,
-    this.rawPayload,
-  });
+  const TransferStartedEvent({this.integrationName, this.integrationType});
 
-  factory TransferStartedEvent.fromJson(
-    Map<String, dynamic> json, {
-    dynamic rawPayload,
-  }) => TransferStartedEvent(
-    integrationName: json['integrationName'] as String?,
-    integrationType: json['integrationType'] as String?,
-    rawPayload: rawPayload,
-  );
+  factory TransferStartedEvent.fromJson(Map<String, dynamic> json) =>
+      TransferStartedEvent(
+        integrationName: json['integrationName'] as String?,
+        integrationType: json['integrationType'] as String?,
+      );
 
   final String? integrationName;
   final String? integrationType;
-  final dynamic rawPayload;
 }
 
 class TransferPreviewedEvent extends MeshEvent {
   const TransferPreviewedEvent({
     required this.amount,
     required this.symbol,
-    required this.toAddress,
     required this.networkId,
     required this.previewId,
+    this.toAddress,
     this.networkName,
     this.amountInFiat,
     this.estimatedNetworkGasFee,
@@ -245,9 +236,7 @@ class TransferPreviewedEvent extends MeshEvent {
       amount: (json['amount'] as num?)?.toDouble(),
       symbol: json['symbol'] as String,
       toAddress:
-          (json['toAddress'] as String?) ??
-          (json['targetAddress'] as String?) ??
-          (throw const FormatException('Missing toAddress/targetAddress')),
+          (json['toAddress'] as String?) ?? (json['targetAddress'] as String?),
       networkId: json['networkId'] as String,
       previewId: json['previewId'] as String,
       networkName: json['networkName'] as String?,
@@ -264,7 +253,7 @@ class TransferPreviewedEvent extends MeshEvent {
 
   final double? amount;
   final String symbol;
-  final String toAddress;
+  final String? toAddress;
   final String networkId;
   final String previewId;
   final String? networkName;
@@ -724,17 +713,6 @@ class DefiWalletErrorEvent extends MeshEvent {
   final String? requestedNetwork;
   final String? connectedNetwork;
   final String? connectUri;
-}
-
-class PaypalComplianceDeclinedEvent extends MeshEvent {
-  const PaypalComplianceDeclinedEvent({required this.transferPreviewed});
-
-  factory PaypalComplianceDeclinedEvent.fromJson(Map<String, dynamic> json) =>
-      PaypalComplianceDeclinedEvent(
-        transferPreviewed: TransferPreviewedEvent.fromJson(json),
-      );
-
-  final TransferPreviewedEvent transferPreviewed;
 }
 
 class HomePageLoadedEvent extends MeshEvent {

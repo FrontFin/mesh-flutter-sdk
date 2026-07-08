@@ -34,6 +34,19 @@ void main() {
         expect(started.integrationType, 'exchange');
       });
 
+      test('parses TransferStartedEvent from a flat v2 message', () {
+        // v2 messages have no nested 'payload' key: fields live at the root.
+        final event = MeshEvent.fromJson({
+          'type': 'transferStarted',
+          'integrationName': 'Coinbase',
+          'integrationType': 'exchange',
+        });
+        expect(event, isA<TransferStartedEvent>());
+        final started = event! as TransferStartedEvent;
+        expect(started.integrationName, 'Coinbase');
+        expect(started.integrationType, 'exchange');
+      });
+
       test('parses VerifyDonePageEvent', () {
         final event = MeshEvent.fromJson({
           'type': 'verifyDonePage',
@@ -408,6 +421,9 @@ void main() {
         });
 
         expect(event, isA<IntegrationMfaEnteredEvent>());
+        expect((event! as IntegrationMfaEnteredEvent).rawPayload, {
+          'mfaCode': '123456',
+        });
       });
 
       test('parses IntegrationOAuthStartedEvent', () {
