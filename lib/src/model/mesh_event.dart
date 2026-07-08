@@ -391,7 +391,7 @@ class WalletMessageSignedEvent extends MeshEvent {
       signedMessageHash: json['signedMessageHash'] as String?,
       message: json['message'] as String?,
       address: json['address'] as String,
-      timeStamp: json['timeStamp'] as int,
+      timeStamp: (json['timeStamp'] as num).toInt(),
       isVerified: json['isVerified'] as bool,
       verifiedAddresses: (json['verifiedAddresses'] as List<dynamic>?)
           ?.cast<String>(),
