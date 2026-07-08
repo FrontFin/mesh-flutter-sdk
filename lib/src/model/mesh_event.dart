@@ -99,7 +99,7 @@ sealed class MeshEvent {
         ),
         'linkTransferQRGenerated' => LinkTransferQrGeneratedEvent.fromJson(p),
         'methodSelected' => HomePageMethodSelectedEvent.fromJson(p),
-        'integrationMfaRequired' => IntegrationMfaRequiredEvent.fromJson(p),
+        'integrationMfaRequired' => const IntegrationMfaRequiredEvent(),
         'defiWalletError' => DefiWalletErrorEvent.fromJson(p),
         'homePageLoaded' => const HomePageLoadedEvent(),
         _ => null,
@@ -217,22 +217,30 @@ class TransferPreviewedEvent extends MeshEvent {
   const TransferPreviewedEvent({
     required this.amount,
     required this.symbol,
+    required this.toAddress,
     required this.networkId,
     required this.previewId,
-    this.toAddress,
     this.networkName,
     this.amountInFiat,
     this.estimatedNetworkGasFee,
     this.fiatCurrency,
+    this.integrationName,
+    this.integrationType,
+    this.institutionTransferFee,
+    this.customClientFee,
+    this.userId,
+    this.clientTransactionId,
   });
 
   factory TransferPreviewedEvent.fromJson(Map<String, dynamic> json) {
     final feeJson = json['estimatedNetworkGasFee'];
+    final institutionFeeJson = json['institutionTransferFee'];
+    final customClientFeeJson = json['customClientFee'];
 
     return TransferPreviewedEvent(
       amount: (json['amount'] as num?)?.toDouble(),
       symbol: json['symbol'] as String,
-      toAddress: json['toAddress'] as String?,
+      toAddress: json['toAddress'] as String,
       networkId: json['networkId'] as String,
       previewId: json['previewId'] as String,
       networkName: json['networkName'] as String?,
@@ -241,18 +249,34 @@ class TransferPreviewedEvent extends MeshEvent {
           ? NetworkFee.fromJson(feeJson)
           : null,
       fiatCurrency: json['fiatCurrency'] as String?,
+      integrationName: json['integrationName'] as String?,
+      integrationType: json['integrationType'] as String?,
+      institutionTransferFee: institutionFeeJson is Map<String, dynamic>
+          ? NetworkFee.fromJson(institutionFeeJson)
+          : null,
+      customClientFee: customClientFeeJson is Map<String, dynamic>
+          ? NetworkFee.fromJson(customClientFeeJson)
+          : null,
+      userId: json['userId'] as String?,
+      clientTransactionId: json['clientTransactionId'] as String?,
     );
   }
 
   final double? amount;
   final String symbol;
-  final String? toAddress;
+  final String toAddress;
   final String networkId;
   final String previewId;
   final String? networkName;
   final double? amountInFiat;
   final NetworkFee? estimatedNetworkGasFee;
   final String? fiatCurrency;
+  final String? integrationName;
+  final String? integrationType;
+  final NetworkFee? institutionTransferFee;
+  final NetworkFee? customClientFee;
+  final String? userId;
+  final String? clientTransactionId;
 }
 
 class TransferPreviewErrorEvent extends MeshEvent {
@@ -651,22 +675,7 @@ class HomePageMethodSelectedEvent extends MeshEvent {
 // ---------------------------------------------------------------------------
 
 class IntegrationMfaRequiredEvent extends MeshEvent {
-  const IntegrationMfaRequiredEvent({
-    this.brokerType,
-    this.brokerName,
-    this.mfaType,
-  });
-
-  factory IntegrationMfaRequiredEvent.fromJson(Map<String, dynamic> json) =>
-      IntegrationMfaRequiredEvent(
-        brokerType: json['brokerType'] as String?,
-        brokerName: json['brokerName'] as String?,
-        mfaType: json['mfaType'] as String?,
-      );
-
-  final String? brokerType;
-  final String? brokerName;
-  final String? mfaType;
+  const IntegrationMfaRequiredEvent();
 }
 
 class DefiWalletErrorEvent extends MeshEvent {
