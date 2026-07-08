@@ -224,9 +224,6 @@ class TransferPreviewedEvent extends MeshEvent {
     this.amountInFiat,
     this.estimatedNetworkGasFee,
     this.fiatCurrency,
-    this.amountInUsd,
-    this.totalAmountInFiat,
-    this.totalAmountInUsd,
   });
 
   factory TransferPreviewedEvent.fromJson(Map<String, dynamic> json) {
@@ -235,8 +232,7 @@ class TransferPreviewedEvent extends MeshEvent {
     return TransferPreviewedEvent(
       amount: (json['amount'] as num?)?.toDouble(),
       symbol: json['symbol'] as String,
-      toAddress:
-          (json['toAddress'] as String?) ?? (json['targetAddress'] as String?),
+      toAddress: json['toAddress'] as String?,
       networkId: json['networkId'] as String,
       previewId: json['previewId'] as String,
       networkName: json['networkName'] as String?,
@@ -245,9 +241,6 @@ class TransferPreviewedEvent extends MeshEvent {
           ? NetworkFee.fromJson(feeJson)
           : null,
       fiatCurrency: json['fiatCurrency'] as String?,
-      amountInUsd: (json['amountInUSD'] as num?)?.toDouble(),
-      totalAmountInFiat: (json['totalAmountInFiat'] as num?)?.toDouble(),
-      totalAmountInUsd: (json['totalAmountInUSD'] as num?)?.toDouble(),
     );
   }
 
@@ -260,9 +253,6 @@ class TransferPreviewedEvent extends MeshEvent {
   final double? amountInFiat;
   final NetworkFee? estimatedNetworkGasFee;
   final String? fiatCurrency;
-  final double? amountInUsd;
-  final double? totalAmountInFiat;
-  final double? totalAmountInUsd;
 }
 
 class TransferPreviewErrorEvent extends MeshEvent {

@@ -448,6 +448,10 @@ void main() {
         final declined = event! as ConnectionDeclinedEvent;
         expect(declined.integrationName, 'Coinbase');
         expect(declined.reason, 'user_cancelled');
+        expect(declined.rawPayload, {
+          'integrationName': 'Coinbase',
+          'reason': 'user_cancelled',
+        });
       });
 
       test('parses TransferDeclinedEvent', () {
@@ -460,6 +464,10 @@ void main() {
         final declined = event! as TransferDeclinedEvent;
         expect(declined.integrationName, 'Coinbase');
         expect(declined.status, 'declined');
+        expect(declined.rawPayload, {
+          'integrationName': 'Coinbase',
+          'status': 'declined',
+        });
       });
     });
 

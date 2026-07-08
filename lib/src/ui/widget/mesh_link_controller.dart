@@ -233,7 +233,9 @@ class MeshLinkController {
 
     logger
       ..warning('Unhandled JS message type: ${json['type']}')
-      ..fine('Unhandled JS message keys: ${json.keys.toList()}');
+      // Build the keys string lazily so nothing is allocated when FINE logging
+      // is disabled (the logger defaults to INFO).
+      ..fine(() => 'Unhandled JS message keys: ${json.keys.toList()}');
   }
 
   /// Returns true if a store URL launch was scheduled ([_isExternalAppOpened]
