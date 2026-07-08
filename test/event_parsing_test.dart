@@ -471,6 +471,82 @@ void main() {
       });
     });
 
+    group('New v2 events', () {
+      test('parses ConnectionUnavailableEvent', () {
+        final event = MeshEvent.fromJson({
+          'type': 'connectionUnavailable',
+          'payload': {'integrationName': 'Coinbase', 'reason': 'maintenance'},
+        });
+
+        expect(event, isA<ConnectionUnavailableEvent>());
+        final unavailable = event! as ConnectionUnavailableEvent;
+        expect(unavailable.integrationName, 'Coinbase');
+        expect(unavailable.reason, 'maintenance');
+        expect(unavailable.rawPayload, {
+          'integrationName': 'Coinbase',
+          'reason': 'maintenance',
+        });
+      });
+
+      test('parses IntegrationMfaRequiredEvent (no payload)', () {
+        final event = MeshEvent.fromJson({
+          'type': 'integrationMfaRequired',
+          'payload': <String, dynamic>{},
+        });
+        expect(event, isA<IntegrationMfaRequiredEvent>());
+      });
+
+      test('parses HomePageLoadedEvent', () {
+        final event = MeshEvent.fromJson({
+          'type': 'homePageLoaded',
+          'payload': <String, dynamic>{},
+        });
+        expect(event, isA<HomePageLoadedEvent>());
+      });
+
+      test('parses DefiWalletErrorEvent with details', () {
+        final event = MeshEvent.fromJson({
+          'type': 'defiWalletError',
+          'payload': {
+            'integrationName': 'MetaMask',
+            'errorType': 'verifyMismatch',
+            'timeStamp': 1712345678,
+            'details': {
+              'requestedAddress': '0xrequested',
+              'connectedAddress': '0xconnected',
+              'requestedNetwork': 'ethereum',
+              'connectedNetwork': 'polygon',
+            },
+          },
+        });
+
+        expect(event, isA<DefiWalletErrorEvent>());
+        final error = event! as DefiWalletErrorEvent;
+        expect(error.integrationName, 'MetaMask');
+        expect(error.errorType, 'verifyMismatch');
+        expect(error.timeStamp, 1712345678);
+        expect(error.requestedAddress, '0xrequested');
+        expect(error.connectedAddress, '0xconnected');
+        expect(error.requestedNetwork, 'ethereum');
+        expect(error.connectedNetwork, 'polygon');
+      });
+
+      test('parses DefiWalletErrorEvent when timeStamp is a double', () {
+        final event = MeshEvent.fromJson({
+          'type': 'defiWalletError',
+          'payload': {
+            'integrationName': 'MetaMask',
+            'errorType': 'timeout',
+            'timeStamp': 1712345678.0,
+            'details': <String, dynamic>{},
+          },
+        });
+
+        expect(event, isA<DefiWalletErrorEvent>());
+        expect((event! as DefiWalletErrorEvent).timeStamp, 1712345678);
+      });
+    });
+
     group('Error handling', () {
       test('returns null for unknown event type', () {
         final event = MeshEvent.fromJson({
