@@ -184,6 +184,43 @@ void main() {
         expect(preview.estimatedNetworkGasFee, isNull);
       });
 
+      test('parses TransferPreviewedEvent cryptocurrencyFundingOptions', () {
+        final event = MeshEvent.fromJson({
+          'type': 'transferPreviewed',
+          'payload': {
+            'symbol': 'USDC',
+            'toAddress': '0xabc',
+            'networkId': 'ethereum',
+            'previewId': 'preview-789',
+            'cryptocurrencyFundingOptions': [
+              {
+                'cryptocurrencyFundingOptionType': 'card',
+                'name': 'Visa',
+                'usedAmountInFiat': 25.5,
+                'cryptocurrencySymbol': 'USDC',
+                'fee': {
+                  'amountInFiat': 1.5,
+                  'fiatSymbol': 'USD',
+                  'isInclusive': false,
+                },
+              },
+            ],
+          },
+        });
+
+        expect(event, isA<TransferPreviewedEvent>());
+        final preview = event! as TransferPreviewedEvent;
+        expect(preview.cryptocurrencyFundingOptions, hasLength(1));
+        final option = preview.cryptocurrencyFundingOptions!.first;
+        expect(option.cryptocurrencyFundingOptionType, 'card');
+        expect(option.name, 'Visa');
+        expect(option.usedAmountInFiat, 25.5);
+        expect(option.cryptocurrencySymbol, 'USDC');
+        expect(option.fee?.amountInFiat, 1.5);
+        expect(option.fee?.fiatSymbol, 'USD');
+        expect(option.fee?.isInclusive, false);
+      });
+
       test('parses TransferPreviewErrorEvent', () {
         final event = MeshEvent.fromJson({
           'type': 'transferPreviewError',

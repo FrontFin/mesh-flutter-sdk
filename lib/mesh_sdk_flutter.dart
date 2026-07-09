@@ -12,6 +12,7 @@ export 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
 export 'package:mesh_sdk_flutter/src/model/success/integration.dart';
 export 'package:mesh_sdk_flutter/src/model/success/success.dart';
 export 'package:mesh_sdk_flutter/src/model/success/transfer.dart';
+export 'package:mesh_sdk_flutter/src/model/transfer/cryptocurrency_funding_option.dart';
 export 'package:mesh_sdk_flutter/src/model/transfer/ineligible_token.dart';
 export 'package:mesh_sdk_flutter/src/model/transfer/network_fee.dart';
 export 'package:mesh_sdk_flutter/src/model/transfer/transfer_executed_status.dart';

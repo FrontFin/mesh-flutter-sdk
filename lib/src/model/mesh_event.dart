@@ -1,5 +1,6 @@
 import 'package:mesh_sdk_flutter/src/model/integration/integration_connected_payload.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
+import 'package:mesh_sdk_flutter/src/model/transfer/cryptocurrency_funding_option.dart';
 import 'package:mesh_sdk_flutter/src/model/transfer/ineligible_token.dart';
 import 'package:mesh_sdk_flutter/src/model/transfer/network_fee.dart';
 import 'package:mesh_sdk_flutter/src/model/transfer/transfer_executed_status.dart';
@@ -20,16 +21,23 @@ sealed class MeshEvent {
       }
 
       final payload = json['payload'];
+      final hasPayload = json.containsKey('payload');
       final isPayloadMap = payload is Map<String, dynamic>;
 
-      // Fall back to the root JSON when there is no nested 'payload' key,
-      // so events are parsed correctly regardless of the message structure.
-      final p = isPayloadMap ? payload : json;
+      // Events nest their fields under 'payload'. Only fall back to the root
+      // JSON when there is genuinely no 'payload' key; if 'payload' is present
+      // but not a map (e.g. null), treat it as an empty payload rather than
+      // misreading root-level keys.
+      final p = isPayloadMap
+          ? payload
+          : (hasPayload ? const <String, dynamic>{} : json);
 
-      // Backward-compatible rawPayload: keep the original v1 value (the nested
-      // 'payload') when the key is present, and fall back to the root json for
-      // v2 flat messages. This preserves everything we already send in events.
-      final rawP = json.containsKey('payload') ? payload : json;
+      // Backward-compatible rawPayload: keep the original nested 'payload' when
+      // present. For a message with no 'payload' key, expose the root without
+      // the internal 'type' key so the shape stays consistent for consumers.
+      final rawP = hasPayload
+          ? payload
+          : (Map<String, dynamic>.of(json)..remove('type'));
 
       return switch (json['type']) {
         'integrationSelected' => IntegrationSelectedEvent.fromJson(p),
@@ -84,6 +92,9 @@ sealed class MeshEvent {
           p,
           rawPayload: rawP,
         ),
+        // errorMessage is optional here (unlike the pure error events) because
+        // this event also carries rawPayload and must never be dropped on a
+        // sparse payload, matching the other rawPayload-bearing events.
         'transferConfigureError' => TransferConfigureErrorEvent(
           errorMessage: p['errorMessage'] as String?,
           requestId: p['requestId'] as String?,
@@ -230,12 +241,14 @@ class TransferPreviewedEvent extends MeshEvent {
     this.customClientFee,
     this.userId,
     this.clientTransactionId,
+    this.cryptocurrencyFundingOptions,
   });
 
   factory TransferPreviewedEvent.fromJson(Map<String, dynamic> json) {
     final feeJson = json['estimatedNetworkGasFee'];
     final institutionFeeJson = json['institutionTransferFee'];
     final customClientFeeJson = json['customClientFee'];
+    final fundingOptionsJson = json['cryptocurrencyFundingOptions'];
 
     return TransferPreviewedEvent(
       amount: (json['amount'] as num?)?.toDouble(),
@@ -259,6 +272,12 @@ class TransferPreviewedEvent extends MeshEvent {
           : null,
       userId: json['userId'] as String?,
       clientTransactionId: json['clientTransactionId'] as String?,
+      cryptocurrencyFundingOptions: fundingOptionsJson is List
+          ? fundingOptionsJson
+                .whereType<Map<String, dynamic>>()
+                .map(CryptocurrencyFundingOption.fromJson)
+                .toList()
+          : null,
     );
   }
 
@@ -277,6 +296,7 @@ class TransferPreviewedEvent extends MeshEvent {
   final NetworkFee? customClientFee;
   final String? userId;
   final String? clientTransactionId;
+  final List<CryptocurrencyFundingOption>? cryptocurrencyFundingOptions;
 }
 
 class TransferPreviewErrorEvent extends MeshEvent {
@@ -408,7 +428,8 @@ class WalletMessageSignedEvent extends MeshEvent {
       timeStamp: (json['timeStamp'] as num).toInt(),
       isVerified: json['isVerified'] as bool,
       verifiedAddresses: (json['verifiedAddresses'] as List<dynamic>?)
-          ?.cast<String>(),
+          ?.whereType<String>()
+          .toList(),
     );
   }
 
