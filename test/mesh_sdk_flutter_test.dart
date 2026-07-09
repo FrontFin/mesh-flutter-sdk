@@ -83,7 +83,7 @@ void main() {
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
-      expect(webViewController.requestUri?.path, Uri.parse(rawUrl).path);
+      expect(webViewController.requestUri?.origin, Uri.parse(rawUrl).origin);
       expect(
         webViewController.requestUri?.queryParameters['platform'],
         'flutter',
@@ -101,7 +101,7 @@ void main() {
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
-      expect(webViewController.requestUri?.path, Uri.parse(rawUrl).path);
+      expect(webViewController.requestUri?.origin, Uri.parse(rawUrl).origin);
       expect(
         webViewController.requestUri?.queryParameters['platform'],
         'flutter',
@@ -124,7 +124,7 @@ void main() {
       final expectedLng =
           WidgetsBinding.instance.platformDispatcher.locale.languageCode;
       expect(webViewController.requestUri?.queryParameters['lng'], expectedLng);
-      expect(webViewController.requestUri?.path, Uri.parse(rawUrl).path);
+      expect(webViewController.requestUri?.origin, Uri.parse(rawUrl).origin);
     });
   });
 
@@ -233,7 +233,7 @@ void main() {
       expect(webViewController.backgroundColor, Colors.transparent);
       expect(webViewController.javaScriptMode, JavaScriptMode.unrestricted);
       expect(webViewController.javaScriptChannel, 'JSBridge');
-      expect(webViewController.requestUri?.path, Uri.parse(rawUrl).path);
+      expect(webViewController.requestUri?.origin, Uri.parse(rawUrl).origin);
       expect(
         webViewController.requestUri?.queryParameters['platform'],
         'flutter',
