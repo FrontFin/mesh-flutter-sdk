@@ -188,6 +188,7 @@ void main() {
         final event = MeshEvent.fromJson({
           'type': 'transferPreviewed',
           'payload': {
+            'amount': 100,
             'symbol': 'USDC',
             'toAddress': '0xabc',
             'networkId': 'ethereum',

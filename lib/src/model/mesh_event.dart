@@ -39,7 +39,7 @@ sealed class MeshEvent {
           ? payload
           : (Map<String, dynamic>.of(json)..remove('type'));
 
-      return switch (json['type']) {
+      return switch (type) {
         'integrationSelected' => IntegrationSelectedEvent.fromJson(p),
         'loaded' => const LoadedEvent(),
         'integrationConnectionError' => IntegrationConnectionErrorEvent(
