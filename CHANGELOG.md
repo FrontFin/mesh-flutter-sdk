@@ -1,9 +1,8 @@
 ## 1.1.8
 
 ### Added
-- Link v2 event support: events are now parsed from both the v1 nested `payload` and the v2 flat message shape.
+- Enriched existing events with additional optional fields from the Link event contract: `requestId` on the error events, `nativeLink`/`userSearched` on `IntegrationSelectedEvent`, `verifiedAddresses` on `WalletMessageSignedEvent`, and `integrationName`/`integrationType`/`userId`/`clientTransactionId`/fee/fiat fields plus `cryptocurrencyFundingOptions` on `TransferPreviewedEvent`.
 - New events: `IntegrationMfaRequiredEvent`, `DefiWalletErrorEvent`, and `HomePageLoadedEvent`.
-- New optional fields on existing events to match the Link contract (e.g. `requestId` on error events, `nativeLink`/`userSearched` on `IntegrationSelectedEvent`, `verifiedAddresses` on `WalletMessageSignedEvent`, and `userId`/`clientTransactionId` plus fee and fiat fields on the transfer events).
 - `platform=flutter` query parameter is now sent to the Link UI.
 
 ### Fixed
