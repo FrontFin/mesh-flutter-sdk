@@ -318,22 +318,22 @@ class TransferExecutionErrorEvent extends MeshEvent {
 
 class TransferInitiatedEvent extends MeshEvent {
   const TransferInitiatedEvent({
+    required this.integrationName,
     required this.status,
-    this.integrationName,
     this.integrationType,
     this.clientName,
   });
 
   factory TransferInitiatedEvent.fromJson(Map<String, dynamic> json) {
     return TransferInitiatedEvent(
-      integrationName: json['integrationName'] as String?,
+      integrationName: json['integrationName'] as String,
       status: json['status'] as String,
       integrationType: json['integrationType'] as String?,
       clientName: json['clientName'] as String?,
     );
   }
 
-  final String? integrationName;
+  final String integrationName;
   final String status;
   final String? integrationType;
   final String? clientName;
