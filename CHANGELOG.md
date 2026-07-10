@@ -1,12 +1,11 @@
 ## 1.1.8
 
 ### Added
-- Enriched existing events with additional optional fields from the Link event contract: `requestId` on the error events, `nativeLink`/`userSearched` on `IntegrationSelectedEvent`, `verifiedAddresses` on `WalletMessageSignedEvent`, and `integrationName`/`integrationType`/`userId`/`clientTransactionId`/fee/fiat fields plus `cryptocurrencyFundingOptions` on `TransferPreviewedEvent`.
-- New events: `IntegrationMfaRequiredEvent`, `DefiWalletErrorEvent`, and `HomePageLoadedEvent`.
-- `platform=flutter` query parameter is now sent to the Link UI.
+- Enriched existing SDK events with additional optional fields from the Link event contract.
+- Send `platform=flutter` query parameter to the Link UI.
 
 ### Fixed
-- Events with sparse payloads are no longer silently dropped, and `timeStamp` values sent as JSON doubles are parsed correctly instead of throwing.
+- Events with sparse payloads are no longer dropped.
 
 ## 1.1.7
 
