@@ -326,7 +326,7 @@ class TransferInitiatedEvent extends MeshEvent {
 
   factory TransferInitiatedEvent.fromJson(Map<String, dynamic> json) {
     return TransferInitiatedEvent(
-      integrationName: json['integrationName'] as String,
+      integrationName: (json['integrationName'] as String?) ?? '',
       status: json['status'] as String,
       integrationType: json['integrationType'] as String?,
       clientName: json['clientName'] as String?,
