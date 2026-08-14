@@ -1,19 +1,25 @@
 import 'package:flutter/foundation.dart';
 
-/// Schemes that must never be handed to the OS from web content. `javascript`
-/// and `data` execute in whatever context receives them, `file` and `content`
-/// reach local storage, `intent` and `android-app` can address an arbitrary
-/// component with arbitrary extras, and `about` / `blob` are inert but
-/// meaningless to launch.
+/// Schemes that must never be handed to the OS from web content: code
+/// execution, local or sensitive handlers, arbitrary app launch, and browser
+/// internals. Mirrors link-v2's `sanitizeHostedQrDeepLink` blocklist so both
+/// ends of the same hand-off agree, plus `android-app`.
 const _blockedSchemes = {
   'javascript',
+  'vbscript',
   'data',
   'file',
+  'blob',
   'content',
   'intent',
   'android-app',
   'about',
-  'blob',
+  'mailto',
+  'tel',
+  'sms',
+  'chrome',
+  'chrome-extension',
+  'view-source',
 };
 
 final _whitespacePattern = RegExp(r'\s');

@@ -54,13 +54,22 @@ void main() {
     group('2. blocked schemes are never launched', () {
       const blocked = [
         'javascript:alert(1)',
+        'vbscript:msgbox(1)',
         'data:text/html,<script>alert(1)</script>',
         'file:///etc/passwd',
+        'blob:https://link.meshconnect.com/abc',
         'content://com.android.provider/x',
         'intent://scan/#Intent;scheme=zxing;end',
         'android-app://com.evil.app',
         'about:blank',
-        'blob:https://link.meshconnect.com/abc',
+        // OS action schemes. No wallet uses them and a compromised Link build
+        // could dial or message a premium-rate number from inside the WebView.
+        'mailto:victim@example.com',
+        'tel:+1900555000',
+        'sms:+1900555000&body=x',
+        'chrome://settings',
+        'chrome-extension://abcdef/page.html',
+        'view-source:https://link.meshconnect.com',
       ];
 
       test('returns false for every blocked scheme', () {
