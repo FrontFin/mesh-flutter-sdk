@@ -36,6 +36,14 @@ void main() {
         ),
         isTrue,
       );
+      // The catalog's Exodus WalletConnect link has no trailing slash; the
+      // origin entry used to, and the matcher requires exact-or-nested.
+      expect(
+        isExternallyOpenedOrigin(
+          'https://exodus.com/m?uri=wc%3A935389b9989400492b52a78a14f5a514',
+        ),
+        isTrue,
+      );
       expect(isExternallyOpenedOrigin('https://i.bybit.com/1TYabIso'), isTrue);
       expect(
         isExternallyOpenedOrigin('https://krak.app/request/abc123'),
@@ -49,6 +57,49 @@ void main() {
       );
       expect(
         isExternallyOpenedOrigin('https://cash.app/launch/abc123'),
+        isTrue,
+      );
+    });
+
+    // In-wallet browser deeplinks. These hosts come from wallet metadata
+    // served by the backend, so a wallet that changes its deeplink host stops
+    // opening until it is added here.
+    test('Returns true for in-wallet browser deeplink hosts', () {
+      expect(
+        isExternallyOpenedOrigin(
+          'https://link.metamask.io/dapp/link.meshconnect.com/dapp/eyJhIjoiYiJ9',
+        ),
+        isTrue,
+      );
+      expect(
+        isExternallyOpenedOrigin(
+          'https://phantom.app/ul/browse/https%3A%2F%2Flink.meshconnect.com%2Fdapp%2FeyJhIjoiYiJ9?ref=https%3A%2F%2Flink.meshconnect.com',
+        ),
+        isTrue,
+      );
+      expect(
+        isExternallyOpenedOrigin(
+          'https://base.app/app/https%3A%2F%2Flink.meshconnect.com%2Fdapp%2FeyJhIjoiYiJ9',
+        ),
+        isTrue,
+      );
+      expect(
+        isExternallyOpenedOrigin(
+          'https://bkcode.vip?action=dapp&url=https%3A%2F%2Flink.meshconnect.com%2Fdapp%2FeyJhIjoiYiJ9',
+        ),
+        isTrue,
+      );
+      expect(
+        isExternallyOpenedOrigin(
+          'https://app.tonkeeper.com/dapp/link.meshconnect.com/dapp/eyJhIjoiYiJ9',
+        ),
+        isTrue,
+      );
+    });
+
+    test('Returns true for the MetaMask WalletConnect universal link', () {
+      expect(
+        isExternallyOpenedOrigin('https://metamask.app.link/wc?uri=wc%3Aabc'),
         isTrue,
       );
     });
@@ -77,6 +128,22 @@ void main() {
         isExternallyOpenedOrigin('https://link.trustwallet.com.evil.com/wc'),
         isFalse,
       );
+      expect(
+        isExternallyOpenedOrigin('https://link.metamask.io.evil.com/dapp/x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://base.app.evil.com/app/x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://bkcode.vip.evil.com?action=dapp'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://app.tonkeeper.com.evil.com/dapp/x'),
+        isFalse,
+      );
     });
 
     test('Returns false for lookalike paths (path-prefix attack)', () {
@@ -90,6 +157,9 @@ void main() {
         isExternallyOpenedOrigin('https://go.rabby.io/mobileEvil/path'),
         isFalse,
       );
+      // Dropping the trailing slash from the Exodus origin must not widen it
+      // to any path starting with "m".
+      expect(isExternallyOpenedOrigin('https://exodus.com/malicious'), isFalse);
     });
 
     group('OAuth redirect regex', () {

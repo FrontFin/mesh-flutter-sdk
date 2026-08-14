@@ -1,3 +1,12 @@
+## 1.1.9
+
+### Fixed
+- MetaMask, Base (Coinbase Wallet), Bitget Wallet, and Tonkeeper now open from the wallet selection screen. Their in-wallet browser deeplinks were blocked by the WebView instead of launching the app.
+- Wallets that connect over WalletConnect now open too. Their deep links were matched against a hardcoded list of app schemes, so most of the catalog was silently blocked.
+
+### Changed
+- A wallet deep link is now recognised by its scheme rather than by a hardcoded list, so newly added wallets work without an SDK release. Schemes that can execute code or reach local storage stay blocked.
+
 ## 1.1.8
 
 ### Added
