@@ -67,6 +67,7 @@ void main() {
         'mailto:victim@example.com',
         'tel:+1900555000',
         'sms:+1900555000&body=x',
+        'shortcuts://run-shortcut?name=Evil',
         'chrome://settings',
         'chrome-extension://abcdef/page.html',
         'view-source:https://link.meshconnect.com',

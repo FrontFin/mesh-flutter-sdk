@@ -130,6 +130,11 @@ class MeshLinkController {
               return NavigationDecision.prevent;
             }
 
+            // Deliberately ahead of the domain whitelist: that list holds https
+            // origins, so a wallet's custom scheme can never satisfy it and
+            // checking it first would block every deep link. What may LEAVE the
+            // WebView is governed by the scheme denylist in `isAppUrlChange`,
+            // what may RENDER in it by the whitelist below.
             if (isAppUrlChange(navigation.url)) {
               logger.info('Opening app link: $uri');
               unawaited(_launchExternalUri(uri, isApp: true));

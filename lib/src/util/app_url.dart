@@ -17,6 +17,9 @@ const _blockedSchemes = {
   'mailto',
   'tel',
   'sms',
+  // Runs an already-installed automation, so it is a code-execution vector
+  // rather than an app hand-off.
+  'shortcuts',
   'chrome',
   'chrome-extension',
   'view-source',
