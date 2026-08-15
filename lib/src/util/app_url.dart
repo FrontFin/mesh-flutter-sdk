@@ -2,8 +2,13 @@ import 'package:flutter/foundation.dart';
 
 /// Schemes that must never be handed to the OS from web content: code
 /// execution, local or sensitive handlers, arbitrary app launch, and browser
-/// internals. Mirrors link-v2's `sanitizeHostedQrDeepLink` blocklist so both
-/// ends of the same hand-off agree, plus `android-app`.
+/// internals.
+///
+/// Takes link-v2's `sanitizeHostedQrDeepLink` blocklist as the shared baseline,
+/// then adds the native surface the web side has no reason to carry:
+/// `android-app` (Android intents) and `shortcuts` (iOS automations). The two
+/// lists are deliberately not identical, since each end blocks what its own
+/// platform can reach.
 const _blockedSchemes = {
   'javascript',
   'vbscript',
