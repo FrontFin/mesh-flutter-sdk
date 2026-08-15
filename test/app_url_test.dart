@@ -67,7 +67,10 @@ void main() {
         'mailto:victim@example.com',
         'tel:+1900555000',
         'sms:+1900555000&body=x',
+        'facetime://victim@example.com',
+        'facetime-audio://victim@example.com',
         'shortcuts://run-shortcut?name=Evil',
+        'itms-services://?action=download-manifest&url=https://evil.example/m.plist',
         'chrome://settings',
         'chrome-extension://abcdef/page.html',
         'view-source:https://link.meshconnect.com',
@@ -186,6 +189,23 @@ void main() {
 
       test('matches itms-apps case-insensitively', () {
         expect(isAppUrlChange('ITMS-Apps://apps.apple.com/x'), isTrue);
+      });
+
+      // Store links are supported on purpose: the Android `market`/`intent`
+      // hosts, the iOS App Store host, and `getStoreUriFromAppUri`'s Play Store
+      // fallback all exist to send a user to install a missing wallet. `market`
+      // is the Android counterpart of `itms-apps`, so both stay launchable
+      // while `itms-services` (enterprise OTA install) does not.
+      test('market stays launchable, itms-services does not', () {
+        expect(
+          isAppUrlChange('market://details?id=exodusmovement.exodus'),
+          isTrue,
+        );
+        expect(isAppUrlChange('itms-apps://apps.apple.com/app/id123'), isTrue);
+        expect(
+          isAppUrlChange('itms-services://?action=download-manifest&url=x'),
+          isFalse,
+        );
       });
     });
 

@@ -22,9 +22,14 @@ const _blockedSchemes = {
   'mailto',
   'tel',
   'sms',
+  'facetime',
+  'facetime-audio',
   // Runs an already-installed automation, so it is a code-execution vector
   // rather than an app hand-off.
   'shortcuts',
+  // Enterprise over-the-air install. Prompts to install an arbitrary
+  // enterprise-signed app, unlike `itms-apps` which only opens a store page.
+  'itms-services',
   'chrome',
   'chrome-extension',
   'view-source',
