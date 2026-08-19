@@ -1,3 +1,9 @@
+## 1.1.9
+
+### Fixed
+- MetaMask now opens from the wallet selection screen. Its in-wallet browser deep link was not recognised, so the WebView blocked it instead of launching the app.
+- Exodus now opens on iOS. Its WalletConnect link was matched against an origin with a trailing slash that the real link never had.
+
 ## 1.1.8
 
 ### Added

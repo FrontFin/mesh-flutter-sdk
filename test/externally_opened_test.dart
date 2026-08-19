@@ -53,6 +53,26 @@ void main() {
       );
     });
 
+    // The real value the backend serves for MetaMask's in-wallet browser, so a
+    // change to the catalog shows up here.
+    test('Returns true for the MetaMask in-wallet browser link', () {
+      expect(
+        isExternallyOpenedOrigin(
+          'https://link.metamask.io/dapp/link.meshconnect.com/dapp/eyJhIjoiYiJ9',
+        ),
+        isTrue,
+      );
+    });
+
+    // The catalog's Exodus link has no trailing slash, and the matcher requires
+    // the URL path to equal the origin path or be nested under it.
+    test('Returns true for the Exodus link as the catalog serves it', () {
+      expect(
+        isExternallyOpenedOrigin('https://exodus.com/m?uri=wc%3Aabc'),
+        isTrue,
+      );
+    });
+
     test('Returns false for about:blank', () {
       expect(isExternallyOpenedOrigin('about:blank'), isFalse);
     });
@@ -77,6 +97,10 @@ void main() {
         isExternallyOpenedOrigin('https://link.trustwallet.com.evil.com/wc'),
         isFalse,
       );
+      expect(
+        isExternallyOpenedOrigin('https://link.metamask.io.evil.com/dapp/x'),
+        isFalse,
+      );
     });
 
     test('Returns false for lookalike paths (path-prefix attack)', () {
@@ -90,6 +114,9 @@ void main() {
         isExternallyOpenedOrigin('https://go.rabby.io/mobileEvil/path'),
         isFalse,
       );
+      // Dropping the trailing slash from the Exodus origin must not widen it
+      // to every path starting with "m".
+      expect(isExternallyOpenedOrigin('https://exodus.com/malicious'), isFalse);
     });
 
     group('OAuth redirect regex', () {

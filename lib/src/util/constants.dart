@@ -124,14 +124,15 @@ const _externallyOpenedOrigins = [
   'https://go.rabby.io/mobile',     // Rabby
   'https://app.binance.com',        // Binance Connect
   'https://web3.okx.com',           // Okx
-  'https://metamask.app.link',      // MetaMask
+  'https://metamask.app.link',      // MetaMask (WalletConnect)
+  'https://link.metamask.io',       // MetaMask (in-wallet browser)
   'https://phantom.app',            // Phantom
   'https://solflare.com',           // Solflare
   'https://coinbase.com',           // Coinbase
   'https://www.coinbase.com',       // Coinbase
   'https://login.coinbase.com',     // Coinbase
   'https://pay.coinbase.com',       // Coinbase Pay (ramp fallback)
-  'https://exodus.com/m/',          // Exodus
+  'https://exodus.com/m',           // Exodus
   'https://sandbox.meshconnect.com/authorize/Coinbase', // Coinbase on Sandbox
   'https://api.cb-device-intelligence.com',
   'https://i.bybit.com',           // Bybit Pay
