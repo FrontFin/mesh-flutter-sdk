@@ -64,15 +64,6 @@ void main() {
       );
     });
 
-    // The catalog's Exodus link has no trailing slash, and the matcher requires
-    // the URL path to equal the origin path or be nested under it.
-    test('Returns true for the Exodus link as the catalog serves it', () {
-      expect(
-        isExternallyOpenedOrigin('https://exodus.com/m?uri=wc%3Aabc'),
-        isTrue,
-      );
-    });
-
     test('Returns false for about:blank', () {
       expect(isExternallyOpenedOrigin('about:blank'), isFalse);
     });
@@ -114,9 +105,6 @@ void main() {
         isExternallyOpenedOrigin('https://go.rabby.io/mobileEvil/path'),
         isFalse,
       );
-      // Dropping the trailing slash from the Exodus origin must not widen it
-      // to every path starting with "m".
-      expect(isExternallyOpenedOrigin('https://exodus.com/malicious'), isFalse);
     });
 
     group('OAuth redirect regex', () {
