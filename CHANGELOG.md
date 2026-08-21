@@ -1,3 +1,11 @@
+## 1.1.10
+
+### Fixed
+- Robinhood Wallet now opens from the wallet selection screen. Its `robinhood-wallet://` deep link was not in the allowed native schemes, so the WebView blocked it instead of launching the app.
+
+### Changed
+- README: added `robinhood-wallet` to the documented iOS `LSApplicationQueriesSchemes` list, keeping it in sync with the allowed native schemes.
+
 ## 1.1.9
 
 ### Fixed

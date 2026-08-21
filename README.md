@@ -146,6 +146,7 @@ Add the following URL schemes to `LSApplicationQueriesSchemes` in your app's `In
     <string>phantom</string>
     <string>trust</string>
     <string>metamask</string>
+    <string>robinhood-wallet</string>
     <string>bybit</string>
     <string>cryptocom</string>
     <string>krakenpay</string>

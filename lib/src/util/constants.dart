@@ -170,6 +170,7 @@ const allowedNativeSchemes = {
   'phantom',
   'trust',
   'metamask',
+  'robinhood-wallet',
   // Hosted-QR deposit / pay flows
   'bybit',
   'cryptocom',
