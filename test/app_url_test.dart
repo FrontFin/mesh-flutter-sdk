@@ -150,8 +150,8 @@ void main() {
         expect(isAppUrlChange('exodus://some/path'), isTrue);
       });
 
-      // First hyphenated scheme in the allowlist, so it also covers that a
-      // hyphen survives Uri.parse's scheme extraction.
+      // First allowlisted scheme containing a hyphen, so this also checks that
+      // Uri.parse keeps the hyphen when it extracts the scheme.
       test('robinhood-wallet WalletConnect deep link', () {
         expect(
           isAppUrlChange('robinhood-wallet://wc?uri=wc%3Atopic%402'),
