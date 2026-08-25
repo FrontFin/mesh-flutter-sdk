@@ -87,6 +87,7 @@ Uri? getStoreUriFromAppUri(Uri uri) {
 // dart format off
 const _whitelistedOrigins = [
   '*.meshconnect.com',
+  '*.meshpay.com', // MFS / Link v3
   '*.getfront.com',
   '*.walletconnect.com',
   '*.walletconnect.org',
