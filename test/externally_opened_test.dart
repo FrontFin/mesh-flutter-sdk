@@ -51,6 +51,45 @@ void main() {
         isExternallyOpenedOrigin('https://cash.app/launch/abc123'),
         isTrue,
       );
+      expect(
+        isExternallyOpenedOrigin('https://ramp.revolut.com/order/abc123'),
+        isTrue,
+      );
+    });
+
+    // Without this entry the Revolut Connect handoff was a dead tap: the ramp
+    // URL is in no list, so `onNavigationRequest` fell through to
+    // `NavigationDecision.prevent` and only a device log recorded it. iOS is
+    // unaffected because its default for an unlisted host is to leave the
+    // WebView; Flutter's is to refuse.
+    // Both environments: `.com` is Revolut prod, `.codes` is Revolut's dev env
+    // wired to Mesh dev. The hosts differ per environment, so listing only one
+    // leaves the handoff dead on the other.
+    test('Returns true for the Revolut Connect ramp handoff', () {
+      expect(isExternallyOpenedOrigin('https://ramp.revolut.com'), isTrue);
+      expect(
+        isExternallyOpenedOrigin(
+          'https://ramp.revolut.com/?order_id=abc&amount=50',
+        ),
+        isTrue,
+      );
+      expect(isExternallyOpenedOrigin('https://ramp.revolut.codes'), isTrue);
+      expect(
+        isExternallyOpenedOrigin(
+          'https://ramp.revolut.codes/?order_id=abc&amount=50',
+        ),
+        isTrue,
+      );
+    });
+
+    // Revolut's own sign-in hop happens in the browser, after we have handed
+    // over, so it must NOT be listed here. Pinned so nobody "completes the set"
+    // and widens the surface for no reason.
+    test('Returns false for other revolut hosts', () {
+      expect(isExternallyOpenedOrigin('https://sso.revolut.com'), isFalse);
+      expect(isExternallyOpenedOrigin('https://revolut.com'), isFalse);
+      expect(isExternallyOpenedOrigin('https://sso.revolut.codes'), isFalse);
+      expect(isExternallyOpenedOrigin('https://revolut.codes'), isFalse);
     });
 
     // The real value the backend serves for MetaMask's in-wallet browser, so a
@@ -90,6 +129,14 @@ void main() {
       );
       expect(
         isExternallyOpenedOrigin('https://link.metamask.io.evil.com/dapp/x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://ramp.revolut.com.evil.com/order/1'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://ramp.revolut.codes.evil.com/order/1'),
         isFalse,
       );
     });

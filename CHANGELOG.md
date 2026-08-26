@@ -1,3 +1,8 @@
+## 1.1.11
+
+### Fixed
+- Revolut Connect now opens.
+
 ## 1.1.10
 
 ### Fixed
