@@ -53,13 +53,11 @@ void main() {
       );
     });
 
-    // Revolut asked us not to carry their domains in SDK source; the checkout
-    // reaches the browser via shouldExternaliseUnlistedNavigation instead.
-    test('Returns false for every revolut host', () {
-      expect(isExternallyOpenedOrigin('https://ramp.revolut.com'), isFalse);
-      expect(isExternallyOpenedOrigin('https://ramp.revolut.codes'), isFalse);
-      expect(isExternallyOpenedOrigin('https://sso.revolut.com'), isFalse);
-      expect(isExternallyOpenedOrigin('https://revolut.com'), isFalse);
+    // Hosted checkouts are deliberately absent from this list. They reach the
+    // browser via shouldExternaliseUnlistedNavigation, which needs no hostname.
+    test('Returns false for an unlisted hosted checkout', () {
+      expect(isExternallyOpenedOrigin('https://ramp.example'), isFalse);
+      expect(isExternallyOpenedOrigin('https://sso.example'), isFalse);
     });
 
     // The real value the backend serves for MetaMask's in-wallet browser, so a

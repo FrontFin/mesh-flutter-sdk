@@ -6,7 +6,7 @@ void main() {
     test('hands an https page to the browser', () {
       expect(
         shouldExternaliseUnlistedNavigation(
-          'https://ramp.revolut.com/payment?amount=817',
+          'https://checkout.example/payment?amount=817',
         ),
         isTrue,
       );
@@ -14,7 +14,7 @@ void main() {
 
     test('refuses anything that is not https', () {
       for (final url in [
-        'http://ramp.revolut.com/payment',
+        'http://checkout.example/payment',
         'about:blank',
         'javascript:alert(1)',
         'data:text/html,<script>alert(1)</script>',
@@ -23,6 +23,12 @@ void main() {
       ]) {
         expect(shouldExternaliseUnlistedNavigation(url), isFalse, reason: url);
       }
+    });
+
+    // An https URI with no authority is not navigable.
+    test('refuses https with no host', () {
+      expect(shouldExternaliseUnlistedNavigation('https:'), isFalse);
+      expect(shouldExternaliseUnlistedNavigation('https:///path'), isFalse);
     });
   });
 }

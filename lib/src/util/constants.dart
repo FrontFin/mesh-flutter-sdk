@@ -28,7 +28,8 @@ bool isWhitelistedOrigin(String url) {
 /// navigations: webview_flutter reports `isMainFrame: false` for a
 /// `target=_blank` popup, which is the case this exists for.
 bool shouldExternaliseUnlistedNavigation(String url) {
-  return Uri.tryParse(url)?.scheme == 'https';
+  final uri = Uri.tryParse(url);
+  return uri?.scheme == 'https' && uri!.host.isNotEmpty;
 }
 
 bool isExternallyOpenedOrigin(String url) {

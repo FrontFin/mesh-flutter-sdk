@@ -138,8 +138,10 @@ class MeshLinkController {
 
             if (configuration.isDomainWhitelistEnabled &&
                 !isWhitelistedOrigin(navigation.url)) {
-              // Not renderable here, but a top-level page still belongs
-              // somewhere: send it to the browser instead of a dead tap.
+              // Not renderable here, so send it to the browser instead of a
+              // dead tap. Applies to any refused navigation, iframes included:
+              // see shouldExternaliseUnlistedNavigation for why it cannot be
+              // narrowed to top-level ones.
               if (shouldExternaliseUnlistedNavigation(navigation.url)) {
                 // Warning, not info: this replaced a `severe` block and is
                 // still how an unexpected host shows up in a device log.
