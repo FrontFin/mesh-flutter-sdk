@@ -23,6 +23,14 @@ bool isWhitelistedOrigin(String url) {
   }
 }
 
+/// Whether a navigation the whitelist refuses should go to the browser instead
+/// of being dropped. https only. Deliberately not narrowed to top-level
+/// navigations: webview_flutter reports `isMainFrame: false` for a
+/// `target=_blank` popup, which is the case this exists for.
+bool shouldExternaliseUnlistedNavigation(String url) {
+  return Uri.tryParse(url)?.scheme == 'https';
+}
+
 bool isExternallyOpenedOrigin(String url) {
   try {
     if (url == 'about:blank') {
@@ -139,13 +147,6 @@ const _externallyOpenedOrigins = [
   'https://krak.app',              // Kraken Pay
   'https://js.crypto.com',         // Crypto.com Pay
   'https://cash.app',              // Cash App Pay
-  // Revolut Connect. The hosted on-ramp checkout, reached by handing the user
-  // out of the WebView; Revolut's own redirect to sso.revolut.com for sign-in
-  // then happens in the browser, so only this first host needs listing.
-  // `.codes` is Revolut's dev environment, wired to Mesh dev, and is listed for
-  // the same reason the Coinbase sandbox origin above is.
-  'https://ramp.revolut.com',
-  'https://ramp.revolut.codes',
 ];
 // dart format on
 
