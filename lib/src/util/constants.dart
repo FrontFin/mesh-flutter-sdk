@@ -29,7 +29,10 @@ bool isWhitelistedOrigin(String url) {
 /// `target=_blank` popup, which is the case this exists for.
 bool shouldExternaliseUnlistedNavigation(String url) {
   final uri = Uri.tryParse(url);
-  return uri?.scheme == 'https' && uri!.host.isNotEmpty;
+  if (uri == null) {
+    return false;
+  }
+  return uri.scheme == 'https' && uri.host.isNotEmpty;
 }
 
 bool isExternallyOpenedOrigin(String url) {

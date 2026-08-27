@@ -1,7 +1,7 @@
 ## 1.1.12
 
 ### Changed
-- Pages the WebView cannot render now open in the browser instead of being blocked.
+- Unlisted https pages now open in the browser instead of being blocked.
 
 ## 1.1.11
 

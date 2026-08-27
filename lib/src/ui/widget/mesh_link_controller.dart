@@ -119,7 +119,15 @@ class MeshLinkController {
           },
           onNavigationRequest: (navigation) {
             logger.info('Navigation request: ${navigation.url}');
-            final uri = Uri.parse(navigation.url);
+            // tryParse, not parse: the url is untrusted and a FormatException
+            // here would escape the callback.
+            final uri = Uri.tryParse(navigation.url);
+            if (uri == null) {
+              logger.severe(
+                'Blocked unparseable navigation: ${navigation.url}',
+              );
+              return NavigationDecision.prevent;
+            }
 
             if (isExternallyOpenedOrigin(navigation.url)) {
               logger.info(
