@@ -1,7 +1,7 @@
 ## 1.1.12
 
 ### Removed
-- Reverted the Revolut Connect handoff from 1.1.11: it required hardcoding partner origins in the SDK.
+- Dropped the Revolut sandbox origin added in 1.1.11. Revolut Connect still opens against prod.
 
 ## 1.1.11
 

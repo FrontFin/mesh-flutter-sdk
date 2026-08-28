@@ -51,6 +51,10 @@ void main() {
         isExternallyOpenedOrigin('https://cash.app/launch/abc123'),
         isTrue,
       );
+      expect(
+        isExternallyOpenedOrigin('https://ramp.revolut.com/order/abc123'),
+        isTrue,
+      );
     });
 
     // The real value the backend serves for MetaMask's in-wallet browser, so a
@@ -90,6 +94,10 @@ void main() {
       );
       expect(
         isExternallyOpenedOrigin('https://link.metamask.io.evil.com/dapp/x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://ramp.revolut.com.evil.com/order/1'),
         isFalse,
       );
     });

@@ -139,6 +139,10 @@ const _externallyOpenedOrigins = [
   'https://krak.app',              // Kraken Pay
   'https://js.crypto.com',         // Crypto.com Pay
   'https://cash.app',              // Cash App Pay
+  // Revolut Connect. Prod only: Revolut asked us not to carry their
+  // dev/sandbox host in SDK source, so the handoff works against prod Revolut
+  // but not against their sandbox.
+  'https://ramp.revolut.com',
 ];
 // dart format on
 
