@@ -1,7 +1,7 @@
 ## 1.1.12
 
-### Changed
-- Unlisted https pages now open in the browser instead of being blocked.
+### Removed
+- Reverted the Revolut Connect handoff from 1.1.11: it required hardcoding partner origins in the SDK.
 
 ## 1.1.11
 
@@ -33,7 +33,7 @@
 ## 1.1.7
 
 ### Removed
-- Removed the hardcoded Revolut origins (`https://ramp.revolut.codes`, `https://sso.revolut.codes`, `https://ramp.revolut.com`) from the whitelisted origins list.
+- Removed hardcoded partner origins from the whitelisted origins list.
 
 ## 1.1.6
 

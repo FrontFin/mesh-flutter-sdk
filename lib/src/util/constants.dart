@@ -23,18 +23,6 @@ bool isWhitelistedOrigin(String url) {
   }
 }
 
-/// Whether a navigation the whitelist refuses should go to the browser instead
-/// of being dropped. https only. Deliberately not narrowed to top-level
-/// navigations: webview_flutter reports `isMainFrame: false` for a
-/// `target=_blank` popup, which is the case this exists for.
-bool shouldExternaliseUnlistedNavigation(String url) {
-  final uri = Uri.tryParse(url);
-  if (uri == null) {
-    return false;
-  }
-  return uri.scheme == 'https' && uri.host.isNotEmpty;
-}
-
 bool isExternallyOpenedOrigin(String url) {
   try {
     if (url == 'about:blank') {

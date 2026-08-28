@@ -119,15 +119,7 @@ class MeshLinkController {
           },
           onNavigationRequest: (navigation) {
             logger.info('Navigation request: ${navigation.url}');
-            // tryParse, not parse: the url is untrusted and a FormatException
-            // here would escape the callback.
-            final uri = Uri.tryParse(navigation.url);
-            if (uri == null) {
-              logger.severe(
-                'Blocked unparseable navigation: ${navigation.url}',
-              );
-              return NavigationDecision.prevent;
-            }
+            final uri = Uri.parse(navigation.url);
 
             if (isExternallyOpenedOrigin(navigation.url)) {
               logger.info(
@@ -146,21 +138,7 @@ class MeshLinkController {
 
             if (configuration.isDomainWhitelistEnabled &&
                 !isWhitelistedOrigin(navigation.url)) {
-              // Not renderable here, so send it to the browser instead of a
-              // dead tap. Applies to any refused navigation, iframes included:
-              // see shouldExternaliseUnlistedNavigation for why it cannot be
-              // narrowed to top-level ones.
-              if (shouldExternaliseUnlistedNavigation(navigation.url)) {
-                // Warning, not info: this replaced a `severe` block and is
-                // still how an unexpected host shows up in a device log.
-                logger.warning(
-                  'Unlisted origin, opening in external browser: '
-                  '${navigation.url}',
-                );
-                unawaited(_launchExternalUri(uri, isApp: false));
-              } else {
-                logger.severe('Blocked navigation to: ${navigation.url}');
-              }
+              logger.severe('Blocked navigation to: ${navigation.url}');
               return NavigationDecision.prevent;
             }
 

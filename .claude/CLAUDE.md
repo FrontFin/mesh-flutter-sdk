@@ -134,7 +134,7 @@ The Android SDK (`mesh-android-sdk`) does the same thing in Kotlin. The two SDKs
 
 - **Whitelisted** (render in WebView): wildcard and explicit origins covering Mesh, WalletConnect, OKX, Gemini, Robinhood, Google, hCaptcha, Stripe, Usercentrics, and others. `lib/src/util/constants.dart` (`_whitelistedOrigins`) is the authoritative list — do not rely on any summary here.
 - **Externally opened** (via `url_launcher` → native app): Trust Wallet, Uphold, Rabby, Binance, OKX, MetaMask, Phantom, Solflare, Coinbase, Exodus. See `_externallyOpenedOrigins` in `constants.dart`.
-- **Everything else**: `https` opens in the system browser (`shouldExternaliseUnlistedNavigation`), anything else is blocked. Nothing unlisted ever renders in the WebView.
+- **Everything else**: blocked
 
 Clients can disable the whitelist via `MeshConfiguration` for custom flows, but this is not recommended.
 

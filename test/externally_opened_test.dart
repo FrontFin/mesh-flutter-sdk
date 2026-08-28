@@ -53,13 +53,6 @@ void main() {
       );
     });
 
-    // Hosted checkouts are deliberately absent from this list. They reach the
-    // browser via shouldExternaliseUnlistedNavigation, which needs no hostname.
-    test('Returns false for an unlisted hosted checkout', () {
-      expect(isExternallyOpenedOrigin('https://ramp.example'), isFalse);
-      expect(isExternallyOpenedOrigin('https://sso.example'), isFalse);
-    });
-
     // The real value the backend serves for MetaMask's in-wallet browser, so a
     // change to the catalog shows up here.
     test('Returns true for the MetaMask in-wallet browser link', () {
