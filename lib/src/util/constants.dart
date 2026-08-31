@@ -144,6 +144,12 @@ const _externallyOpenedOrigins = [
   // dev/sandbox host in SDK source, so the handoff works against prod Revolut
   // but not against their sandbox.
   'https://ramp.revolut.com',
+  // Block explorers. Link offers a "view transaction" link after a transfer and
+  // the URL is backend-supplied per network, so this list cannot be complete
+  // here: a network whose explorer is missing dead-taps. Sourcing it from the
+  // backend network config is tracked separately.
+  'https://basescan.org',
+  'https://etherscan.io',
 ];
 // dart format on
 
