@@ -30,7 +30,8 @@ bool isExternallyOpenedOrigin(String url) {
     }
 
     // Allow OAuth redirect URLs to open externally
-    if (_oAuthRedirectRegex.hasMatch(url)) {
+    if (_oAuthRedirectRegex.hasMatch(url) ||
+        _mfsOAuthRedirectRegex.hasMatch(url)) {
       return true;
     }
 
@@ -87,6 +88,7 @@ Uri? getStoreUriFromAppUri(Uri uri) {
 // dart format off
 const _whitelistedOrigins = [
   '*.meshconnect.com',
+  '*.meshpay.com', // MFS / Link v3
   '*.getfront.com',
   '*.walletconnect.com',
   '*.walletconnect.org',
@@ -143,12 +145,29 @@ const _externallyOpenedOrigins = [
   // dev/sandbox host in SDK source, so the handoff works against prod Revolut
   // but not against their sandbox.
   'https://ramp.revolut.com',
+  // Block explorers. Link offers a "view transaction" link after a transfer and
+  // the URL is backend-supplied per network, so this list cannot be complete
+  // here: a network whose explorer is missing dead-taps. Sourcing it from the
+  // backend network config is tracked separately.
+  'https://basescan.org',
+  'https://etherscan.io',
 ];
 // dart format on
 
 // Matches https://*.meshconnect.com/*/catalog/oauth/redirect/*
 final _oAuthRedirectRegex = RegExp(
   r'^https://[^.]+\.meshconnect\.com/.+/catalog/oauth/redirect/.*$',
+);
+
+// The Link v3 equivalent: https://api*.meshpay.com/v2/sessions/<id>/child-sessions/<id>:redirect
+// Must open externally like its v1/v2 counterpart. The host is whitelisted, so
+// without this the redirect renders in the WebView, unloading Link and losing
+// the in-flight OAuth session.
+// `:redirect` is anchored to the end of the path so a longer sibling endpoint
+// (`:redirectSomethingElse`) does not also open externally.
+final _mfsOAuthRedirectRegex = RegExp(
+  r'^https://api(?:\.[a-z0-9-]+)*\.meshpay\.com'
+  r'/v2/sessions/[^/]+/child-sessions/[^/?]+:redirect(?:\?|$)',
 );
 
 const _exodusSchema = 'exodus';

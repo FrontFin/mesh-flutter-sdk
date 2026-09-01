@@ -8,6 +8,7 @@ export 'package:mesh_sdk_flutter/src/model/integration_access_token.dart';
 export 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
 export 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
 export 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
+export 'package:mesh_sdk_flutter/src/model/mesh_link_environment.dart';
 export 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
 export 'package:mesh_sdk_flutter/src/model/success/integration.dart';
 export 'package:mesh_sdk_flutter/src/model/success/success.dart';

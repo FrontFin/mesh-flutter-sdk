@@ -1,3 +1,8 @@
+## 1.1.13
+
+### Changed
+- Link host updates
+
 ## 1.1.12
 
 ### Removed
