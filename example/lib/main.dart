@@ -26,9 +26,6 @@ class MeshExampleApp extends StatelessWidget {
 
 /// A link token is base64 of a Link URL; a session token (`ory_ac_...`) is not
 /// valid base64 at all, so the two are told apart by trying to decode one.
-///
-/// This lives in the example app, not the SDK: a session token needs an
-/// environment, and guessing it would silently send a dev token to production.
 bool _isLinkToken(String input) {
   try {
     final decoded = utf8.decode(base64Decode(base64.normalize(input)));
@@ -47,14 +44,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _textController = TextEditingController();
-
-  /// Only consulted for session tokens; a link token carries its own host.
-  MeshLinkEnvironment _environment = MeshLinkEnvironment.prod;
+  bool _isBusy = false;
 
   @override
   Widget build(BuildContext context) {
     final input = _textController.text.trim();
-    final isLinkToken = input.isEmpty || _isLinkToken(input);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Mesh Example App')),
@@ -68,6 +62,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 TextField(
                   controller: _textController,
+                  enabled: !_isBusy,
                   decoration: const InputDecoration(
                     labelText: 'Link or session token',
                     border: OutlineInputBorder(
@@ -76,40 +71,17 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onChanged: (value) => setState(() {}),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  input.isEmpty
-                      ? 'Paste either kind, the type is detected'
-                      : isLinkToken
-                      ? 'Detected: link token'
-                      : 'Detected: session token',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                // Session tokens carry no host, so the environment picks one.
-                if (input.isNotEmpty && !isLinkToken) ...[
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<MeshLinkEnvironment>(
-                    initialValue: _environment,
-                    decoration: const InputDecoration(
-                      labelText: 'Environment',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                      ),
-                    ),
-                    items: [
-                      for (final env in MeshLinkEnvironment.values)
-                        DropdownMenuItem(value: env, child: Text(env.name)),
-                    ],
-                    onChanged: (env) =>
-                        setState(() => _environment = env ?? _environment),
-                  ),
-                ],
                 const SizedBox(height: 32),
                 FilledButton(
-                  onPressed: input.isEmpty
+                  onPressed: input.isEmpty || _isBusy
                       ? null
-                      : () => _showMeshLinkPage(input),
-                  child: const Text('Start'),
+                      : () => _connect(input),
+                  child: _isBusy
+                      ? const SizedBox.square(
+                          dimension: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Connect'),
                 ),
               ],
             ),
@@ -119,21 +91,109 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> _showMeshLinkPage(String input) async {
-    final isLinkToken = _isLinkToken(input);
-    print(
-      'Opening Link with a ${isLinkToken ? "link" : "session"} token'
-      '${isLinkToken ? "" : " (${_environment.name})"}',
-    );
+  Future<void> _connect(String input) async {
+    // A link token carries its own host, so it needs nothing else. A session
+    // token does not, and the environment cannot be guessed from the token, so
+    // ask rather than assume: a dev token opened against prod fails in a way
+    // that is hard to read.
+    MeshLinkEnvironment? environment;
+    if (!_isLinkToken(input)) {
+      environment = await _askEnvironment();
+      if (environment == null || !mounted) {
+        return;
+      }
+    }
 
+    setState(() => _isBusy = true);
     _textController.clear();
-    setState(() {});
+
+    try {
+      await _showMeshLinkPage(input, environment);
+    } finally {
+      if (mounted) {
+        setState(() => _isBusy = false);
+      }
+    }
+  }
+
+  Future<MeshLinkEnvironment?> _askEnvironment() {
+    return showDialog<MeshLinkEnvironment>(
+      context: context,
+      builder: (context) => AlertDialog(
+        // Claw back the horizontal room the three buttons need.
+        contentPadding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+        title: Row(
+          children: [
+            const Expanded(child: Text('MFS native token')),
+            IconButton(
+              icon: const Icon(Icons.close),
+              tooltip: 'Cancel',
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'This looks like a session token rather than a link token, so it '
+              'is an MFS native session. It will be wrapped into a link token '
+              'for the environment you pick.\n\n'
+              'Pick the environment the token was minted in.',
+            ),
+            const SizedBox(height: 24),
+            // A Row rather than `actions`: four buttons overflow the dialog's
+            // OverflowBar and it silently stacks them vertically.
+            Row(
+              children: [
+                for (final env in MeshLinkEnvironment.values) ...[
+                  if (env != MeshLinkEnvironment.values.first)
+                    const SizedBox(width: 8),
+                  Expanded(
+                    child: FilledButton(
+                      // Default button padding is wider than a third of a
+                      // dialog, which wraps even a 4-character label.
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        visualDensity: VisualDensity.compact,
+                        textStyle: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(env),
+                      child: Text(
+                        env.name.toUpperCase(),
+                        maxLines: 1,
+                        softWrap: false,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showMeshLinkPage(
+    String input,
+    MeshLinkEnvironment? environment,
+  ) async {
+    print(
+      environment == null
+          ? 'Opening Link with a link token'
+          : 'Opening Link with a session token (${environment.name})',
+    );
 
     // The two constructors differ only in how Link is addressed. Every option
     // and callback below is identical, and so is everything downstream.
     final result = await MeshSdk.show(
       context,
-      configuration: isLinkToken
+      configuration: environment == null
           ? MeshConfiguration(
               linkToken: input,
               language: 'system',
@@ -149,7 +209,7 @@ class _HomePageState extends State<HomePage> {
             )
           : MeshConfiguration.session(
               token: input,
-              environment: _environment,
+              environment: environment,
               language: 'system',
               displayFiatCurrency: 'USD',
               theme: ThemeMode.system,

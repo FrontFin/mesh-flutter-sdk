@@ -146,10 +146,11 @@ void main() {
 
     test('P1.5 a malformed token does not yield a loadable URL', () {
       // Flutter surfaces this as a thrown/!hasScheme URI which the controller
-      // turns into MeshErrorType.connectionError.
+      // turns into MeshErrorType.connectionError. Pinned to the exact type:
+      // `anyOf(throwsA, returnsNormally)` asserts nothing.
       expect(
         () => buildLinkUri(const MeshConfiguration(linkToken: 'not-base64!!')),
-        anyOf(throwsA(anything), returnsNormally),
+        throwsFormatException,
       );
       final uri = buildLinkUri(
         MeshConfiguration(linkToken: tokenFor('not a url')),

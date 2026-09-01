@@ -15,8 +15,11 @@ void main() {
   String urlFor(MeshConfiguration c) => utf8.decode(base64Decode(c.linkToken));
 
   group('session token is wrapped into a link token', () {
-    test('production is the default environment', () {
-      final config = MeshConfiguration.session(token: token);
+    test('prod resolves to the prod host', () {
+      final config = MeshConfiguration.session(
+        token: token,
+        environment: MeshLinkEnvironment.prod,
+      );
       expect(urlFor(config), 'https://link.meshpay.com/?token=$token');
     });
 
@@ -42,9 +45,43 @@ void main() {
     });
   });
 
+  group('reserved characters in the token survive', () {
+    // A token carrying `&` was previously truncated at it, losing the rest.
+    test('the token is percent-encoded, not interpolated raw', () {
+      const messy = 'abc&x=1#frag+plus%25';
+      final uri = buildLinkUri(
+        MeshConfiguration.session(
+          token: messy,
+          environment: MeshLinkEnvironment.prod,
+        ),
+      );
+      expect(uri.queryParameters['token'], messy);
+    });
+
+    test(':redirect prefix lookalikes are not opened externally', () {
+      expect(
+        isExternallyOpenedOrigin(
+          'https://api.meshpay.com/v2/sessions/a/child-sessions/b:redirectevil',
+        ),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin(
+          'https://api.meshpay.com/v2/sessions/a/child-sessions/b:redirect?t=1',
+        ),
+        isTrue,
+      );
+    });
+  });
+
   group('the wrapped token behaves like any other link token', () {
     test('buildLinkUri resolves the host and keeps the session token', () {
-      final uri = buildLinkUri(MeshConfiguration.session(token: token));
+      final uri = buildLinkUri(
+        MeshConfiguration.session(
+          token: token,
+          environment: MeshLinkEnvironment.prod,
+        ),
+      );
       expect(uri.host, 'link.meshpay.com');
       expect(uri.queryParameters['token'], token);
       expect(uri.queryParameters['platform'], 'flutter');
@@ -64,6 +101,7 @@ void main() {
       final uri = buildLinkUri(
         MeshConfiguration.session(
           token: token,
+          environment: MeshLinkEnvironment.prod,
           language: 'es',
           displayFiatCurrency: 'EUR',
           theme: ThemeMode.dark,
@@ -79,6 +117,7 @@ void main() {
       MeshErrorType? received;
       final config = MeshConfiguration.session(
         token: token,
+        environment: MeshLinkEnvironment.prod,
         isDomainWhitelistEnabled: false,
         onError: (error) => received = error,
       );

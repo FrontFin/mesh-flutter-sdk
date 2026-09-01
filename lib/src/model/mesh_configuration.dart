@@ -33,6 +33,10 @@ class MeshConfiguration {
   /// The token is wrapped into a link token for [environment], so everything
   /// downstream behaves exactly as it does for a link token from the Mesh API.
   ///
+  /// [environment] is required rather than defaulted: a session token belongs
+  /// to exactly one environment, and quietly assuming production would send a
+  /// dev token to the wrong Link and fail in a way that is hard to read.
+  ///
   /// ```dart
   /// MeshConfiguration.session(
   ///   token: 'ory_ac_...',
@@ -41,7 +45,7 @@ class MeshConfiguration {
   /// ```
   factory MeshConfiguration.session({
     required String token,
-    MeshLinkEnvironment environment = MeshLinkEnvironment.prod,
+    required MeshLinkEnvironment environment,
     String language = _defaultLanguage,
     String? displayFiatCurrency,
     ThemeMode? theme,
@@ -54,7 +58,11 @@ class MeshConfiguration {
     ValueChanged<IntegrationConnectedEvent>? onIntegrationConnected,
     ValueChanged<TransferFinishedEvent>? onTransferFinished,
   }) {
-    final url = '${environment.linkUrl}/?token=$token';
+    // Built through `Uri` rather than interpolated: a token carrying a reserved
+    // character (`&`, `#`, `%`) would otherwise be silently truncated at it.
+    final url = Uri.parse(
+      environment.linkUrl,
+    ).replace(path: '/', queryParameters: {'token': token}).toString();
 
     return MeshConfiguration(
       linkToken: base64Encode(utf8.encode(url)),

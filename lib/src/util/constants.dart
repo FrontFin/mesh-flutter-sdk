@@ -163,9 +163,11 @@ final _oAuthRedirectRegex = RegExp(
 // Must open externally like its v1/v2 counterpart. The host is whitelisted, so
 // without this the redirect renders in the WebView, unloading Link and losing
 // the in-flight OAuth session.
+// `:redirect` is anchored to the end of the path so a longer sibling endpoint
+// (`:redirectSomethingElse`) does not also open externally.
 final _mfsOAuthRedirectRegex = RegExp(
   r'^https://api(?:\.[a-z0-9-]+)*\.meshpay\.com'
-  '/v2/sessions/[^/]+/child-sessions/[^/?]+:redirect',
+  r'/v2/sessions/[^/]+/child-sessions/[^/?]+:redirect(?:\?|$)',
 );
 
 const _exodusSchema = 'exodus';
