@@ -177,7 +177,7 @@ For each platform you can use a **custom URL scheme** (e.g. `yourapp://`) — qu
 - **Custom scheme:** register it under `CFBundleURLTypes` in `Info.plist`.
 - **Universal Link:** add the *Associated Domains* capability (`applinks:links.yourcompany.com`) and host an `apple-app-site-association` file at `https://<host>/.well-known/apple-app-site-association`.
 
-Returning focus is enough — iOS foregrounds the existing scene and the presented Link view controller resumes automatically. See the [iOS SDK guide](https://github.com/FrontFin/mesh-ios-sdk#returning-to-your-app-with-deep-links).
+Returning focus is enough — iOS foregrounds the existing scene and the `MeshLinkPage` route (the WebView) pushed by `MeshSdk.show` resumes automatically; no scene-delegate handling is needed to restore it. See the [iOS SDK guide](https://github.com/FrontFin/mesh-ios-sdk#returning-to-your-app-with-deep-links).
 
 ### Android
 
