@@ -633,6 +633,53 @@ void main() {
     );
   });
 
+  group('withdrawalRequested', () {
+    testWidgets('reaches onEvent as a WithdrawalRequestedEvent', (
+      tester,
+    ) async {
+      final events = <MeshEvent>[];
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onEvent: events.add,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage(
+        '{"type":"withdrawalRequested",'
+        '"payload":{"transferId":"transfer-1","status":"pending"}}',
+      );
+      await tester.pumpAndSettle();
+
+      expect(events, hasLength(1));
+      final event = events.single as WithdrawalRequestedEvent;
+      expect(event.transferId, 'transfer-1');
+      expect(event.status, 'pending');
+    });
+
+    testWidgets('keeps an unknown status', (tester) async {
+      final events = <MeshEvent>[];
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onEvent: events.add,
+      );
+
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage(
+        '{"type":"withdrawalRequested",'
+        '"payload":{"transferId":"transfer-1","status":"failed"}}',
+      );
+      await tester.pumpAndSettle();
+
+      expect((events.single as WithdrawalRequestedEvent).status, 'failed');
+    });
+  });
+
   group('onTransferFinished Callback', () {
     testWidgets('is called with success payload', (tester) async {
       TransferFinishedEvent? event;

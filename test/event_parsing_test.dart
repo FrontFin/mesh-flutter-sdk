@@ -585,6 +585,30 @@ void main() {
       });
     });
 
+    group('WithdrawalRequestedEvent', () {
+      for (final status in ['pending', 'success', 'failed']) {
+        test('parses status "$status" as sent', () {
+          final event = MeshEvent.fromJson({
+            'type': 'withdrawalRequested',
+            'payload': {'transferId': 'transfer-1', 'status': status},
+          });
+
+          expect(event, isA<WithdrawalRequestedEvent>());
+          final requested = event! as WithdrawalRequestedEvent;
+          expect(requested.transferId, 'transfer-1');
+          expect(requested.status, status);
+        });
+      }
+
+      test('returns null without a transferId', () {
+        final event = MeshEvent.fromJson({
+          'type': 'withdrawalRequested',
+          'payload': {'status': 'pending'},
+        });
+        expect(event, isNull);
+      });
+    });
+
     group('Error handling', () {
       test('returns null for unknown event type', () {
         final event = MeshEvent.fromJson({

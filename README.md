@@ -115,6 +115,21 @@ Here's what you can configure in the `MeshConfiguration`:
 | `onIntegrationConnected`   | `ValueChanged<IntegrationConnectedEvent>?` |          | Callback for when an integration is connected. Use this to store the access token.                                   |
 | `onTransferFinished`       | `ValueChanged<TransferFinishedEvent>?`     |          | Callback for when a crypto transfer is executed.                                                                     |
 
+### Withdrawal events
+
+When a user confirms a withdrawal, `onEvent` receives a `WithdrawalRequestedEvent`, then Link closes.
+Keep the `transferId` and continue the withdrawal once Link has closed, for example with your own 2FA prompt.
+The event carries no address or amount: read the transfer details from the webhook or the transfer API.
+
+```dart
+onEvent: (event) {
+  if (event is WithdrawalRequestedEvent) {
+    // event.status is 'pending' or 'success'; treat any other value as pending.
+    final transferId = event.transferId;
+  }
+},
+```
+
 ### Whitelist
 
 See the full list of whitelisted
