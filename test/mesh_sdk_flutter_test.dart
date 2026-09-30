@@ -727,6 +727,132 @@ void main() {
     });
   });
 
+  group('Closing', () {
+    late List<String> calls;
+    late MeshConfiguration configuration;
+    MeshResult? result;
+
+    Future<void> openFromHostPage(
+      WidgetTester tester, {
+      ValueChanged<MeshEvent>? onEvent,
+    }) async {
+      calls = [];
+      result = null;
+      configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onEvent: onEvent,
+        onSuccess: (payload) => calls.add('success:${payload.page}'),
+        onError: (error) => calls.add('error:${error.name}'),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: MeshLocalizations.localizationsDelegates,
+          supportedLocales: MeshLocalizations.supportedLocales,
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: FilledButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => Scaffold(
+                      body: FilledButton(
+                        onPressed: () async {
+                          result = await MeshSdk.show(
+                            context,
+                            configuration: configuration,
+                          );
+                        },
+                        child: const Text('Open SDK'),
+                      ),
+                    ),
+                  ),
+                ),
+                child: const Text('Open host page'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Open host page'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Open SDK'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('a repeated close finishes once and keeps the host page', (
+      tester,
+    ) async {
+      await openFromHostPage(tester);
+
+      webViewController
+        ..simulateJsMessage('{"type":"close"}')
+        ..simulateJsMessage('{"type":"close"}');
+      await tester.pumpAndSettle();
+
+      expect(calls, ['success:${MeshResult.unknownPage}']);
+      expect(result, isA<MeshSuccess>());
+      expect(find.text('Open SDK'), findsOneWidget);
+    });
+
+    testWidgets('a close while the exit dialog is open closes Link', (
+      tester,
+    ) async {
+      await openFromHostPage(tester);
+
+      webViewController.simulateJsMessage('{"type":"showClose"}');
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsOneWidget);
+
+      webViewController.simulateJsMessage('{"type":"close"}');
+      await tester.pumpAndSettle();
+
+      expect(calls, ['success:${MeshResult.unknownPage}']);
+      expect(result, isA<MeshSuccess>());
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.text('Open SDK'), findsOneWidget);
+    });
+
+    testWidgets('a close after Exit is ignored', (tester) async {
+      await openFromHostPage(tester);
+
+      webViewController.simulateJsMessage('{"type":"showClose"}');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Exit'));
+      webViewController.simulateJsMessage('{"type":"close"}');
+      await tester.pumpAndSettle();
+
+      expect(calls, ['error:${MeshErrorType.userCancelled.name}']);
+      expect(result, isA<MeshError>());
+      expect(find.text('Open SDK'), findsOneWidget);
+    });
+
+    testWidgets('a close after the host popped Link leaves the host alone', (
+      tester,
+    ) async {
+      late BuildContext linkContext;
+      await openFromHostPage(
+        tester,
+        onEvent: (event) {
+          if (event is WithdrawalRequestedEvent) {
+            Navigator.of(linkContext).pop();
+          }
+        },
+      );
+      linkContext = tester.element(find.byType(Scaffold).last);
+
+      webViewController
+        ..simulateJsMessage(
+          '{"type":"withdrawalRequested",'
+          '"payload":{"transferId":"transfer-1","status":"pending"}}',
+        )
+        ..simulateJsMessage('{"type":"close"}');
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(calls, ['success:${MeshResult.unknownPage}']);
+      expect(find.text('Open SDK'), findsOneWidget);
+    });
+  });
+
   group('onTransferFinished Callback', () {
     testWidgets('is called with success payload', (tester) async {
       TransferFinishedEvent? event;

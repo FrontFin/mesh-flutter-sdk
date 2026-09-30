@@ -117,7 +117,9 @@ Here's what you can configure in the `MeshConfiguration`:
 
 ### Withdrawal events
 
-When a user confirms a withdrawal, `onEvent` receives a `WithdrawalRequestedEvent`, then Link closes.
+When a user confirms a withdrawal, `onEvent` receives a `WithdrawalRequestedEvent`, then Link closes: `MeshSdk.show` completes with a `MeshSuccess` and `onSuccess` fires with a `BaseSuccessPayload` whose `page` is `MeshResult.unknownPage`.
+Treat the event, not the result, as confirmation of the withdrawal: Link can also close this way when the user leaves without withdrawing.
+Continue once `MeshSdk.show` completes: a route you push from `onEvent` is closed along with Link.
 Keep the `transferId` and continue the withdrawal once Link has closed, for example with your own 2FA prompt.
 The event carries no address or amount: read the transfer details from the webhook or the transfer API.
 
