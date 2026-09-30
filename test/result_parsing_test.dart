@@ -107,6 +107,15 @@ void main() {
         final success = result! as MeshSuccess;
         expect(success.payload.page, 'closed');
       });
+
+      test('parses a payload-less close as success with an unknown page', () {
+        final result = MeshResult.fromJson({'type': 'close'});
+
+        expect(result, isA<MeshSuccess>());
+        final success = result! as MeshSuccess;
+        expect(success.payload, isA<BaseSuccessPayload>());
+        expect(success.payload.page, MeshResult.unknownPage);
+      });
     });
 
     group('Error handling', () {

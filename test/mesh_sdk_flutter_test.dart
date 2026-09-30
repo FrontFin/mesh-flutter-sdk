@@ -678,6 +678,53 @@ void main() {
 
       expect((events.single as WithdrawalRequestedEvent).status, 'failed');
     });
+
+    testWidgets('then a payload-less close pops the page', (tester) async {
+      final calls = <String>[];
+      MeshResult? result;
+      final configuration = MeshConfiguration(
+        linkToken: validLinkToken,
+        onEvent: (event) => calls.add('event:${event.runtimeType}'),
+        onSuccess: (payload) => calls.add('success:${payload.page}'),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: MeshLocalizations.localizationsDelegates,
+          supportedLocales: MeshLocalizations.supportedLocales,
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: FilledButton(
+                onPressed: () async {
+                  result = await MeshSdk.show(
+                    context,
+                    configuration: configuration,
+                  );
+                },
+                child: const Text('Open SDK'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Open SDK'));
+      await tester.pumpAndSettle();
+
+      webViewController
+        ..simulateJsMessage(
+          '{"type":"withdrawalRequested",'
+          '"payload":{"transferId":"transfer-1","status":"pending"}}',
+        )
+        ..simulateJsMessage('{"type":"close"}');
+      await tester.pumpAndSettle();
+
+      expect(calls, [
+        'event:WithdrawalRequestedEvent',
+        'success:${MeshResult.unknownPage}',
+      ]);
+      expect(result, isA<MeshSuccess>());
+      expect(find.text('Open SDK'), findsOneWidget);
+    });
   });
 
   group('onTransferFinished Callback', () {
