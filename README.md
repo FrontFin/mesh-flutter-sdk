@@ -168,20 +168,13 @@ These map to the same Link URL parameters (`lng`,`th`) as the [Web SDK](https://
 
 ## Returning to your app with deep links
 
-Some integrations can't complete inside the Link WebView and are handed off to the device's external browser. When the provider finishes, it redirects to a **return URL** that must bring your app back to the foreground so the in-progress Link flow resumes. Configure the return URL for both platforms.
-
-For each platform you can use a **custom URL scheme** (e.g. `yourapp://`) — quickest, no web hosting, but iOS shows an *Open in "YourApp"?* prompt and Android may show an app-chooser dialog — or a **verified `https://` link** (iOS Universal Link / Android App Link) — **recommended**, opens the app with no prompt, but requires hosting an association file on your domain.
+Some integrations complete in the device's external browser, then redirect to a **return URL** that must bring your app back to the foreground so the flow can resume. Configure the return URL for both platforms.
 
 ### iOS
 
-- **Custom scheme:** register it under `CFBundleURLTypes` in `Info.plist`.
-- **Universal Link:** add the *Associated Domains* capability (`applinks:links.yourcompany.com`) and host an `apple-app-site-association` file at `https://<host>/.well-known/apple-app-site-association`.
-
-Returning focus is enough — iOS foregrounds the existing scene and the `MeshLinkPage` route (the WebView) pushed by `MeshSdk.show` resumes automatically; no scene-delegate handling is needed to restore it. See the [iOS SDK guide](https://github.com/FrontFin/mesh-ios-sdk#returning-to-your-app-with-deep-links).
+Register a custom URL scheme or, preferably, a Universal Link so the redirect opens your app. Returning focus is enough: iOS foregrounds the existing scene and the `MeshLinkPage` route pushed by `MeshSdk.show` resumes automatically. See the [iOS SDK guide](https://github.com/FrontFin/mesh-ios-sdk#returning-to-your-app-with-deep-links) for setup details.
 
 ### Android
 
-- **Custom scheme:** register an `intent-filter` in `AndroidManifest.xml`.
-- **App Link:** add `android:autoVerify="true"` and host a Digital Asset Links file at `https://<host>/.well-known/assetlinks.json`.
+Register a custom URL scheme or an App Link, and route it through a lightweight trampoline Activity that moves your app's existing task to the front, so the in-progress Link flow isn't lost. See the [Android SDK guide](https://github.com/FrontFin/mesh-android-sdk#returning-to-your-app-with-deep-links) for setup details and a sample trampoline Activity.
 
-The return redirect can restart your app's task and destroy what was on top. Route the return URL through a lightweight **trampoline Activity** that moves the existing task to the front (instead of launching `MainActivity`, which resets the task). See the [Android SDK guide](https://github.com/FrontFin/mesh-android-sdk#returning-to-your-app-with-deep-links).
