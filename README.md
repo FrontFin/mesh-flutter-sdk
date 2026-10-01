@@ -165,3 +165,16 @@ To adapt the Link UI to the user's device settings, use:
 - **`theme`** — e.g. `ThemeMode.system` to follow device light/dark mode (sent as `th` in the link URL).
 
 These map to the same Link URL parameters (`lng`,`th`) as the [Web SDK](https://docs.meshconnect.com/guides/web-sdk).
+
+## Returning to your app with deep links
+
+Some integrations complete in the device's external browser, then redirect to a **return URL** that must bring your app back to the foreground so the flow can resume. Configure the return URL for both platforms.
+
+### iOS
+
+Register a custom URL scheme or, preferably, a Universal Link so the redirect opens your app. Returning focus is enough: iOS foregrounds the existing scene and the `MeshLinkPage` route pushed by `MeshSdk.show` resumes automatically. See the [iOS SDK guide](https://github.com/FrontFin/mesh-ios-sdk#returning-to-your-app-with-deep-links) for setup details.
+
+### Android
+
+Register a custom URL scheme or an App Link, and route it through a lightweight trampoline Activity that moves your app's existing task to the front, so the in-progress Link flow isn't lost. See the [Android SDK guide](https://github.com/FrontFin/mesh-android-sdk#returning-to-your-app-with-deep-links) for setup details and a sample trampoline Activity.
+
