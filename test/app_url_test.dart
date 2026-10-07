@@ -150,6 +150,19 @@ void main() {
         expect(isAppUrlChange('exodus://some/path'), isTrue);
       });
 
+      test('okxwallet in-wallet browser deep link', () {
+        expect(
+          isAppUrlChange(
+            'okxwallet://wallet/dapp/url?dappUrl=https%3A%2F%2Flink.meshconnect.com',
+          ),
+          isTrue,
+        );
+      });
+
+      test('okxwallet lookalike scheme is rejected', () {
+        expect(isAppUrlChange('okxwalletx://wallet/dapp/url'), isFalse);
+      });
+
       // First allowlisted scheme containing a hyphen, so this also checks that
       // Uri.parse keeps the hyphen when it extracts the scheme.
       test('robinhood-wallet WalletConnect deep link', () {

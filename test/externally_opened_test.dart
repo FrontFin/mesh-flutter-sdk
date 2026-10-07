@@ -68,6 +68,42 @@ void main() {
       );
     });
 
+    // The real values the backend serves for these wallets on Android.
+    test('Returns true for the Base in-wallet browser link', () {
+      expect(
+        isExternallyOpenedOrigin(
+          'https://base.app/app/https%3A%2F%2Flink.meshconnect.com',
+        ),
+        isTrue,
+      );
+    });
+
+    test('Returns true for the Bitget Wallet links', () {
+      expect(
+        isExternallyOpenedOrigin(
+          'https://bkcode.vip?action=dapp&url=https%3A%2F%2Flink.meshconnect.com',
+        ),
+        isTrue,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://bkapp.vip/wc?uri=wc%3Aabc'),
+        isTrue,
+      );
+    });
+
+    test('Returns false for Base and Bitget lookalikes', () {
+      expect(isExternallyOpenedOrigin('https://evilbase.app/app/x'), isFalse);
+      expect(
+        isExternallyOpenedOrigin('https://base.app.evil.com/app/x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://bkcode.vip.evil.com/?url=x'),
+        isFalse,
+      );
+      expect(isExternallyOpenedOrigin('http://bkapp.vip/wc'), isFalse);
+    });
+
     test('Returns false for about:blank', () {
       expect(isExternallyOpenedOrigin('about:blank'), isFalse);
     });
