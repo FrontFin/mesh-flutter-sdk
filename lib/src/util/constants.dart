@@ -124,6 +124,9 @@ const _externallyOpenedOrigins = [
   'https://go.rabby.io/mobile',     // Rabby
   'https://app.binance.com',        // Binance Connect
   'https://web3.okx.com',           // Okx
+  'https://base.app',               // Base (in-wallet browser)
+  'https://bkcode.vip',             // Bitget Wallet (in-wallet browser)
+  'https://bkapp.vip',              // Bitget Wallet (WalletConnect)
   'https://metamask.app.link',      // MetaMask (WalletConnect)
   'https://link.metamask.io',       // MetaMask (in-wallet browser)
   'https://phantom.app',            // Phantom
@@ -163,6 +166,7 @@ const allowedNativeSchemes = {
   'bitcoin',
   'zengo',
   'okx',
+  'okxwallet',
   'uniswap',
   'rainbow',
   'bitkeep',

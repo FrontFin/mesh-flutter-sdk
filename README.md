@@ -135,6 +135,7 @@ Add the following URL schemes to `LSApplicationQueriesSchemes` in your app's `In
     <string>bitcoin</string>
     <string>zengo</string>
     <string>okx</string>
+    <string>okxwallet</string>
     <string>uniswap</string>
     <string>rainbow</string>
     <string>bitkeep</string>

@@ -1,3 +1,11 @@
+## 1.1.13
+
+### Fixed
+- Base, Bitget Wallet and OKX Wallet (`okxwallet://`) deep links now open the wallet on Android instead of being blocked.
+
+### Changed
+- README: added `okxwallet` to the documented iOS `LSApplicationQueriesSchemes` list.
+
 ## 1.1.12
 
 ### Removed
