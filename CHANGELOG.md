@@ -4,7 +4,7 @@
 - Base, Bitget Wallet and OKX Wallet (`okxwallet://`) deep links now open the wallet on Android instead of being blocked.
 
 ### Changed
-- README: added `okxwallet` to the documented iOS `LSApplicationQueriesSchemes` list.
+- README and the example app: added `okxwallet` to the iOS `LSApplicationQueriesSchemes` list.
 
 ## 1.1.12
 
