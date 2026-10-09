@@ -10,6 +10,10 @@ import 'package:mesh_sdk_flutter/src/util/logger.dart';
 sealed class MeshResult {
   const MeshResult();
 
+  /// `page` reported when the host closes without an event summary, which is
+  /// how Link v3's legacy bridge sends `close`.
+  static const unknownPage = 'unknown';
+
   static MeshResult? fromJson(Map<String, dynamic> json) {
     final type = json['type'] as String?;
     final payload = json['payload'];
@@ -18,6 +22,11 @@ sealed class MeshResult {
       return switch (type) {
         'close' || 'done' when payload is Map<String, dynamic> => MeshSuccess(
           payload: SuccessPayload.fromJson(payload),
+        ),
+        // Link v3 sends a bare `close`, and the nav bar is hidden on the Link
+        // host, so without this the page never closes. `done` has a payload.
+        'close' => const MeshSuccess(
+          payload: BaseSuccessPayload(page: unknownPage),
         ),
         _ => null,
       };

@@ -29,6 +29,10 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
   /// (for example, when we navigate to a 3rd party integration webpage).
   bool _showNativeNavBar = false;
 
+  /// Link can send `close` more than once, and the page stays mounted while it
+  /// animates out, so a result is delivered only the first time.
+  bool _isFinished = false;
+
   @override
   void initState() {
     super.initState();
@@ -162,6 +166,23 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
   }
 
   void _finish(BuildContext context, MeshResult result) {
+    if (_isFinished) {
+      return;
+    }
+    _isFinished = true;
+
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      // The host already popped Link, so MeshSdk.show reports userCancelled.
+      if (!route.isActive) {
+        return;
+      }
+      // Pop before the callbacks, so a route they push stays on top.
+      Navigator.of(context)
+        ..popUntil((top) => top == route)
+        ..pop(result);
+    }
+
     result.when(
       success: (success) {
         widget.configuration.onSuccess?.call(success.payload);
@@ -170,7 +191,5 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
         widget.configuration.onError?.call(error.type);
       },
     );
-
-    Navigator.pop(context, result);
   }
 }

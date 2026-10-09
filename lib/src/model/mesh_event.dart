@@ -113,6 +113,7 @@ sealed class MeshEvent {
         'integrationMfaRequired' => const IntegrationMfaRequiredEvent(),
         'defiWalletError' => DefiWalletErrorEvent.fromJson(p),
         'homePageLoaded' => const HomePageLoadedEvent(),
+        'withdrawalRequested' => WithdrawalRequestedEvent.fromJson(p),
         _ => null,
       };
     } catch (e, s) {
@@ -737,4 +738,24 @@ class DefiWalletErrorEvent extends MeshEvent {
 
 class HomePageLoadedEvent extends MeshEvent {
   const HomePageLoadedEvent();
+}
+
+class WithdrawalRequestedEvent extends MeshEvent {
+  const WithdrawalRequestedEvent({
+    required this.transferId,
+    required this.status,
+  });
+
+  factory WithdrawalRequestedEvent.fromJson(Map<String, dynamic> json) {
+    return WithdrawalRequestedEvent(
+      transferId: json['transferId'] as String,
+      status: json['status'] as String,
+    );
+  }
+
+  final String transferId;
+
+  /// 'pending' or 'success'. Kept as sent, so a status Link adds later still
+  /// reaches the host.
+  final String status;
 }
