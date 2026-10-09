@@ -171,6 +171,18 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
     }
     _isFinished = true;
 
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      // The host already popped Link, so MeshSdk.show reports userCancelled.
+      if (!route.isActive) {
+        return;
+      }
+      // Pop before the callbacks, so a route they push stays on top.
+      Navigator.of(context)
+        ..popUntil((top) => top == route)
+        ..pop(result);
+    }
+
     result.when(
       success: (success) {
         widget.configuration.onSuccess?.call(success.payload);
@@ -179,14 +191,5 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
         widget.configuration.onError?.call(error.type);
       },
     );
-
-    // Pop this page rather than the top route (e.g. the exit dialog), unless
-    // the host already popped it.
-    final route = ModalRoute.of(context);
-    if (route != null && route.isActive) {
-      Navigator.of(context)
-        ..popUntil((top) => top == route)
-        ..pop(result);
-    }
   }
 }

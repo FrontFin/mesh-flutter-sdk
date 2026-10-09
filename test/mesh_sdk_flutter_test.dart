@@ -735,13 +735,17 @@ void main() {
     Future<void> openFromHostPage(
       WidgetTester tester, {
       ValueChanged<MeshEvent>? onEvent,
+      VoidCallback? afterSuccess,
     }) async {
       calls = [];
       result = null;
       configuration = MeshConfiguration(
         linkToken: validLinkToken,
         onEvent: onEvent,
-        onSuccess: (payload) => calls.add('success:${payload.page}'),
+        onSuccess: (payload) {
+          calls.add('success:${payload.page}');
+          afterSuccess?.call();
+        },
         onError: (error) => calls.add('error:${error.name}'),
       );
       await tester.pumpWidget(
@@ -848,8 +852,29 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
-      expect(calls, ['success:${MeshResult.unknownPage}']);
+      expect(calls, isEmpty);
+      expect(result, isA<MeshError>());
       expect(find.text('Open SDK'), findsOneWidget);
+    });
+
+    testWidgets('a route pushed from onSuccess stays on top', (tester) async {
+      await openFromHostPage(
+        tester,
+        afterSuccess: () => tester
+            .state<NavigatorState>(find.byType(Navigator))
+            .push(
+              MaterialPageRoute<void>(
+                builder: (_) =>
+                    const Scaffold(body: Text('Withdrawal pending')),
+              ),
+            ),
+      );
+
+      webViewController.simulateJsMessage('{"type":"close"}');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Withdrawal pending'), findsOneWidget);
+      expect(result, isA<MeshSuccess>());
     });
   });
 
