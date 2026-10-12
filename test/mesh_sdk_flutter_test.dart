@@ -815,6 +815,41 @@ void main() {
       expect(find.text('Open SDK'), findsOneWidget);
     });
 
+    testWidgets('a close with the exit dialog open on a nested navigator '
+        'closes both', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: MeshLocalizations.localizationsDelegates,
+          supportedLocales: MeshLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Navigator(
+              onGenerateRoute: (_) => MaterialPageRoute<void>(
+                builder: (context) => FilledButton(
+                  onPressed: () => MeshSdk.show(
+                    context,
+                    configuration: MeshConfiguration(linkToken: validLinkToken),
+                  ),
+                  child: const Text('Open SDK'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Open SDK'));
+      await tester.pumpAndSettle();
+
+      webViewController.simulateJsMessage('{"type":"showClose"}');
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsOneWidget);
+
+      webViewController.simulateJsMessage('{"type":"close"}');
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.text('Open SDK'), findsOneWidget);
+    });
+
     testWidgets('a close after Exit is ignored', (tester) async {
       await openFromHostPage(tester);
 
