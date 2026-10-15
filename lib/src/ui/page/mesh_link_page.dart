@@ -29,6 +29,13 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
   /// (for example, when we navigate to a 3rd party integration webpage).
   bool _showNativeNavBar = false;
 
+  /// Link can send `close` more than once, and the page stays mounted while it
+  /// animates out, so a result is delivered only the first time.
+  bool _isFinished = false;
+
+  /// Removed by reference on finish, so routes the host pushed above Link stay.
+  Route<dynamic>? _closeDialogRoute;
+
   @override
   void initState() {
     super.initState();
@@ -127,12 +134,17 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
 
   void _showCloseDialog(BuildContext context) => showDialog<void>(
     context: context,
+    // On Link's navigator, so closing Link also closes this dialog.
+    useRootNavigator: false,
     barrierDismissible: false,
-    builder: (_) => ExitDialog(
-      onConfirm: () {
-        _finish(context, const MeshError(MeshErrorType.userCancelled));
-      },
-    ),
+    builder: (dialogContext) {
+      _closeDialogRoute = ModalRoute.of(dialogContext);
+      return ExitDialog(
+        onConfirm: () {
+          _finish(context, const MeshError(MeshErrorType.userCancelled));
+        },
+      );
+    },
   );
 
   void _handleInternalEvent(BuildContext context, MeshInternalEvent event) {
@@ -162,6 +174,30 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
   }
 
   void _finish(BuildContext context, MeshResult result) {
+    if (_isFinished) {
+      return;
+    }
+    _isFinished = true;
+
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      // The host already popped Link, so MeshSdk.show reports userCancelled.
+      if (!route.isActive) {
+        return;
+      }
+      final dialog = _closeDialogRoute;
+      if (dialog != null && dialog.isActive) {
+        dialog.navigator?.removeRoute(dialog);
+      }
+      // Close Link before the callbacks, so a route they push stays on top.
+      final navigator = Navigator.of(context);
+      if (route.isCurrent) {
+        navigator.pop(result);
+      } else {
+        navigator.removeRoute(route, result);
+      }
+    }
+
     result.when(
       success: (success) {
         widget.configuration.onSuccess?.call(success.payload);
@@ -170,7 +206,5 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
         widget.configuration.onError?.call(error.type);
       },
     );
-
-    Navigator.pop(context, result);
   }
 }

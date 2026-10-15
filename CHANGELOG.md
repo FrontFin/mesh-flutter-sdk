@@ -1,3 +1,12 @@
+## 1.1.14
+
+### Added
+- `WithdrawalRequestedEvent` in `onEvent`, sent when a user confirms a withdrawal in Link, with its `transferId` and `status`.
+
+### Fixed
+- The Link page now closes when Link v3 sends `close` without a payload, as it does after a withdrawal. It finishes as `MeshSuccess` with page `unknown`.
+- The result is delivered once and only the Link page is popped, even if `close` repeats, the exit dialog is open, or the host already popped Link.
+
 ## 1.1.13
 
 ### Fixed
