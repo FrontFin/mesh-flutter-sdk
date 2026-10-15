@@ -33,6 +33,9 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
   /// animates out, so a result is delivered only the first time.
   bool _isFinished = false;
 
+  /// Removed by reference on finish, so routes the host pushed above Link stay.
+  Route<dynamic>? _closeDialogRoute;
+
   @override
   void initState() {
     super.initState();
@@ -134,11 +137,14 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
     // On Link's navigator, so closing Link also closes this dialog.
     useRootNavigator: false,
     barrierDismissible: false,
-    builder: (_) => ExitDialog(
-      onConfirm: () {
-        _finish(context, const MeshError(MeshErrorType.userCancelled));
-      },
-    ),
+    builder: (dialogContext) {
+      _closeDialogRoute = ModalRoute.of(dialogContext);
+      return ExitDialog(
+        onConfirm: () {
+          _finish(context, const MeshError(MeshErrorType.userCancelled));
+        },
+      );
+    },
   );
 
   void _handleInternalEvent(BuildContext context, MeshInternalEvent event) {
@@ -179,10 +185,17 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
       if (!route.isActive) {
         return;
       }
-      // Pop before the callbacks, so a route they push stays on top.
-      Navigator.of(context)
-        ..popUntil((top) => top == route)
-        ..pop(result);
+      final dialog = _closeDialogRoute;
+      if (dialog != null && dialog.isActive) {
+        dialog.navigator?.removeRoute(dialog);
+      }
+      // Close Link before the callbacks, so a route they push stays on top.
+      final navigator = Navigator.of(context);
+      if (route.isCurrent) {
+        navigator.pop(result);
+      } else {
+        navigator.removeRoute(route, result);
+      }
     }
 
     result.when(

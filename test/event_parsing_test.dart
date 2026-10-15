@@ -586,7 +586,7 @@ void main() {
     });
 
     group('WithdrawalRequestedEvent', () {
-      for (final status in ['pending', 'success', 'failed']) {
+      for (final status in ['pending', 'success', 'someFutureStatus']) {
         test('parses status "$status" as sent', () {
           final event = MeshEvent.fromJson({
             'type': 'withdrawalRequested',

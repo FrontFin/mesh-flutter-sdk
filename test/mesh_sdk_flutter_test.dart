@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -672,11 +673,14 @@ void main() {
 
       webViewController.simulateJsMessage(
         '{"type":"withdrawalRequested",'
-        '"payload":{"transferId":"transfer-1","status":"failed"}}',
+        '"payload":{"transferId":"transfer-1","status":"someFutureStatus"}}',
       );
       await tester.pumpAndSettle();
 
-      expect((events.single as WithdrawalRequestedEvent).status, 'failed');
+      expect(
+        (events.single as WithdrawalRequestedEvent).status,
+        'someFutureStatus',
+      );
     });
 
     testWidgets('then a payload-less close pops the page', (tester) async {
@@ -889,6 +893,44 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(calls, isEmpty);
       expect(result, isA<MeshError>());
+      expect(find.text('Open SDK'), findsOneWidget);
+    });
+
+    testWidgets('a route pushed from onEvent stays on top after a close', (
+      tester,
+    ) async {
+      await openFromHostPage(
+        tester,
+        onEvent: (event) {
+          if (event is WithdrawalRequestedEvent) {
+            unawaited(
+              tester
+                  .state<NavigatorState>(find.byType(Navigator))
+                  .push(
+                    MaterialPageRoute<void>(
+                      builder: (_) =>
+                          const Scaffold(body: Text('Withdrawal pending')),
+                    ),
+                  ),
+            );
+          }
+        },
+      );
+
+      webViewController.simulateJsMessage(
+        '{"type":"withdrawalRequested",'
+        '"payload":{"transferId":"transfer-1","status":"pending"}}',
+      );
+      await tester.pumpAndSettle();
+      webViewController.simulateJsMessage('{"type":"close"}');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Withdrawal pending'), findsOneWidget);
+      expect(calls, ['success:${MeshResult.unknownPage}']);
+      expect(result, isA<MeshSuccess>());
+
+      tester.state<NavigatorState>(find.byType(Navigator)).pop();
+      await tester.pumpAndSettle();
       expect(find.text('Open SDK'), findsOneWidget);
     });
 
