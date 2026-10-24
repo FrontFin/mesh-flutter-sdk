@@ -7,7 +7,7 @@ description: >
   says things like "we're ready to release" or "what version should this be?".
 
   Steps: diff HEAD against the latest git tag → classify changes as MAJOR/MINOR/PATCH →
-  increment the version in pubspec.yaml → prepend a new entry to CHANGELOG.md.
+  increment the version in pubspec.yaml and `sdkVersion` in lib/src/mesh_sdk_version.dart → prepend a new entry to CHANGELOG.md.
 ---
 
 ## bump-version skill
@@ -103,6 +103,19 @@ Apply the bump:
 
 Write the new version back using Edit — change only the `version:` line, nothing else.
 
+Then set the `sdkVersion` constant in `lib/src/mesh_sdk_version.dart` to the same value:
+
+```dart
+const String sdkVersion = 'X.Y.Z';
+```
+
+The SDK reports this constant to Link as `window.meshSdkVersion`, and `test/version_test.dart`
+fails CI when it differs from `pubspec.yaml`. Confirm they match:
+
+```bash
+flutter test test/version_test.dart
+```
+
 ---
 
 ### Step 4 — Update CHANGELOG.md
@@ -152,18 +165,19 @@ Reason: new `displayFiatCurrency` field added to MeshConfiguration,
         new Language enum values added.
 
 Files updated:
-  • pubspec.yaml   (version field)
-  • CHANGELOG.md   (new entry prepended)
+  • pubspec.yaml                    (version field)
+  • lib/src/mesh_sdk_version.dart   (sdkVersion constant)
+  • CHANGELOG.md                    (new entry prepended)
 ```
 
 Then ask the user:
 
 > Would you like me to commit these changes?
 
-If they say yes, stage only the two modified files and create a commit:
+If they say yes, stage only the three modified files and create a commit:
 
 ```bash
-git add pubspec.yaml CHANGELOG.md
+git add pubspec.yaml lib/src/mesh_sdk_version.dart CHANGELOG.md
 git commit -m "chore: bump version to X.Y.Z"
 ```
 
