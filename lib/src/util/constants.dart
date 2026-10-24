@@ -88,6 +88,7 @@ Uri? getStoreUriFromAppUri(Uri uri) {
 const _whitelistedOrigins = [
   '*.meshconnect.com',
   '*.getfront.com',
+  '*.meshpay.com',
   '*.walletconnect.com',
   '*.walletconnect.org',
   '*.walletlink.org',
