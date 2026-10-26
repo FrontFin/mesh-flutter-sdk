@@ -6,10 +6,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
 import 'package:mesh_sdk_flutter/src/mesh_sdk_version.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
 
 import 'mock/app.dart';
 import 'mock/navigation_delegate.dart';
+import 'mock/url_launcher.dart';
 import 'mock/web_view.dart';
 import 'mock/web_view_controller.dart';
 import 'mock/web_view_widget.dart';
@@ -290,6 +292,62 @@ void main() {
         r'\"brokerType\":\"brokerType\",'
         r'\"brokerName\":\"brokerName\"}]";',
       );
+    });
+  });
+
+  group('Wallet app launch', () {
+    late MockUrlLauncher urlLauncher;
+
+    setUp(() {
+      urlLauncher = MockUrlLauncher();
+      UrlLauncherPlatform.instance = urlLauncher;
+    });
+
+    Future<void> openLink(WidgetTester tester) async {
+      final configuration = MeshConfiguration(linkToken: validLinkToken);
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> leaveAndReturn(WidgetTester tester) async {
+      // The same order Android reports when the wallet opens and the user
+      // comes back.
+      [
+        AppLifecycleState.inactive,
+        AppLifecycleState.hidden,
+        AppLifecycleState.paused,
+        AppLifecycleState.hidden,
+        AppLifecycleState.inactive,
+        AppLifecycleState.resumed,
+      ].forEach(tester.binding.handleAppLifecycleStateChanged);
+      await tester.pump();
+    }
+
+    testWidgets('a second launch before returning to the app is ignored', (
+      tester,
+    ) async {
+      await openLink(tester);
+
+      await navigationDelegate.simulateNavigationRequest('trust://wc');
+      await navigationDelegate.simulateNavigationRequest('trust://open');
+      await tester.pumpAndSettle();
+
+      expect(urlLauncher.launchedUrls, ['trust://wc']);
+    });
+
+    testWidgets('the wallet opens again after returning to the app', (
+      tester,
+    ) async {
+      await openLink(tester);
+
+      await navigationDelegate.simulateNavigationRequest('trust://wc');
+      await tester.pumpAndSettle();
+      await leaveAndReturn(tester);
+      await navigationDelegate.simulateNavigationRequest('trust://open');
+      await tester.pumpAndSettle();
+
+      expect(urlLauncher.launchedUrls, ['trust://wc', 'trust://open']);
     });
   });
 
