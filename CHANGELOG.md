@@ -1,7 +1,7 @@
 ## 1.1.16
 
 ### Fixed
-- After a wallet app opens once (for example to connect), later opens in the same session work again, so the wallet now opens on approve. Previously every later open was ignored on MFS.
+- On the latest Link, the wallet app now opens on approve, not just on connect.
 
 ## 1.1.14
 

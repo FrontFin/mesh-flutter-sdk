@@ -60,8 +60,9 @@ class MeshLinkController {
     await _webViewController?.runJavaScript('window.history.go(-1)');
   }
 
-  /// Call when the host app returns to the foreground. MFS Link never changes
-  /// its URL, so the URL-change reset alone would block every later launch.
+  /// Call when the host app returns to the foreground. The latest Link never
+  /// changes its URL, so the URL-change reset alone would block every later
+  /// launch.
   void onAppResumed() {
     _isExternalAppOpened = false;
   }
