@@ -3,6 +3,9 @@
 ### Added
 - Link can now load pages on `*.meshpay.com` subdomains.
 
+### Fixed
+- OAuth sign-in on `*.meshpay.com` now hands off to the browser instead of unloading Link and losing the session.
+
 ## 1.1.14
 
 ### Added
