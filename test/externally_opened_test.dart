@@ -230,5 +230,46 @@ void main() {
         );
       });
     });
+
+    group('MFS (Link v3) OAuth redirect regex', () {
+      test('Returns true for child-session redirect URLs', () {
+        expect(
+          isExternallyOpenedOrigin(
+            'https://api.meshpay.com/v2/sessions/a/child-sessions/b:redirect',
+          ),
+          isTrue,
+        );
+        expect(
+          isExternallyOpenedOrigin(
+            'https://api.sandbox.meshpay.com/v2/sessions/a/child-sessions/b:redirect?t=1',
+          ),
+          isTrue,
+        );
+      });
+
+      test('Returns false for :redirect prefix lookalikes', () {
+        expect(
+          isExternallyOpenedOrigin(
+            'https://api.meshpay.com/v2/sessions/a/child-sessions/b:redirectevil',
+          ),
+          isFalse,
+        );
+      });
+
+      test('Returns false for non-api or non-meshpay.com hosts', () {
+        expect(
+          isExternallyOpenedOrigin(
+            'https://link.meshpay.com/v2/sessions/a/child-sessions/b:redirect',
+          ),
+          isFalse,
+        );
+        expect(
+          isExternallyOpenedOrigin(
+            'https://api.meshpay.com.evil.com/v2/sessions/a/child-sessions/b:redirect',
+          ),
+          isFalse,
+        );
+      });
+    });
   });
 }

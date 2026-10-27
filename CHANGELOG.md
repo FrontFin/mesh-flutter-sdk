@@ -1,3 +1,8 @@
+## 1.1.15
+
+### Added
+- Link can now load pages on `*.meshpay.com` subdomains.
+
 ## 1.1.14
 
 ### Added
