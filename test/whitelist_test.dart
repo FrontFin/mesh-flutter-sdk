@@ -19,6 +19,8 @@ void main() {
     test('Returns true for wildcard origins', () {
       expect(isWhitelistedOrigin('https://preview1.meshconnect.com'), isTrue);
       expect(isWhitelistedOrigin('https://preview2.getfront.com'), isTrue);
+      expect(isWhitelistedOrigin('https://pay.meshpay.com'), isTrue);
+      expect(isWhitelistedOrigin('https://sandbox.meshpay.com/path'), isTrue);
       expect(isWhitelistedOrigin('https://myapp.local'), isTrue);
       expect(isWhitelistedOrigin('https://myapp.localcan.dev'), isTrue);
     });
@@ -32,6 +34,18 @@ void main() {
       expect(isWhitelistedOrigin('http://meshconnect.com'), isFalse);
       expect(isWhitelistedOrigin('ftp://getfront.com'), isFalse);
       expect(isWhitelistedOrigin('meshconnect://'), isFalse);
+    });
+
+    test('Returns false for wildcard lookalikes without a dot boundary', () {
+      expect(isWhitelistedOrigin('https://evilmeshpay.com'), isFalse);
+      expect(isWhitelistedOrigin('https://notmeshpay.com'), isFalse);
+      expect(isWhitelistedOrigin('https://evilmeshconnect.com'), isFalse);
+      expect(isWhitelistedOrigin('https://evilgetfront.com'), isFalse);
+      expect(isWhitelistedOrigin('https://meshpay.com.evil.com'), isFalse);
+    });
+
+    test('Returns false for the bare wildcard root', () {
+      expect(isWhitelistedOrigin('https://meshpay.com'), isFalse);
     });
   });
 }

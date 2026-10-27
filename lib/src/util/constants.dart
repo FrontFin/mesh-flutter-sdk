@@ -8,8 +8,9 @@ bool isWhitelistedOrigin(String url) {
 
     return _whitelistedOrigins.any((origin) {
       if (origin.startsWith('*.')) {
-        // Wildcard origin, e.g. "*.meshconnect.com"
-        final root = origin.substring(2);
+        // Wildcard origin, e.g. "*.meshconnect.com" -> ".meshconnect.com".
+        // Keeping the dot stops lookalikes like "evilmeshconnect.com".
+        final root = origin.substring(1);
         final uri = Uri.parse(url);
         final host = uri.host;
 
@@ -30,7 +31,8 @@ bool isExternallyOpenedOrigin(String url) {
     }
 
     // Allow OAuth redirect URLs to open externally
-    if (_oAuthRedirectRegex.hasMatch(url)) {
+    if (_oAuthRedirectRegex.hasMatch(url) ||
+        _mfsOAuthRedirectRegex.hasMatch(url)) {
       return true;
     }
 
@@ -88,6 +90,7 @@ Uri? getStoreUriFromAppUri(Uri uri) {
 const _whitelistedOrigins = [
   '*.meshconnect.com',
   '*.getfront.com',
+  '*.meshpay.com',
   '*.walletconnect.com',
   '*.walletconnect.org',
   '*.walletlink.org',
@@ -152,6 +155,17 @@ const _externallyOpenedOrigins = [
 // Matches https://*.meshconnect.com/*/catalog/oauth/redirect/*
 final _oAuthRedirectRegex = RegExp(
   r'^https://[^.]+\.meshconnect\.com/.+/catalog/oauth/redirect/.*$',
+);
+
+// The Link v3 equivalent: https://api*.meshpay.com/v2/sessions/<id>/child-sessions/<id>:redirect
+// Must open externally like its v1/v2 counterpart. The host is whitelisted, so
+// without this the redirect renders in the WebView, unloading Link and losing
+// the in-flight OAuth session.
+// `:redirect` is anchored to the end of the path so a longer sibling endpoint
+// (`:redirectSomethingElse`) does not also open externally.
+final _mfsOAuthRedirectRegex = RegExp(
+  r'^https://api(?:\.[a-z0-9-]+)*\.meshpay\.com'
+  r'/v2/sessions/[^/]+/child-sessions/[^/?]+:redirect(?:\?|$)',
 );
 
 const _exodusSchema = 'exodus';

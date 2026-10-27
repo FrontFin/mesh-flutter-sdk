@@ -3,6 +3,11 @@
 ### Fixed
 - On the latest Link, the wallet app now opens on approve, not just on connect.
 
+## 1.1.15
+
+### Added
+- Link can now load pages on `*.meshpay.com` subdomains.
+
 ## 1.1.14
 
 ### Added
