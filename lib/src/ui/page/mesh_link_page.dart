@@ -24,6 +24,7 @@ class MeshLinkPage extends StatefulWidget {
 
 class _MeshLinkPageState extends State<MeshLinkPage> {
   late final MeshLinkController _controller;
+  late final AppLifecycleListener _lifecycleListener;
 
   /// Whether to show the native navigation bar
   /// (for example, when we navigate to a 3rd party integration webpage).
@@ -64,6 +65,11 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
       },
     );
 
+    // Back from a wallet app, so the next wallet launch is allowed again.
+    _lifecycleListener = AppLifecycleListener(
+      onResume: _controller.onAppResumed,
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(
         _controller.init(context).then((_) {
@@ -74,6 +80,12 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
         }),
       );
     });
+  }
+
+  @override
+  void dispose() {
+    _lifecycleListener.dispose();
+    super.dispose();
   }
 
   @override

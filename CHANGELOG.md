@@ -1,3 +1,8 @@
+## 1.1.16
+
+### Fixed
+- On the latest Link, the wallet app now opens on approve, not just on connect.
+
 ## 1.1.15
 
 ### Added
