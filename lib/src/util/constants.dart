@@ -8,8 +8,9 @@ bool isWhitelistedOrigin(String url) {
 
     return _whitelistedOrigins.any((origin) {
       if (origin.startsWith('*.')) {
-        // Wildcard origin, e.g. "*.meshconnect.com"
-        final root = origin.substring(2);
+        // Wildcard origin, e.g. "*.meshconnect.com" -> ".meshconnect.com".
+        // Keeping the dot stops lookalikes like "evilmeshconnect.com".
+        final root = origin.substring(1);
         final uri = Uri.parse(url);
         final host = uri.host;
 

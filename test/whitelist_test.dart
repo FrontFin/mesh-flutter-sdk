@@ -35,5 +35,17 @@ void main() {
       expect(isWhitelistedOrigin('ftp://getfront.com'), isFalse);
       expect(isWhitelistedOrigin('meshconnect://'), isFalse);
     });
+
+    test('Returns false for wildcard lookalikes without a dot boundary', () {
+      expect(isWhitelistedOrigin('https://evilmeshpay.com'), isFalse);
+      expect(isWhitelistedOrigin('https://notmeshpay.com'), isFalse);
+      expect(isWhitelistedOrigin('https://evilmeshconnect.com'), isFalse);
+      expect(isWhitelistedOrigin('https://evilgetfront.com'), isFalse);
+      expect(isWhitelistedOrigin('https://meshpay.com.evil.com'), isFalse);
+    });
+
+    test('Returns false for the bare wildcard root', () {
+      expect(isWhitelistedOrigin('https://meshpay.com'), isFalse);
+    });
   });
 }
