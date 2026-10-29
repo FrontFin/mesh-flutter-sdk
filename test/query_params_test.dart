@@ -39,6 +39,13 @@ void main() {
       );
     });
 
+    test('keeps empty query parts', () {
+      expect(
+        removeQueryParam('https://a.com/?a=1&&b=2&', 'th'),
+        'https://a.com/?a=1&&b=2&',
+      );
+    });
+
     test('drops the question mark when nothing is left', () {
       expect(
         removeQueryParam('https://a.com/?th=dark', 'th'),

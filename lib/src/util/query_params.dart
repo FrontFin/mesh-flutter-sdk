@@ -51,7 +51,7 @@ String removeQueryParam(String url, String name) {
   }
   final kept = _queryPairs(
     url,
-  ).where((pair) => pair.isNotEmpty && _pairKey(pair) != name);
+  ).where((pair) => pair.isEmpty || _pairKey(pair) != name);
   final base = beforeFragment.substring(0, queryStart);
   return '$base${kept.isEmpty ? '' : '?${kept.join('&')}'}$fragment';
 }
