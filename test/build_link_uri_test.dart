@@ -19,83 +19,129 @@ MeshConfiguration _config({
   theme: theme,
 );
 
+Uri _build(
+  MeshConfiguration configuration, {
+  Brightness platformBrightness = Brightness.light,
+}) => buildLinkUri(configuration, platformBrightness: platformBrightness);
+
 void main() {
   group('buildLinkUri', () {
     test('preserves base URL scheme, host, and path', () {
-      final uri = buildLinkUri(_config());
+      final uri = _build(_config());
       expect(uri.scheme, 'https');
       expect(uri.host, 'link.meshconnect.com');
       expect(uri.path, '/path');
     });
 
     test('always sets lng from configuration language', () {
-      final uri = buildLinkUri(_config(language: 'es'));
-      expect(uri.queryParameters['lng'], 'es');
+      expect(_build(_config(language: 'es')).queryParameters['lng'], 'es');
     });
 
     test('defaults lng to en', () {
-      final uri = buildLinkUri(_config());
-      expect(uri.queryParameters['lng'], 'en');
+      expect(_build(_config()).queryParameters['lng'], 'en');
+    });
+
+    test('sets platform to flutter', () {
+      expect(_build(_config()).queryParameters['platform'], 'flutter');
     });
 
     test('sets fiatCur when displayFiatCurrency is provided', () {
-      final uri = buildLinkUri(_config(displayFiatCurrency: 'EUR'));
+      final uri = _build(_config(displayFiatCurrency: 'EUR'));
       expect(uri.queryParameters['fiatCur'], 'EUR');
     });
 
     test('omits fiatCur when displayFiatCurrency is null', () {
-      final uri = buildLinkUri(_config());
+      final uri = _build(_config());
       expect(uri.queryParameters.containsKey('fiatCur'), isFalse);
     });
 
-    test('sets th to light when theme is ThemeMode.light', () {
-      final uri = buildLinkUri(_config(theme: ThemeMode.light));
-      expect(uri.queryParameters['th'], 'light');
+    test('sets th to light or dark from the configuration theme', () {
+      expect(
+        _build(_config(theme: ThemeMode.light)).queryParameters['th'],
+        'light',
+      );
+      expect(
+        _build(_config(theme: ThemeMode.dark)).queryParameters['th'],
+        'dark',
+      );
     });
 
-    test('sets th to dark when theme is ThemeMode.dark', () {
-      final uri = buildLinkUri(_config(theme: ThemeMode.dark));
-      expect(uri.queryParameters['th'], 'dark');
-    });
-
-    test('sets th to system when theme is ThemeMode.system', () {
-      final uri = buildLinkUri(_config(theme: ThemeMode.system));
-      expect(uri.queryParameters['th'], 'system');
+    test('sends a system theme as the device theme', () {
+      final config = _config(theme: ThemeMode.system);
+      expect(
+        _build(
+          config,
+          platformBrightness: Brightness.dark,
+        ).queryParameters['th'],
+        'dark',
+      );
+      expect(
+        _build(
+          config,
+          platformBrightness: Brightness.light,
+        ).queryParameters['th'],
+        'light',
+      );
     });
 
     test('omits th when theme is null', () {
-      final uri = buildLinkUri(_config());
+      final uri = _build(_config());
       expect(uri.queryParameters.containsKey('th'), isFalse);
     });
 
-    test('preserves existing query parameters from link token URL', () {
-      final uri = buildLinkUri(
-        _config(url: 'https://link.meshconnect.com/path?existing=value'),
+    test('replaces the token th with the app theme', () {
+      final uri = _build(
+        _config(
+          url: 'https://link.meshpay.com/?th=dark&token=abc&th=dark',
+          theme: ThemeMode.light,
+        ),
       );
-      expect(uri.queryParameters['existing'], 'value');
+      expect(uri.queryParametersAll['th'], ['light']);
+    });
+
+    test('keeps the token th when the app passes no theme', () {
+      final uri = _build(_config(url: 'https://link.meshpay.com/?th=dark'));
+      expect(uri.queryParameters['th'], 'dark');
+    });
+
+    test('keeps the other token params as they are', () {
+      const flow = '{%22flow%22%3A%22login%22}';
+      final uri = _build(
+        _config(
+          url: 'https://link.meshpay.com/?token=a-b_c+d&flow=$flow&th=dark',
+          theme: ThemeMode.light,
+        ),
+      );
+      // Uri.parse only escapes the raw braces, which decode the same.
+      expect(
+        uri.toString(),
+        'https://link.meshpay.com/?token=a-b_c+d&flow=%7B%22flow%22%3A%22login%22%7D'
+        '&platform=flutter&lng=en&th=light',
+      );
+      expect(uri.queryParameters['flow'], '{"flow":"login"}');
+    });
+
+    test('adds params before the fragment', () {
+      final uri = _build(_config(url: 'https://link.meshpay.com/?a=1#x'));
+      expect(uri.fragment, 'x');
+      expect(uri.queryParameters['platform'], 'flutter');
     });
 
     test('overrides existing lng in link token URL', () {
-      final uri = buildLinkUri(
+      final uri = _build(
         _config(
           url: 'https://link.meshconnect.com/path?lng=fr',
           language: 'pt',
         ),
       );
-      expect(uri.queryParameters['lng'], 'pt');
+      expect(uri.queryParametersAll['lng'], ['pt']);
     });
 
-    test('sets all params together', () {
-      final uri = buildLinkUri(
-        _config(
-          language: 'es',
-          displayFiatCurrency: 'GBP',
-          theme: ThemeMode.dark,
-        ),
+    test('preserves existing query parameters from link token URL', () {
+      final uri = _build(
+        _config(url: 'https://link.meshconnect.com/path?existing=value'),
       );
-      expect(uri.queryParameters['lng'], 'es');
-      expect(uri.queryParameters['fiatCur'], 'GBP');
-      expect(uri.queryParameters['th'], 'dark');
+      expect(uri.queryParameters['existing'], 'value');
     });
   });
 }

@@ -1,3 +1,9 @@
+## 1.1.17
+
+### Fixed
+- The area around Link now matches Link's theme. No more light bars around a dark page.
+- `ThemeMode.system` now applies on the latest Link, sent as the device's light or dark.
+
 ## 1.1.16
 
 ### Fixed

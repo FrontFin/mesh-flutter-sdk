@@ -40,9 +40,13 @@ class MeshLinkController {
 
   WebViewController? _webViewController;
   late Brightness _brightness;
+  bool _isLatestLink = false;
   bool _isExternalAppOpened = false;
 
   Brightness get brightness => _brightness;
+
+  /// Whether Link is the latest Link, which has its own page colors.
+  bool get isLatestLink => _isLatestLink;
 
   bool get isInitialized => _webViewController != null;
 
@@ -70,14 +74,19 @@ class MeshLinkController {
   /// Initialize the controller using [configuration].
   Future<void> init(BuildContext context) async {
     try {
-      final uri = buildLinkUri(configuration);
+      // Read once, like the page: Link doesn't follow a device switch.
+      final platformBrightness = MediaQuery.platformBrightnessOf(context);
+      final uri = buildLinkUri(
+        configuration,
+        platformBrightness: platformBrightness,
+      );
 
       await _initWebViewController(uri);
       if (!context.mounted) {
         return;
       }
 
-      _initStyle(context, uri);
+      _initStyle(uri, platformBrightness);
     } catch (e, s) {
       logger.severe('Error initializing MeshLinkPage: $e', e, s);
       onError(MeshErrorType.connectionError);
@@ -172,17 +181,13 @@ class MeshLinkController {
     _webViewController = controller;
   }
 
-  void _initStyle(BuildContext context, Uri uri) {
-    final theme = resolveTheme(uri, configuration.theme);
-
-    final brightness = switch (theme) {
-      ThemeMode.light => Brightness.light,
-      ThemeMode.dark => Brightness.dark,
-      ThemeMode.system => MediaQuery.platformBrightnessOf(context),
-    };
+  void _initStyle(Uri uri, Brightness platformBrightness) {
+    final url = uri.toString();
+    final brightness = resolveLinkBrightness(url, platformBrightness);
 
     onBrightnessChanged(brightness);
     _brightness = brightness;
+    _isLatestLink = isLatestLinkUrl(url);
   }
 
   /// Callback when a JavaScript console message is received.

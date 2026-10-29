@@ -1,29 +1,38 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
 import 'package:mesh_sdk_flutter/src/util/language.dart';
+import 'package:mesh_sdk_flutter/src/util/query_params.dart';
 
 /// Builds the full link [Uri] from [configuration] (including its link token),
 /// with query parameters for platform, language, theme, and fiat currency.
-Uri buildLinkUri(MeshConfiguration configuration) {
-  final url = String.fromCharCodes(base64Decode(configuration.linkToken));
-  final parsedUri = Uri.parse(url);
-  final queryParams = {...parsedUri.queryParameters};
+///
+/// The app's theme replaces any `th` already in the token (some backends add
+/// `th=dark`), and `system` is sent as the device's light or dark.
+Uri buildLinkUri(
+  MeshConfiguration configuration, {
+  required Brightness platformBrightness,
+}) {
+  var url = String.fromCharCodes(base64Decode(configuration.linkToken));
 
-  queryParams['platform'] = 'flutter';
-
-  final lng = resolveLanguage(configuration.language);
-  queryParams['lng'] = lng;
+  url = setQueryParam(url, 'platform', 'flutter');
+  url = setQueryParam(url, 'lng', resolveLanguage(configuration.language));
 
   final fiatCur = configuration.displayFiatCurrency;
   if (fiatCur != null) {
-    queryParams['fiatCur'] = fiatCur;
+    url = setQueryParam(url, 'fiatCur', fiatCur);
   }
 
-  final th = configuration.theme?.name;
+  final th = switch (configuration.theme) {
+    ThemeMode.light => 'light',
+    ThemeMode.dark => 'dark',
+    ThemeMode.system => platformBrightness.name,
+    null => null,
+  };
   if (th != null) {
-    queryParams['th'] = th;
+    url = setQueryParam(url, 'th', th);
   }
 
-  return parsedUri.replace(queryParameters: queryParams);
+  return Uri.parse(url);
 }

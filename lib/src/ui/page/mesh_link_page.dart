@@ -112,7 +112,10 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
     }
 
     final backgroundColor = _controller.isInitialized
-        ? getNavBarColor(_controller.brightness)
+        ? getLinkBackgroundColor(
+            _controller.brightness,
+            isLatestLink: _controller.isLatestLink,
+          )
         : Colors.transparent;
 
     return PopScope(
