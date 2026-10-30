@@ -15,7 +15,6 @@ import 'package:mesh_sdk_flutter/src/util/app_url.dart';
 import 'package:mesh_sdk_flutter/src/util/constants.dart';
 import 'package:mesh_sdk_flutter/src/util/link_uri.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
-import 'package:mesh_sdk_flutter/src/util/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -40,13 +39,9 @@ class MeshLinkController {
 
   WebViewController? _webViewController;
   late Brightness _brightness;
-  bool _isLatestLink = false;
   bool _isExternalAppOpened = false;
 
   Brightness get brightness => _brightness;
-
-  /// Whether Link is the latest Link, which has its own page colors.
-  bool get isLatestLink => _isLatestLink;
 
   bool get isInitialized => _webViewController != null;
 
@@ -75,10 +70,9 @@ class MeshLinkController {
   Future<void> init(BuildContext context) async {
     try {
       // Read once, like the page: Link doesn't follow a device switch.
-      final platformBrightness = MediaQuery.platformBrightnessOf(context);
-      final uri = buildLinkUri(
+      final (:uri, :brightness) = buildLinkUri(
         configuration,
-        platformBrightness: platformBrightness,
+        platformBrightness: MediaQuery.platformBrightnessOf(context),
       );
 
       await _initWebViewController(uri);
@@ -86,7 +80,7 @@ class MeshLinkController {
         return;
       }
 
-      _initStyle(uri, platformBrightness);
+      _initStyle(brightness);
     } catch (e, s) {
       logger.severe('Error initializing MeshLinkPage: $e', e, s);
       onError(MeshErrorType.connectionError);
@@ -181,13 +175,9 @@ class MeshLinkController {
     _webViewController = controller;
   }
 
-  void _initStyle(Uri uri, Brightness platformBrightness) {
-    final url = uri.toString();
-    final brightness = resolveLinkBrightness(url, platformBrightness);
-
+  void _initStyle(Brightness brightness) {
     onBrightnessChanged(brightness);
     _brightness = brightness;
-    _isLatestLink = isLatestLinkUrl(url);
   }
 
   /// Callback when a JavaScript console message is received.
