@@ -22,7 +22,7 @@ LinkUri buildLinkUri(
   final params = {
     // Without an app theme, Link reads th / link_style from the token itself.
     if (appTheme != null) 'th': appTheme.name,
-    if (language.isNotEmpty) 'lng': language,
+    'lng': ?language,
     'fiatCur': ?currency,
     'platform': 'flutter',
   };

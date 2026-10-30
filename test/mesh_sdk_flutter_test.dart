@@ -126,8 +126,8 @@ void main() {
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
-      final expectedLng =
-          WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+      final expectedLng = WidgetsBinding.instance.platformDispatcher.locale
+          .toLanguageTag();
       expect(webViewController.requestUri?.queryParameters['lng'], expectedLng);
       expect(webViewController.requestUri?.origin, Uri.parse(rawUrl).origin);
       expect(webViewController.requestUri?.path, Uri.parse(rawUrl).path);
