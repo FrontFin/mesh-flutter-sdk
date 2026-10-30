@@ -163,6 +163,27 @@ void main() {
         expect(isAppUrlChange('okxwalletx://wallet/dapp/url'), isFalse);
       });
 
+      test('bitcoincom deep link (Bitcoin.com Wallet on Android)', () {
+        expect(isAppUrlChange('bitcoincom://wc?uri=wc%3Atopic%402'), isTrue);
+      });
+
+      test('bitcoincom and bitcoin are separate schemes', () {
+        expect(isAppUrlChange('bitcoincomx://wc'), isFalse);
+        expect(isAppUrlChange('bitcoinx://wc'), isFalse);
+      });
+
+      test('blockchain-wallet deep link', () {
+        expect(
+          isAppUrlChange('blockchain-wallet://wc?uri=wc%3Atopic%402'),
+          isTrue,
+        );
+      });
+
+      test('blockchain-wallet lookalike scheme is rejected', () {
+        expect(isAppUrlChange('blockchain-wallets://wc'), isFalse);
+        expect(isAppUrlChange('blockchain://wc'), isFalse);
+      });
+
       // First allowlisted scheme containing a hyphen, so this also checks that
       // Uri.parse keeps the hyphen when it extracts the scheme.
       test('robinhood-wallet WalletConnect deep link', () {
