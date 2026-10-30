@@ -1,3 +1,8 @@
+## 1.1.17
+
+### Fixed
+- Robinhood Connect now opens in the Robinhood app, so Link can finish the deposit when the user comes back.
+
 ## 1.1.16
 
 ### Fixed
