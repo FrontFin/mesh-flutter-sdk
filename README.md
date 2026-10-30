@@ -133,6 +133,8 @@ Add the following URL schemes to `LSApplicationQueriesSchemes` in your app's `In
 <array>
     <string>tronlinkoutside</string>
     <string>bitcoin</string>
+    <string>bitcoincom</string>
+    <string>blockchain-wallet</string>
     <string>zengo</string>
     <string>okx</string>
     <string>okxwallet</string>
