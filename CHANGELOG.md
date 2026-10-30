@@ -1,3 +1,8 @@
+## 1.1.17
+
+### Fixed
+- The theme, language and currency set in the app now always apply, and the area around Link matches its theme.
+
 ## 1.1.16
 
 ### Fixed

@@ -1,21 +1,42 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:mesh_sdk_flutter/src/model/link_style.dart';
+import 'package:mesh_sdk_flutter/src/util/logger.dart';
 
-ThemeMode resolveTheme(Uri uri, ThemeMode? configurationTheme) {
-  if (configurationTheme != null) {
-    return configurationTheme;
+/// `light`, `dark` or `system` as a [Brightness]; null for anything else.
+Brightness? resolveTheme(String? theme, Brightness platformBrightness) =>
+    switch (theme) {
+      'light' => Brightness.light,
+      'dark' => Brightness.dark,
+      'system' => platformBrightness,
+      _ => null,
+    };
+
+/// The theme Link opens in: app theme, then the URL's `th`, then
+/// `link_style.th`, then dark (Link's default).
+Brightness resolveLinkTheme({
+  required Brightness? appTheme,
+  required String? urlTheme,
+  required String? linkStyle,
+  required Brightness platformBrightness,
+}) =>
+    appTheme ??
+    resolveTheme(urlTheme, platformBrightness) ??
+    resolveTheme(_linkStyleTheme(linkStyle), platformBrightness) ??
+    Brightness.dark;
+
+String? _linkStyleTheme(String? linkStyle) {
+  if (linkStyle == null || linkStyle.isEmpty) {
+    return null;
   }
-  final linkStyleParam = uri.queryParameters['link_style'];
-  final linkStyleBytes = linkStyleParam == null
-      ? null
-      : base64Decode(linkStyleParam);
-  final linkStyleJson = linkStyleBytes == null
-      ? null
-      : json.decode(utf8.decode(linkStyleBytes));
-  final linkStyle = linkStyleJson is Map<String, dynamic>
-      ? LinkStyle.fromJson(linkStyleJson)
-      : LinkStyle.fromJson(const {});
-  return linkStyle.theme;
+  try {
+    // URL decoding turns '+' into a space.
+    final value = base64.normalize(linkStyle.replaceAll(' ', '+'));
+    final style = json.decode(utf8.decode(base64.decode(value)));
+    final th = style is Map ? style['th'] : null;
+    return th is String && th.isNotEmpty ? th : null;
+  } on Object catch (e) {
+    logger.warning("Couldn't read the theme from link_style: $e");
+    return null;
+  }
 }
