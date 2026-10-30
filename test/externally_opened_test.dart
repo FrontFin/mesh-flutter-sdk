@@ -142,9 +142,7 @@ void main() {
         isFalse,
       );
       expect(
-        isExternallyOpenedOrigin(
-          'https://branch.wallet.bitcoin.com.evil.com/',
-        ),
+        isExternallyOpenedOrigin('https://branch.wallet.bitcoin.com.evil.com/'),
         isFalse,
       );
     });
