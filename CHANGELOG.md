@@ -1,7 +1,15 @@
-## 1.1.17
+## 1.1.18
 
 ### Fixed
 - Robinhood Connect now opens in the Robinhood app, so Link can finish the deposit when the user comes back.
+
+## 1.1.17
+
+### Fixed
+- Bitcoin.com Wallet, Blockchain.com Wallet and Tonkeeper deep links now open the wallet on iOS and Android instead of being blocked.
+
+### Changed
+- Add `bitcoincom` and `blockchain-wallet` to the `LSApplicationQueriesSchemes` list in your iOS `Info.plist`.
 
 ## 1.1.16
 
