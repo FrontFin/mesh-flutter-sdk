@@ -6,26 +6,23 @@ void main() {
     test('returns the language as-is for explicit values', () {
       expect(resolveLanguage('en'), 'en');
       expect(resolveLanguage('es'), 'es');
-      expect(resolveLanguage('pt'), 'pt');
+      expect(resolveLanguage('pt-BR'), 'pt-BR');
     });
 
-    test('returns any arbitrary string unchanged', () {
-      expect(resolveLanguage('fr'), 'fr');
-      expect(resolveLanguage('zh'), 'zh');
+    test('trims the value', () {
+      expect(resolveLanguage(' es '), 'es');
     });
 
-    testWidgets('returns a non-empty language code for system', (tester) async {
-      final result = resolveLanguage('system');
-      expect(result, isNotEmpty);
-      expect(result, isNot('system'));
+    test('returns null when empty', () {
+      expect(resolveLanguage(''), isNull);
+      expect(resolveLanguage('  '), isNull);
     });
 
-    testWidgets('system returns the platform locale language code', (
-      tester,
-    ) async {
-      final platformLocale =
-          tester.binding.platformDispatcher.locale.languageCode;
+    testWidgets('system returns the platform locale tag', (tester) async {
+      final platformLocale = tester.binding.platformDispatcher.locale
+          .toLanguageTag();
       expect(resolveLanguage('system'), platformLocale);
+      expect(resolveLanguage('system'), isNot('system'));
     });
   });
 }

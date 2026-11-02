@@ -15,7 +15,6 @@ import 'package:mesh_sdk_flutter/src/util/app_url.dart';
 import 'package:mesh_sdk_flutter/src/util/constants.dart';
 import 'package:mesh_sdk_flutter/src/util/link_uri.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
-import 'package:mesh_sdk_flutter/src/util/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -70,14 +69,18 @@ class MeshLinkController {
   /// Initialize the controller using [configuration].
   Future<void> init(BuildContext context) async {
     try {
-      final uri = buildLinkUri(configuration);
+      // Read once, like the page: Link doesn't follow a device switch.
+      final (:uri, :brightness) = buildLinkUri(
+        configuration,
+        platformBrightness: MediaQuery.platformBrightnessOf(context),
+      );
 
       await _initWebViewController(uri);
       if (!context.mounted) {
         return;
       }
 
-      _initStyle(context, uri);
+      _initStyle(brightness);
     } catch (e, s) {
       logger.severe('Error initializing MeshLinkPage: $e', e, s);
       onError(MeshErrorType.connectionError);
@@ -172,15 +175,7 @@ class MeshLinkController {
     _webViewController = controller;
   }
 
-  void _initStyle(BuildContext context, Uri uri) {
-    final theme = resolveTheme(uri, configuration.theme);
-
-    final brightness = switch (theme) {
-      ThemeMode.light => Brightness.light,
-      ThemeMode.dark => Brightness.dark,
-      ThemeMode.system => MediaQuery.platformBrightnessOf(context),
-    };
-
+  void _initStyle(Brightness brightness) {
     onBrightnessChanged(brightness);
     _brightness = brightness;
   }
