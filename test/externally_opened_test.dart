@@ -104,6 +104,49 @@ void main() {
       expect(isExternallyOpenedOrigin('http://bkapp.vip/wc'), isFalse);
     });
 
+    // The values the wallet catalog serves for these wallets.
+    test('Returns true for the Tonkeeper link', () {
+      expect(
+        isExternallyOpenedOrigin(
+          'https://app.tonkeeper.com/dapp/https%3A%2F%2Flink.meshconnect.com',
+        ),
+        isTrue,
+      );
+    });
+
+    test('Returns true for the Bitcoin.com Wallet link on iOS', () {
+      expect(
+        isExternallyOpenedOrigin(
+          'https://branch.wallet.bitcoin.com/?uri=wc%3Aabc',
+        ),
+        isTrue,
+      );
+    });
+
+    test('Returns false for Tonkeeper and Bitcoin.com lookalikes', () {
+      expect(isExternallyOpenedOrigin('https://tonkeeper.com/dapp/x'), isFalse);
+      expect(
+        isExternallyOpenedOrigin('https://app.tonkeeper.com.evil.com/dapp/x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://evilapp.tonkeeper.com/dapp/x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('http://app.tonkeeper.com/dapp/x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://wallet.bitcoin.com/?uri=x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://branch.wallet.bitcoin.com.evil.com/'),
+        isFalse,
+      );
+    });
+
     test('Returns false for about:blank', () {
       expect(isExternallyOpenedOrigin('about:blank'), isFalse);
     });

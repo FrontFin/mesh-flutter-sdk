@@ -131,6 +131,8 @@ const _externallyOpenedOrigins = [
   'https://bkcode.vip',             // Bitget Wallet (in-wallet browser)
   'https://bkapp.vip',              // Bitget Wallet (WalletConnect)
   'https://metamask.app.link',      // MetaMask (WalletConnect)
+  'https://app.tonkeeper.com',      // Tonkeeper
+  'https://branch.wallet.bitcoin.com', // Bitcoin.com Wallet (iOS)
   'https://link.metamask.io',       // MetaMask (in-wallet browser)
   'https://phantom.app',            // Phantom
   'https://solflare.com',           // Solflare
@@ -178,6 +180,8 @@ const _exodusPlayStoreUrl =
 const allowedNativeSchemes = {
   'tronlinkoutside',
   'bitcoin',
+  'bitcoincom',
+  'blockchain-wallet',
   'zengo',
   'okx',
   'okxwallet',
