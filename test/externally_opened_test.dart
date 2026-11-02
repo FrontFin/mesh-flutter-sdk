@@ -55,6 +55,12 @@ void main() {
         isExternallyOpenedOrigin('https://ramp.revolut.com/order/abc123'),
         isTrue,
       );
+      expect(
+        isExternallyOpenedOrigin(
+          'https://applink.robinhood.com/u/connect?applicationId=abc',
+        ),
+        isTrue,
+      );
     });
 
     // The real value the backend serves for MetaMask's in-wallet browser, so a
