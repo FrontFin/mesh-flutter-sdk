@@ -4,11 +4,19 @@ class MockNavigationDelegate extends PlatformNavigationDelegate {
   MockNavigationDelegate()
     : super.implementation(const PlatformNavigationDelegateCreationParams());
 
+  NavigationRequestCallback? _onNavigationRequest;
+
+  /// Simulates the WebView asking whether it may navigate to [url].
+  Future<NavigationDecision?> simulateNavigationRequest(String url) async =>
+      _onNavigationRequest?.call(
+        NavigationRequest(url: url, isMainFrame: true),
+      );
+
   @override
   Future<void> setOnNavigationRequest(
     NavigationRequestCallback onNavigationRequest,
   ) async {
-    // Do nothing
+    _onNavigationRequest = onNavigationRequest;
   }
 
   @override

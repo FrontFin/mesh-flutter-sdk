@@ -20,3 +20,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Enable Swift Package Manager for this project regardless of the global
+  # `flutter config` setting, since the iOS project references the
+  # generated FlutterGeneratedPluginSwiftPackage.
+  config:
+    enable-swift-package-manager: true

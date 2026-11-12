@@ -104,6 +104,49 @@ void main() {
       expect(isExternallyOpenedOrigin('http://bkapp.vip/wc'), isFalse);
     });
 
+    // The values the wallet catalog serves for these wallets.
+    test('Returns true for the Tonkeeper link', () {
+      expect(
+        isExternallyOpenedOrigin(
+          'https://app.tonkeeper.com/dapp/https%3A%2F%2Flink.meshconnect.com',
+        ),
+        isTrue,
+      );
+    });
+
+    test('Returns true for the Bitcoin.com Wallet link on iOS', () {
+      expect(
+        isExternallyOpenedOrigin(
+          'https://branch.wallet.bitcoin.com/?uri=wc%3Aabc',
+        ),
+        isTrue,
+      );
+    });
+
+    test('Returns false for Tonkeeper and Bitcoin.com lookalikes', () {
+      expect(isExternallyOpenedOrigin('https://tonkeeper.com/dapp/x'), isFalse);
+      expect(
+        isExternallyOpenedOrigin('https://app.tonkeeper.com.evil.com/dapp/x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://evilapp.tonkeeper.com/dapp/x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('http://app.tonkeeper.com/dapp/x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://wallet.bitcoin.com/?uri=x'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://branch.wallet.bitcoin.com.evil.com/'),
+        isFalse,
+      );
+    });
+
     test('Returns false for about:blank', () {
       expect(isExternallyOpenedOrigin('about:blank'), isFalse);
     });
@@ -225,6 +268,47 @@ void main() {
         expect(
           isExternallyOpenedOrigin(
             'https://meshconnect.com/api/v1/catalog/oauth/redirect/x',
+          ),
+          isFalse,
+        );
+      });
+    });
+
+    group('MFS (Link v3) OAuth redirect regex', () {
+      test('Returns true for child-session redirect URLs', () {
+        expect(
+          isExternallyOpenedOrigin(
+            'https://api.meshpay.com/v2/sessions/a/child-sessions/b:redirect',
+          ),
+          isTrue,
+        );
+        expect(
+          isExternallyOpenedOrigin(
+            'https://api.sandbox.meshpay.com/v2/sessions/a/child-sessions/b:redirect?t=1',
+          ),
+          isTrue,
+        );
+      });
+
+      test('Returns false for :redirect prefix lookalikes', () {
+        expect(
+          isExternallyOpenedOrigin(
+            'https://api.meshpay.com/v2/sessions/a/child-sessions/b:redirectevil',
+          ),
+          isFalse,
+        );
+      });
+
+      test('Returns false for non-api or non-meshpay.com hosts', () {
+        expect(
+          isExternallyOpenedOrigin(
+            'https://link.meshpay.com/v2/sessions/a/child-sessions/b:redirect',
+          ),
+          isFalse,
+        );
+        expect(
+          isExternallyOpenedOrigin(
+            'https://api.meshpay.com.evil.com/v2/sessions/a/child-sessions/b:redirect',
           ),
           isFalse,
         );

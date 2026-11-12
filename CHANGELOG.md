@@ -1,3 +1,21 @@
+## 1.1.17
+
+### Fixed
+- Bitcoin.com Wallet, Blockchain.com Wallet and Tonkeeper deep links now open the wallet on iOS and Android instead of being blocked.
+
+### Changed
+- Add `bitcoincom` and `blockchain-wallet` to the `LSApplicationQueriesSchemes` list in your iOS `Info.plist`.
+
+## 1.1.16
+
+### Fixed
+- On the latest Link, the wallet app now opens on approve, not just on connect.
+
+## 1.1.15
+
+### Added
+- Link can now load pages on `*.meshpay.com` subdomains.
+
 ## 1.1.14
 
 ### Added

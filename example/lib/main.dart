@@ -40,31 +40,28 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(title: const Text('Mesh Example App')),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextField(
-                  controller: _textController,
-                  decoration: const InputDecoration(
-                    labelText: 'Link Token',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: _textController,
+                decoration: const InputDecoration(
+                  labelText: 'Link Token',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
-                  onChanged: (value) => setState(() {}),
                 ),
-                const SizedBox(height: 32),
-                FilledButton(
-                  onPressed: linkToken.isEmpty
-                      ? null
-                      : () => _showMeshLinkPage(linkToken),
-                  child: const Text('Start'),
-                ),
-              ],
-            ),
+                onChanged: (value) => setState(() {}),
+              ),
+              const SizedBox(height: 32),
+              FilledButton(
+                onPressed: linkToken.isEmpty
+                    ? null
+                    : () => _showMeshLinkPage(linkToken),
+                child: const Text('Link'),
+              ),
+            ],
           ),
         ),
       ),
