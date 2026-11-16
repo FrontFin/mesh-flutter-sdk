@@ -3,8 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:logging/logging.dart';
 import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
 import 'package:mesh_sdk_flutter/src/mesh_sdk_version.dart';
+import 'package:mesh_sdk_flutter/src/util/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
@@ -292,6 +294,100 @@ void main() {
         r'\"brokerType\":\"brokerType\",'
         r'\"brokerName\":\"brokerName\"}]";',
       );
+    });
+  });
+
+  group('URL logging', () {
+    const marker = 'SECRET_MARKER';
+    late List<String> logged;
+    late StreamSubscription<LogRecord> subscription;
+
+    setUp(() {
+      UrlLauncherPlatform.instance = MockUrlLauncher();
+      logged = [];
+      subscription = logger.onRecord.listen(
+        (record) => logged.add('${record.message} ${record.error ?? ''}'),
+      );
+    });
+
+    tearDown(() => subscription.cancel());
+
+    Future<void> openLink(WidgetTester tester, String url) async {
+      final configuration = MeshConfiguration(
+        linkToken: base64Encode(utf8.encode(url)),
+      );
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('a link token with a query does not reach the logs', (
+      tester,
+    ) async {
+      await openLink(tester, 'https://link.example.com/?token=$marker');
+      // The first URL the WebView reports is the loaded link URL.
+      navigationDelegate.simulateUrlChange(
+        webViewController.requestUri.toString(),
+      );
+
+      expect(logged.join('\n'), isNot(contains(marker)));
+    });
+
+    testWidgets('an invalid link token does not reach the logs', (
+      tester,
+    ) async {
+      const configuration = MeshConfiguration(linkToken: '$marker!!');
+      await tester.pumpWidget(const TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      expect(logged, isNotEmpty);
+      expect(logged.join('\n'), isNot(contains(marker)));
+    });
+
+    testWidgets('navigation URLs with code and state do not reach the logs', (
+      tester,
+    ) async {
+      await openLink(tester, 'https://link.example.com/');
+
+      for (final url in [
+        'https://link.example.com/oauth/callback?code=$marker&state=$marker',
+        'https://link.trustwallet.com/open?uri=$marker',
+        'trust://wc?uri=$marker',
+        'https://blocked.example.org/?code=$marker',
+      ]) {
+        navigationDelegate.simulateUrlChange(url);
+        await navigationDelegate.simulateNavigationRequest(url);
+      }
+      await tester.pumpAndSettle();
+
+      expect(logged, isNotEmpty);
+      expect(logged.join('\n'), isNot(contains(marker)));
+    });
+  });
+
+  group('Unparsable navigation URL', () {
+    testWidgets('is blocked and its text stays out of the logs', (
+      tester,
+    ) async {
+      const marker = 'SECRET_MARKER';
+      final logged = <String>[];
+      final subscription = logger.onRecord.listen(
+        (record) => logged.add('${record.message} ${record.error ?? ''}'),
+      );
+      addTearDown(subscription.cancel);
+
+      final configuration = MeshConfiguration(linkToken: validLinkToken);
+      await tester.pumpWidget(TestApp(configuration: configuration));
+      await tester.tap(find.byType(FilledButton));
+      await tester.pumpAndSettle();
+
+      const url = 'https://example.com:badport/?code=$marker';
+      navigationDelegate.simulateUrlChange(url);
+      final decision = await navigationDelegate.simulateNavigationRequest(url);
+
+      expect(decision, NavigationDecision.prevent);
+      expect(logged.join('\n'), isNot(contains(marker)));
     });
   });
 

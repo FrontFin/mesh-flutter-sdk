@@ -26,9 +26,14 @@ class MockNavigationDelegate extends PlatformNavigationDelegate {
     // Do nothing
   }
 
+  UrlChangeCallback? _onUrlChange;
+
+  /// Simulates the WebView reporting that it moved to [url].
+  void simulateUrlChange(String url) => _onUrlChange?.call(UrlChange(url: url));
+
   @override
   Future<void> setOnUrlChange(UrlChangeCallback onUrlChange) async {
-    // Do nothing
+    _onUrlChange = onUrlChange;
   }
 
   @override
