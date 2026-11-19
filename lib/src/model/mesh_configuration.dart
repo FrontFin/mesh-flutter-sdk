@@ -35,10 +35,7 @@ class MeshConfiguration {
   /// Default: 'USD'
   final String? displayFiatCurrency;
 
-  /// Link UI theme. `light` / `dark` force that mode, overriding your portal
-  /// styling. `system` (default) or null uses your portal styling: if you
-  /// styled only one mode, Link always uses it; otherwise it follows the
-  /// device setting.
+  /// Link UI theme. Possible values: 'dark', 'light' and 'system'.
   final ThemeMode? theme;
 
   /// Whether to check domains against our whitelist. Defaults to true.

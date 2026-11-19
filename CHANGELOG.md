@@ -1,8 +1,3 @@
-## 1.1.18
-
-### Fixed
-- With `theme` set to `system` or null, the status and navigation bars now match the mode Link shows (your portal styling) instead of always following the device.
-
 ## 1.1.17
 
 ### Fixed

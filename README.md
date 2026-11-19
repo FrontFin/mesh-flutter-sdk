@@ -106,7 +106,7 @@ Here's what you can configure in the `MeshConfiguration`:
 | `linkToken`                | `String`                                   | ✅       | Link token obtained from the backend.                                                                                |
 | `language`                 | `String`                                   |          | Link UI language. Supported: `"en"`, `"es"`, `"pt"`. Use `"system"` to follow the device locale. Defaults to `"en"`. |
 | `displayFiatCurrency`      | `String?`                                  |          | Fiat currency code for displaying amounts in Link UI (e.g. `"USD"`)                                                  |
-| `theme`                    | `ThemeMode?`                               |          | Link UI theme. `light` / `dark` force that mode, overriding your portal styling. `system` (default) or null uses your portal styling: if you styled only one mode, Link always uses it; otherwise it follows the device setting. |
+| `theme`                    | `ThemeMode?`                               |          | Link UI theme (`ThemeMode.light`, `ThemeMode.dark`, or `ThemeMode.system`)                                           |
 | `isDomainWhitelistEnabled` | `bool`                                     |          | If domain should be checked against our whitelist. Defaults to `true`.                                               |
 | `integrationAccessTokens`  | `List<IntegrationAccessToken>`             |          | List of cached `IntegrationAccessToken`s that you can pass, so users don't need to connect every time.               |
 | `onError`                  | `ValueChanged<MeshErrorType>?`             |          | Error callback with a `MeshErrorType` that describes the error.                                                      |
@@ -165,7 +165,7 @@ Without these entries, `canOpenURL` returns `false` for the corresponding scheme
 To adapt the Link UI to the user's device settings, use:
 
 - **`language: 'system'`** — Uses the device/app locale for the Link UI (same behavior as the Web SDK).
-- **`theme`** — `light` / `dark` force that mode, overriding your portal styling. `system` (default) or null uses your portal styling: if you styled only one mode, Link always uses it; otherwise it follows the device setting (sent as `th` in the link URL).
+- **`theme`** — e.g. `ThemeMode.system` to follow device light/dark mode (sent as `th` in the link URL).
 
 These map to the same Link URL parameters (`lng`,`th`) as the [Web SDK](https://docs.meshconnect.com/guides/web-sdk).
 
