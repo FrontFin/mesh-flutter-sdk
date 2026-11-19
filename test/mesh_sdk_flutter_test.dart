@@ -349,6 +349,31 @@ void main() {
 
       expect(urlLauncher.launchedUrls, ['trust://wc', 'trust://open']);
     });
+
+    testWidgets('Robinhood login stays in the webview', (tester) async {
+      await openLink(tester);
+
+      final decision = await navigationDelegate.simulateNavigationRequest(
+        'https://robinhood.com/login',
+      );
+
+      expect(decision, NavigationDecision.navigate);
+      expect(urlLauncher.launchedUrls, isEmpty);
+    });
+
+    testWidgets('Robinhood Connect opens outside the webview', (tester) async {
+      await openLink(tester);
+
+      const connectUrl =
+          'https://applink.robinhood.com/u/connect?applicationId=x';
+      final decision = await navigationDelegate.simulateNavigationRequest(
+        connectUrl,
+      );
+      await tester.pumpAndSettle();
+
+      expect(decision, NavigationDecision.prevent);
+      expect(urlLauncher.launchedUrls, [connectUrl]);
+    });
   });
 
   group('Callbacks', () {

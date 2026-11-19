@@ -1,7 +1,7 @@
 ## 1.1.18
 
 ### Fixed
-- Robinhood Connect now opens in the Robinhood app, so Link can finish the deposit when the user comes back.
+- Robinhood Connect now opens outside the webview (in the Robinhood app, or the browser if the app isn't installed), so Link can finish the deposit when the user comes back.
 
 ## 1.1.17
 
