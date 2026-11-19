@@ -4,13 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:mesh_sdk_flutter/src/model/link_style.dart';
 import 'package:mesh_sdk_flutter/src/util/session_token_theme.dart';
 
-/// Resolves the theme for the native chrome (system bars, nav bar) so it
-/// matches what Link renders.
+/// Resolves the theme for the native chrome so it matches Link.
 ///
-/// An explicit light/dark [configurationTheme] wins. Otherwise (system or
-/// null) the session token's theme is used, then the legacy `link_style`
-/// param (null configuration only). [ThemeMode.system] means "follow the
-/// device".
+/// An explicit light/dark [configurationTheme] wins; otherwise the session
+/// token's theme, then `link_style`. [ThemeMode.system] follows the device.
 ThemeMode resolveTheme(Uri uri, ThemeMode? configurationTheme) {
   if (configurationTheme case final explicit?
       when explicit != ThemeMode.system) {

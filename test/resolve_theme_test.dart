@@ -7,8 +7,7 @@ import 'package:mesh_sdk_flutter/src/util/theme.dart';
 String _encodeLinkStyle(Map<String, dynamic> json) =>
     base64Encode(utf8.encode(jsonEncode(json)));
 
-/// Encodes a session token envelope the way the backend does: base64url,
-/// no padding.
+/// Encodes a session token envelope as unpadded base64url.
 String _encodeEnvelope(Map<String, Object?> json) =>
     base64Url.encode(utf8.encode(jsonEncode(json))).replaceAll('=', '');
 

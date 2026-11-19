@@ -2,16 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-/// Reads the theme the backend chose for this session from the Link session
-/// token (the `token` query parameter of the Link URL).
+/// Reads the theme Link will use from the session token, if present.
 ///
-/// The token is either a raw code (legacy) or a base64url-encoded JSON
-/// envelope such as `{"v":1,"c":"<code>","th":"LINK_THEME_DARK"}`. Mirrors
-/// Link's parser: an envelope is valid only if it is an object with a numeric
-/// `v` and a non-empty string `c`. Only `LINK_THEME_LIGHT` and
-/// `LINK_THEME_DARK` yield a value; anything else returns null.
-///
-/// Never log the token or its `c` field: it is a session credential.
+/// Returns null when the token carries no light/dark theme. Never log the
+/// token: it is a session credential.
 ThemeMode? themeFromSessionToken(String? token) {
   if (token == null || token.isEmpty) {
     return null;
@@ -34,7 +28,7 @@ Map<String, Object?>? _decodeEnvelope(String token) {
   try {
     decoded = json.decode(utf8.decode(base64Decode(padded)));
   } on FormatException {
-    // A raw (legacy) or malformed token carries no theme.
+    // Tokens that are not an encoded envelope carry no theme.
     return null;
   }
   if (decoded is! Map<String, Object?>) {
