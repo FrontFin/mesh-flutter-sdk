@@ -1,3 +1,9 @@
+## 1.1.19
+
+### Fixed
+- The SDK no longer logs navigation URLs with their query string, such as the link token or OAuth `code` and `state`.
+- Release builds no longer print SDK logs. Debug builds still do.
+
 ## 1.1.18
 
 ### Fixed
