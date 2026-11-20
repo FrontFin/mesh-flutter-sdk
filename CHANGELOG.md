@@ -1,8 +1,13 @@
-## 1.1.18
+## 1.1.19
 
 ### Fixed
 - The SDK no longer logs navigation URLs with their query string, such as the link token or OAuth `code` and `state`.
 - Release builds no longer print SDK logs. Debug builds still do.
+
+## 1.1.18
+
+### Fixed
+- Robinhood Connect now opens outside the webview (in the Robinhood app, or the browser if the app isn't installed), so Link can finish the deposit when the user comes back.
 
 ## 1.1.17
 
