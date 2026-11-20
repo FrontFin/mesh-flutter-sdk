@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-const navBarColorDark = Color(0xFF1E1E24);
-const navBarColorLight = Color(0xFFFBFBFB);
+// One dark and one light color for every Link version and client branding,
+// close enough to all of them that there's no visible seam.
+const navBarColorDark = Color(0xFF1C1C1C);
+const navBarColorLight = Color(0xFFF9F9F9);
 const iconColorDark = Colors.white;
 
+/// The color around Link and of the native nav bar.
 Color getNavBarColor(Brightness brightness) => switch (brightness) {
   Brightness.light => navBarColorLight,
   Brightness.dark => navBarColorDark,

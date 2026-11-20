@@ -126,8 +126,8 @@ void main() {
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
-      final expectedLng =
-          WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+      final expectedLng = WidgetsBinding.instance.platformDispatcher.locale
+          .toLanguageTag();
       expect(webViewController.requestUri?.queryParameters['lng'], expectedLng);
       expect(webViewController.requestUri?.origin, Uri.parse(rawUrl).origin);
       expect(webViewController.requestUri?.path, Uri.parse(rawUrl).path);
@@ -177,7 +177,7 @@ void main() {
       expect(webViewController.requestUri?.queryParameters['th'], 'dark');
     });
 
-    testWidgets('theme adds th=system to request URI', (tester) async {
+    testWidgets('system theme adds the device theme as th', (tester) async {
       final configuration = MeshConfiguration(
         linkToken: validLinkToken,
         theme: ThemeMode.system,
@@ -187,7 +187,8 @@ void main() {
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
-      expect(webViewController.requestUri?.queryParameters['th'], 'system');
+      // The test platform is light.
+      expect(webViewController.requestUri?.queryParameters['th'], 'light');
     });
 
     testWidgets('configuration theme (th) takes precedence over link_style', (
