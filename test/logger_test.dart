@@ -29,6 +29,20 @@ void main() {
       );
     });
 
+    test('drops a query value that holds quotes and brackets', () {
+      expect(
+        scrubUrlTails('https://a.com/?d={"code":"SECRET","state":"S2"}'),
+        isNot(anyOf(contains('SECRET'), contains('S2'))),
+      );
+    });
+
+    test('keeps text after a bracket that ends a sentence', () {
+      expect(
+        scrubUrlTails('(see https://a.com/?code=SECRET). Next'),
+        '(see https://a.com/). Next',
+      );
+    });
+
     test('leaves text without URLs untouched', () {
       expect(
         scrubUrlTails('Result received: MeshSuccess'),

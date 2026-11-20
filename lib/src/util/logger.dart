@@ -6,15 +6,20 @@ final logger = Logger.detached('MeshSDK')
   ..onRecord.listen(_printRecord);
 
 // Matches a URL-like token (`https://host/path`, `wc:topic@2`) followed by a
-// query or fragment, and captures the part before it.
+// query or fragment, and captures the part before it. The query ends at
+// whitespace, or at a closing character (`"`, `'`, `)`, `]`, `}`, `>`) that is
+// followed by whitespace or the end of the text, optionally after `,` `.` `;`.
+// A closing character inside the query (a JSON value) is part of the query.
 final _urlTail = RegExp(
-  r'''(\b[a-zA-Z][a-zA-Z0-9+.\-]*:[^\s?#'")\]}>]*)[?#][^\s'")\]}>]*''',
+  r'''(\b[a-zA-Z][a-zA-Z0-9+.\-]*:[^\s?#'")\]}>]*)'''
+  r'''[?#](?:[^\s'")\]}>]|['")\]}>](?![,.;]*(?:\s|$)))*''',
 );
 
 /// Drops the query and fragment from every URL-like token in [text].
 ///
 /// Safety net for log calls that forget `redactUri`: link URLs carry a
 /// short-lived credential in the query, and OAuth callbacks carry code/state.
+/// A query that holds both a closing character and whitespace is not covered.
 String scrubUrlTails(String text) {
   // Cheap guard: a URL tail needs a `?` or `#`, so skip the regex otherwise.
   if (!text.contains('?') && !text.contains('#')) {

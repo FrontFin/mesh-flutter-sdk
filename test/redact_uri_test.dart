@@ -32,8 +32,15 @@ void main() {
       );
     });
 
-    test('handles an IPv6 host', () {
-      expect(redactUri('http://[::1]:8080/x?code=secret'), 'http://::1');
+    test('keeps the port', () {
+      expect(
+        redactUri('http://localhost:3000/x?code=secret'),
+        'http://localhost:3000',
+      );
+    });
+
+    test('keeps the brackets of an IPv6 host', () {
+      expect(redactUri('http://[::1]:8080/x?code=secret'), 'http://[::1]:8080');
     });
 
     test('returns a placeholder for null or unparsable input', () {
