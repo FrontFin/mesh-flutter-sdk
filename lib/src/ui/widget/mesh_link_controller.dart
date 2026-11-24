@@ -15,6 +15,7 @@ import 'package:mesh_sdk_flutter/src/util/app_url.dart';
 import 'package:mesh_sdk_flutter/src/util/constants.dart';
 import 'package:mesh_sdk_flutter/src/util/link_uri.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
+import 'package:mesh_sdk_flutter/src/util/redact_uri.dart';
 import 'package:mesh_sdk_flutter/src/util/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -79,7 +80,12 @@ class MeshLinkController {
 
       _initStyle(context, uri);
     } catch (e, s) {
-      logger.severe('Error initializing MeshLinkPage: $e', e, s);
+      // The exception text can echo the raw link token, so log the type only.
+      logger.severe(
+        'Error initializing MeshLinkPage: ${e.runtimeType}',
+        null,
+        s,
+      );
       onError(MeshErrorType.connectionError);
     }
   }
@@ -104,15 +110,21 @@ class MeshLinkController {
             logger.info('HTTP auth request: ${navigation.host}');
           },
           onUrlChange: (navigation) {
-            logger.info('URL changed: ${navigation.url}');
+            logger.info('URL changed: ${redactUri(navigation.url)}');
             final newUrl = navigation.url;
             if (newUrl == null) {
               return;
             }
 
-            final newUri = Uri.parse(newUrl);
+            // Uri.parse throws a FormatException that echoes the whole URL
+            // into host crash reports, so parse safely.
+            final newUri = Uri.tryParse(newUrl);
+            if (newUri == null) {
+              return;
+            }
+
             if (isAppUrlChange(newUrl)) {
-              logger.info('app redirect: $newUri');
+              logger.info('app redirect: ${redactUri(newUri)}');
               unawaited(_launchExternalUri(newUri, isApp: true));
               return;
             }
@@ -125,27 +137,31 @@ class MeshLinkController {
             onInternalEvent(ShowNativeNavBar(show: !isLinkHost));
           },
           onNavigationRequest: (navigation) {
-            logger.info('Navigation request: ${navigation.url}');
-            final uri = Uri.parse(navigation.url);
+            logger.info('Navigation request: ${redactUri(navigation.url)}');
+            final uri = Uri.tryParse(navigation.url);
+            if (uri == null) {
+              logger.severe('Blocked unparsable navigation URL');
+              return NavigationDecision.prevent;
+            }
 
             if (isExternallyOpenedOrigin(navigation.url)) {
               logger.info(
                 'Externally opened origin, opening in external browser: '
-                '${navigation.url}',
+                '${redactUri(uri)}',
               );
               unawaited(_launchExternalUri(uri, isApp: false));
               return NavigationDecision.prevent;
             }
 
             if (isAppUrlChange(navigation.url)) {
-              logger.info('Opening app link: $uri');
+              logger.info('Opening app link: ${redactUri(uri)}');
               unawaited(_launchExternalUri(uri, isApp: true));
               return NavigationDecision.prevent;
             }
 
             if (configuration.isDomainWhitelistEnabled &&
                 !isWhitelistedOrigin(navigation.url)) {
-              logger.severe('Blocked navigation to: ${navigation.url}');
+              logger.severe('Blocked navigation to: ${redactUri(uri)}');
               return NavigationDecision.prevent;
             }
 
@@ -154,8 +170,8 @@ class MeshLinkController {
           onHttpError: (error) {
             logger.warning(
               'HTTP error ${error.response?.statusCode}. '
-              'Request (${error.request?.uri}). '
-              'Response ${error.response?.uri}',
+              'Request (${redactUri(error.request?.uri)}). '
+              'Response ${redactUri(error.response?.uri)}',
             );
           },
           onWebResourceError: (error) {
@@ -262,7 +278,8 @@ class MeshLinkController {
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched) {
       logger.info(
-        'Launch of external application returned false for URI: $uri',
+        'Launch of external application returned false for URI: '
+        '${redactUri(uri)}',
       );
     }
     return launched;
@@ -270,7 +287,9 @@ class MeshLinkController {
 
   Future<void> _launchExternalUri(Uri uri, {required bool isApp}) async {
     if (_isExternalAppOpened) {
-      logger.warning('External app already opened, ignoring: $uri');
+      logger.warning(
+        'External app already opened, ignoring: ${redactUri(uri)}',
+      );
       unawaited(goBack());
       return;
     }
@@ -290,7 +309,12 @@ class MeshLinkController {
           return;
         }
       } else {
-        logger.severe('Unexpected platform error launching URI: $uri', e, s);
+        // The platform message can echo the launched URI, so log the code only.
+        logger.severe(
+          'Unexpected platform error launching ${redactUri(uri)}: ${e.code}',
+          null,
+          s,
+        );
       }
       _isExternalAppOpened = false;
     }
