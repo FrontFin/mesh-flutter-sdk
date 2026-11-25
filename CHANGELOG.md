@@ -1,3 +1,8 @@
+## 1.1.20
+
+### Fixed
+- Phantom links on `phantom.com` now open the Phantom app instead of being blocked. Links on `phantom.app` still work.
+
 ## 1.1.19
 
 ### Fixed
