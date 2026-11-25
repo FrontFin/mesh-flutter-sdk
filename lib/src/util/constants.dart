@@ -133,7 +133,8 @@ const _externallyOpenedOrigins = [
   'https://app.tonkeeper.com',      // Tonkeeper
   'https://branch.wallet.bitcoin.com', // Bitcoin.com Wallet (iOS)
   'https://link.metamask.io',       // MetaMask (in-wallet browser)
-  'https://phantom.app',            // Phantom
+  'https://phantom.app',            // Phantom (legacy link)
+  'https://phantom.com',            // Phantom
   'https://solflare.com',           // Solflare
   'https://coinbase.com',           // Coinbase
   'https://www.coinbase.com',       // Coinbase

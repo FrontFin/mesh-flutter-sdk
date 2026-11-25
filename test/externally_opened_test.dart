@@ -153,6 +153,29 @@ void main() {
       );
     });
 
+    test(
+      'Returns true for the Phantom links (phantom.app and phantom.com)',
+      () {
+        expect(
+          isExternallyOpenedOrigin('https://phantom.app/ul/browse/x'),
+          isTrue,
+        );
+        expect(
+          isExternallyOpenedOrigin('https://phantom.com/ul/browse/x'),
+          isTrue,
+        );
+      },
+    );
+
+    test('Returns false for Phantom lookalikes', () {
+      expect(
+        isExternallyOpenedOrigin('https://phantom.com.evil.com/ul/browse/x'),
+        isFalse,
+      );
+      expect(isExternallyOpenedOrigin('https://evilphantom.com/ul/x'), isFalse);
+      expect(isExternallyOpenedOrigin('http://phantom.com/ul/x'), isFalse);
+    });
+
     test('Returns false for about:blank', () {
       expect(isExternallyOpenedOrigin('about:blank'), isFalse);
     });
