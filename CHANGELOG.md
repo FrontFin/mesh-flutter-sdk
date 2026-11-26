@@ -1,3 +1,12 @@
+## 1.1.21
+
+### Fixed
+- SafePal, Tangem, Zerion, Rainbow and ZenGo now open their wallet app on Android instead of staying on "Waiting for wallet...".
+- If SafePal, Tangem or Zerion is not installed on Android, the Play Store opens.
+
+### Changed
+- Add `safepalwallet`, `tangem` and `zerion` to the `LSApplicationQueriesSchemes` list in your iOS `Info.plist`.
+
 ## 1.1.20
 
 ### Fixed

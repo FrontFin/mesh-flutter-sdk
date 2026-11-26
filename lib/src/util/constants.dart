@@ -79,11 +79,12 @@ bool isExternallyOpenedOrigin(String url) {
 }
 
 Uri? getStoreUriFromAppUri(Uri uri) {
-  if (uri.scheme == _exodusSchema) {
-    return Uri.parse(_exodusPlayStoreUrl);
+  final packageId = _playStorePackageByScheme[uri.scheme];
+  if (packageId == null) {
+    return null;
   }
 
-  return null;
+  return Uri.parse('$_playStoreUrlPrefix$packageId');
 }
 
 // dart format off
@@ -148,6 +149,11 @@ const _externallyOpenedOrigins = [
   'https://krak.app',              // Kraken Pay
   'https://js.crypto.com',         // Crypto.com Pay
   'https://cash.app',              // Cash App Pay
+  'https://link.safepal.io',       // SafePal (WalletConnect)
+  'https://app.tangem.com',        // Tangem (WalletConnect)
+  'https://wallet.zerion.io',      // Zerion (WalletConnect)
+  'https://rnbwapp.com',           // Rainbow (WalletConnect)
+  'https://get.zengo.com',         // ZenGo (WalletConnect)
   // Revolut Connect. Prod only: Revolut asked us not to carry their
   // dev/sandbox host in SDK source, so the handoff works against prod Revolut
   // but not against their sandbox.
@@ -171,9 +177,16 @@ final _mfsOAuthRedirectRegex = RegExp(
   r'/v2/sessions/[^/]+/child-sessions/[^/?]+:redirect(?:\?|$)',
 );
 
-const _exodusSchema = 'exodus';
-const _exodusPlayStoreUrl =
-    'https://play.google.com/store/apps/details?id=exodusmovement.exodus';
+const _playStoreUrlPrefix = 'https://play.google.com/store/apps/details?id=';
+
+/// Wallet app scheme to Android package id. Used to open the Play Store when
+/// the wallet app is not installed.
+const _playStorePackageByScheme = {
+  'exodus': 'exodusmovement.exodus',
+  'safepalwallet': 'io.safepal.wallet',
+  'tangem': 'com.tangem.wallet',
+  'zerion': 'io.zerion.android',
+};
 
 /// Native app URL schemes that may leave the WebView (wallet deep links).
 /// Used by `isAppUrlChange` in app_url.dart.
@@ -198,6 +211,9 @@ const allowedNativeSchemes = {
   'trust',
   'metamask',
   'robinhood-wallet',
+  'safepalwallet',
+  'tangem',
+  'zerion',
   // Hosted-QR deposit / pay flows
   'bybit',
   'cryptocom',
