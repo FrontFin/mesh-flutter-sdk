@@ -1,7 +1,23 @@
-## 1.1.18
+## 1.1.21
 
 ### Fixed
 - The theme, language and currency set in the app now always apply, and the area around Link matches its theme.
+
+## 1.1.20
+
+### Fixed
+- Phantom links on `phantom.com` now open the Phantom app instead of being blocked. Links on `phantom.app` still work.
+
+## 1.1.19
+
+### Fixed
+- The SDK no longer logs navigation URLs with their query string, such as the link token or OAuth `code` and `state`.
+- Release builds no longer print SDK logs. Debug builds still do.
+
+## 1.1.18
+
+### Fixed
+- Robinhood Connect now opens outside the webview (in the Robinhood app, or the browser if the app isn't installed), so Link can finish the deposit when the user comes back.
 
 ## 1.1.17
 

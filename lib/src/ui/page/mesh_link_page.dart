@@ -7,7 +7,6 @@ import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_internal_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
 import 'package:mesh_sdk_flutter/src/ui/dialog/exit_dialog.dart';
-import 'package:mesh_sdk_flutter/src/ui/theme.dart';
 import 'package:mesh_sdk_flutter/src/ui/widget/mesh_link_controller.dart';
 import 'package:mesh_sdk_flutter/src/ui/widget/mesh_link_nav_bar.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -101,7 +100,7 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             MeshLinkNavBar(
-              brightness: _controller.brightness,
+              backgroundColor: _controller.backgroundColor,
               onBackPressed: _controller.goBack,
               onClosePressed: () => _showCloseDialog(context),
             ),
@@ -112,7 +111,7 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
     }
 
     final backgroundColor = _controller.isInitialized
-        ? getNavBarColor(_controller.brightness)
+        ? _controller.backgroundColor
         : Colors.transparent;
 
     return PopScope(

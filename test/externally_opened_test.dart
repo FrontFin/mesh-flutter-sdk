@@ -55,6 +55,12 @@ void main() {
         isExternallyOpenedOrigin('https://ramp.revolut.com/order/abc123'),
         isTrue,
       );
+      expect(
+        isExternallyOpenedOrigin(
+          'https://applink.robinhood.com/u/connect?applicationId=abc',
+        ),
+        isTrue,
+      );
     });
 
     // The real value the backend serves for MetaMask's in-wallet browser, so a
@@ -145,6 +151,29 @@ void main() {
         isExternallyOpenedOrigin('https://branch.wallet.bitcoin.com.evil.com/'),
         isFalse,
       );
+    });
+
+    test(
+      'Returns true for the Phantom links (phantom.app and phantom.com)',
+      () {
+        expect(
+          isExternallyOpenedOrigin('https://phantom.app/ul/browse/x'),
+          isTrue,
+        );
+        expect(
+          isExternallyOpenedOrigin('https://phantom.com/ul/browse/x'),
+          isTrue,
+        );
+      },
+    );
+
+    test('Returns false for Phantom lookalikes', () {
+      expect(
+        isExternallyOpenedOrigin('https://phantom.com.evil.com/ul/browse/x'),
+        isFalse,
+      );
+      expect(isExternallyOpenedOrigin('https://evilphantom.com/ul/x'), isFalse);
+      expect(isExternallyOpenedOrigin('http://phantom.com/ul/x'), isFalse);
     });
 
     test('Returns false for about:blank', () {

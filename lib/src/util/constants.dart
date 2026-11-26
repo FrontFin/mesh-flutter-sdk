@@ -115,7 +115,6 @@ const _whitelistedOrigins = [
   'https://front-b2b-api-test.azurewebsites.net',
   'https://web.getfront.com',
   'https://web.meshconnect.com',
-  'https://applink.robinhood.com',
   'https://m.stripe.network',
   'https://js.stripe.com',
   'https://app.usercentrics.eu',
@@ -134,7 +133,8 @@ const _externallyOpenedOrigins = [
   'https://app.tonkeeper.com',      // Tonkeeper
   'https://branch.wallet.bitcoin.com', // Bitcoin.com Wallet (iOS)
   'https://link.metamask.io',       // MetaMask (in-wallet browser)
-  'https://phantom.app',            // Phantom
+  'https://phantom.app',            // Phantom (legacy link)
+  'https://phantom.com',            // Phantom
   'https://solflare.com',           // Solflare
   'https://coinbase.com',           // Coinbase
   'https://www.coinbase.com',       // Coinbase
@@ -144,6 +144,7 @@ const _externallyOpenedOrigins = [
   'https://sandbox.meshconnect.com/authorize/Coinbase', // Coinbase on Sandbox
   'https://api.cb-device-intelligence.com',
   'https://i.bybit.com',           // Bybit Pay
+  'https://applink.robinhood.com', // Robinhood Connect
   'https://krak.app',              // Kraken Pay
   'https://js.crypto.com',         // Crypto.com Pay
   'https://cash.app',              // Cash App Pay

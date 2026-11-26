@@ -6,35 +6,45 @@ import 'package:mesh_sdk_flutter/src/util/currency.dart';
 import 'package:mesh_sdk_flutter/src/util/language.dart';
 import 'package:mesh_sdk_flutter/src/util/theme.dart';
 
-typedef LinkUri = ({Uri uri, Brightness brightness});
+/// The URL to open, whether it opens dark, and the color around it.
+typedef LinkUrl = ({Uri url, bool isDarkTheme, Color backgroundColor});
 
-/// The Link URL with the app's settings applied, and the theme it opens in.
-LinkUri buildLinkUri(
+/// The token URL with the app's `th`, `lng`, `fiatCur` and `platform`
+/// replacing any already in it, in one pass. The rest of the URL is not
+/// edited (only [Uri.parse] can normalize a malformed escape). An app theme of
+/// `system` is sent as `system`, so Link decides; on a legacy link, when the
+/// device decides, the resolved theme is sent instead (see
+/// [resolveLinkAppearance]).
+LinkUrl buildLinkUrl(
   MeshConfiguration configuration, {
   required Brightness platformBrightness,
 }) {
   final url = String.fromCharCodes(base64Decode(configuration.linkToken));
   final query = _Query.parse(url);
 
-  final appTheme = resolveTheme(configuration.theme?.name, platformBrightness);
   final language = resolveLanguage(configuration.language);
   final currency = resolveCurrency(configuration.displayFiatCurrency);
   final params = {
-    // Without an app theme, Link reads th / link_style from the token itself.
-    if (appTheme != null) 'th': appTheme.name,
+    if (configuration.theme case final theme?) 'th': theme.name,
     'lng': ?language,
     'fiatCur': ?currency,
     'platform': 'flutter',
   };
 
+  final appearance = resolveLinkAppearance(
+    urlTheme: params['th'] ?? query.get('th'),
+    token: query.get('token'),
+    linkStyle: query.get('link_style'),
+    platformBrightness: platformBrightness,
+  );
+  if (appearance.themeToWrite case final theme?) {
+    params['th'] = theme.name;
+  }
+
   return (
-    uri: Uri.parse(query.replace(params)),
-    brightness: resolveLinkTheme(
-      appTheme: appTheme,
-      urlTheme: query.get('th'),
-      linkStyle: query.get('link_style'),
-      platformBrightness: platformBrightness,
-    ),
+    url: Uri.parse(query.replace(params)),
+    isDarkTheme: appearance.isDarkTheme,
+    backgroundColor: appearance.backgroundColor,
   );
 }
 

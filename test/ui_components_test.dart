@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mesh_sdk_flutter/src/l10n/mesh_localizations.dart';
 import 'package:mesh_sdk_flutter/src/ui/dialog/exit_dialog.dart';
-import 'package:mesh_sdk_flutter/src/ui/theme.dart';
 import 'package:mesh_sdk_flutter/src/ui/widget/mesh_link_nav_bar.dart';
 
 void main() {
@@ -105,12 +104,32 @@ void main() {
   });
 
   group('MeshLinkNavBar', () {
+    testWidgets('icons contrast with the background color', (tester) async {
+      Future<Color?> iconColor(Color background) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: MeshLinkNavBar(
+                backgroundColor: background,
+                onBackPressed: () {},
+                onClosePressed: () {},
+              ),
+            ),
+          ),
+        );
+        return tester.widget<Icon>(find.byIcon(Icons.close)).color;
+      }
+
+      expect(await iconColor(const Color(0xFF1C1C1C)), Colors.white);
+      expect(await iconColor(const Color(0xFFF9F9F9)), Colors.black);
+    });
+
     testWidgets('renders back and close buttons', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: MeshLinkNavBar(
-              brightness: Brightness.light,
+              backgroundColor: const Color(0xFFF9F9F9),
               onBackPressed: () {},
               onClosePressed: () {},
             ),
@@ -129,7 +148,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: MeshLinkNavBar(
-              brightness: Brightness.light,
+              backgroundColor: const Color(0xFFF9F9F9),
               onBackPressed: () {
                 backPressed = true;
               },
@@ -152,7 +171,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: MeshLinkNavBar(
-              brightness: Brightness.dark,
+              backgroundColor: const Color(0xFF1C1C1C),
               onBackPressed: () {},
               onClosePressed: () {
                 closePressed = true;
@@ -166,18 +185,6 @@ void main() {
       await tester.pump();
 
       expect(closePressed, isTrue);
-    });
-  });
-
-  group('theme', () {
-    test('getNavBarColor returns light color for Brightness.light', () {
-      final color = getNavBarColor(Brightness.light);
-      expect(color, navBarColorLight);
-    });
-
-    test('getNavBarColor returns dark color for Brightness.dark', () {
-      final color = getNavBarColor(Brightness.dark);
-      expect(color, navBarColorDark);
     });
   });
 }

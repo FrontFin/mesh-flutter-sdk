@@ -34,7 +34,12 @@ abstract class MeshSdk {
     );
 
     // Restore the original theme brightness
-    onBrightnessChanged(brightness);
+    setSystemBars(
+      color: Colors.transparent,
+      iconBrightness: brightness == Brightness.dark
+          ? Brightness.light
+          : Brightness.dark,
+    );
 
     return result ?? const MeshError(MeshErrorType.userCancelled);
   }
