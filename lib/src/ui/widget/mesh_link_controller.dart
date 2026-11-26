@@ -10,7 +10,6 @@ import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_internal_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
 import 'package:mesh_sdk_flutter/src/model/success/success.dart';
-import 'package:mesh_sdk_flutter/src/ui/theme.dart';
 import 'package:mesh_sdk_flutter/src/util/app_url.dart';
 import 'package:mesh_sdk_flutter/src/util/constants.dart';
 import 'package:mesh_sdk_flutter/src/util/link_url.dart';
@@ -82,7 +81,7 @@ class MeshLinkController {
         return;
       }
 
-      _initStyle(backgroundColor);
+      _backgroundColor = backgroundColor;
     } catch (e, s) {
       // The exception text can echo the raw link token, so log the type only.
       logger.severe(
@@ -190,11 +189,6 @@ class MeshLinkController {
     await controller.loadRequest(uri);
 
     _webViewController = controller;
-  }
-
-  void _initStyle(Color backgroundColor) {
-    onBarColorChanged(backgroundColor);
-    _backgroundColor = backgroundColor;
   }
 
   /// Callback when a JavaScript console message is received.

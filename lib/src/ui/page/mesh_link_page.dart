@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_internal_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
 import 'package:mesh_sdk_flutter/src/ui/dialog/exit_dialog.dart';
+import 'package:mesh_sdk_flutter/src/ui/theme.dart';
 import 'package:mesh_sdk_flutter/src/ui/widget/mesh_link_controller.dart';
 import 'package:mesh_sdk_flutter/src/ui/widget/mesh_link_nav_bar.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -136,9 +138,13 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
         // We're on the root page, show the close dialog
         _showCloseDialog(context);
       },
-      child: Scaffold(
-        backgroundColor: backgroundColor,
-        body: SafeArea(child: body),
+      // On the page, not set once: it then wins over the host app's own style.
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: linkBarStyle(backgroundColor),
+        child: Scaffold(
+          backgroundColor: backgroundColor,
+          body: SafeArea(child: body),
+        ),
       ),
     );
   }

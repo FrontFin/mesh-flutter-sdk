@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mesh_sdk_flutter/src/l10n/mesh_localizations.dart';
 import 'package:mesh_sdk_flutter/src/ui/dialog/exit_dialog.dart';
+import 'package:mesh_sdk_flutter/src/ui/theme.dart';
 import 'package:mesh_sdk_flutter/src/ui/widget/mesh_link_nav_bar.dart';
 
 void main() {
@@ -185,6 +186,22 @@ void main() {
       await tester.pump();
 
       expect(closePressed, isTrue);
+    });
+  });
+
+  group('linkBarStyle', () {
+    test('icons follow the luminance of the color, not the theme', () {
+      final onLight = linkBarStyle(const Color(0xFFF9F9F9));
+      expect(onLight.statusBarColor, const Color(0xFFF9F9F9));
+      expect(onLight.systemNavigationBarColor, const Color(0xFFF9F9F9));
+      expect(onLight.statusBarIconBrightness, Brightness.dark);
+      expect(onLight.statusBarBrightness, Brightness.light);
+      expect(onLight.systemNavigationBarIconBrightness, Brightness.dark);
+
+      final onDark = linkBarStyle(const Color(0xFF1C1C1C));
+      expect(onDark.statusBarIconBrightness, Brightness.light);
+      expect(onDark.statusBarBrightness, Brightness.dark);
+      expect(onDark.systemNavigationBarIconBrightness, Brightness.light);
     });
   });
 }
