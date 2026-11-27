@@ -1,7 +1,7 @@
 ## 1.1.22
 
 ### Fixed
-- On Android, wallet apps now open in their own task. Uniswap no longer hides your app when it returns, so users land back in your app after they approve.
+- On Android, wallet apps now open in their own task. Uniswap no longer hides the host app when it returns, so users land back in the host app after they approve.
 
 ### Changed
 - Adds the `android_intent_plus` dependency.
