@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mesh_sdk_flutter/src/mesh_sdk_version.dart';
@@ -14,11 +16,10 @@ import 'package:mesh_sdk_flutter/src/util/app_url.dart';
 import 'package:mesh_sdk_flutter/src/util/constants.dart';
 import 'package:mesh_sdk_flutter/src/util/link_url.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
+import 'package:mesh_sdk_flutter/src/util/new_task_launcher.dart';
 import 'package:mesh_sdk_flutter/src/util/redact_uri.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
-const _activityNotFoundCode = 'ACTIVITY_NOT_FOUND';
 
 /// A controller for managing the Mesh Link web view.
 /// This uses [WebViewController] and adds our own logic on top.
@@ -264,7 +265,14 @@ class MeshLinkController {
     return true;
   }
 
-  Future<bool> _launchExternalApplication(Uri uri) async {
+  Future<bool> _launchExternalApplication(
+    Uri uri, {
+    required bool isApp,
+  }) async {
+    if (isApp && defaultTargetPlatform == TargetPlatform.android) {
+      await launchInNewTask(uri);
+      return true;
+    }
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!launched) {
       logger.info(
@@ -286,7 +294,7 @@ class MeshLinkController {
 
     _isExternalAppOpened = true;
     try {
-      if (!await _launchExternalApplication(uri)) {
+      if (!await _launchExternalApplication(uri, isApp: isApp)) {
         if (isApp && _tryStoreFallbackFromAppUri(uri)) {
           return;
         }
@@ -294,7 +302,7 @@ class MeshLinkController {
         return;
       }
     } on PlatformException catch (e, s) {
-      if (isApp && e.code == _activityNotFoundCode) {
+      if (isApp && e.code == activityNotFoundCode) {
         if (_tryStoreFallbackFromAppUri(uri)) {
           return;
         }

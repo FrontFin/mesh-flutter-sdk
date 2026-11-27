@@ -1,7 +1,15 @@
-## 1.1.22
+## 1.1.23
 
 ### Fixed
 - The theme, language and currency set in the app now always apply, and the area around Link matches its theme.
+
+## 1.1.22
+
+### Fixed
+- On Android, wallet apps now open in their own task. Uniswap no longer hides the host app when it returns, so users land back in the host app after they approve.
+
+### Changed
+- Adds the `android_intent_plus` dependency.
 
 ## 1.1.21
 

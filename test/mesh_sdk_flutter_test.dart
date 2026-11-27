@@ -1,12 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logging/logging.dart';
 import 'package:mesh_sdk_flutter/mesh_sdk_flutter.dart';
 import 'package:mesh_sdk_flutter/src/mesh_sdk_version.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
+import 'package:mesh_sdk_flutter/src/util/new_task_launcher.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
@@ -394,11 +398,25 @@ void main() {
 
   group('Wallet app launch', () {
     late MockUrlLauncher urlLauncher;
+    // On Android, wallet apps open through launchInNewTask.
+    final launchedInNewTask = <String>[];
+    final realLaunchInNewTask = launchInNewTask;
+    PlatformException? launchError;
 
     setUp(() {
       urlLauncher = MockUrlLauncher();
       UrlLauncherPlatform.instance = urlLauncher;
+      launchedInNewTask.clear();
+      launchError = null;
+      launchInNewTask = (uri) async {
+        launchedInNewTask.add(uri.toString());
+        if (launchError != null) {
+          throw launchError!;
+        }
+      };
     });
+
+    tearDown(() => launchInNewTask = realLaunchInNewTask);
 
     Future<void> openLink(WidgetTester tester) async {
       final configuration = MeshConfiguration(linkToken: validLinkToken);
@@ -430,7 +448,8 @@ void main() {
       await navigationDelegate.simulateNavigationRequest('trust://open');
       await tester.pumpAndSettle();
 
-      expect(urlLauncher.launchedUrls, ['trust://wc']);
+      expect(launchedInNewTask, ['trust://wc']);
+      expect(urlLauncher.launchedUrls, isEmpty);
     });
 
     testWidgets('the wallet opens again after returning to the app', (
@@ -444,7 +463,35 @@ void main() {
       await navigationDelegate.simulateNavigationRequest('trust://open');
       await tester.pumpAndSettle();
 
-      expect(urlLauncher.launchedUrls, ['trust://wc', 'trust://open']);
+      expect(launchedInNewTask, ['trust://wc', 'trust://open']);
+    });
+
+    testWidgets('on iOS the wallet opens with url_launcher', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      try {
+        await openLink(tester);
+
+        await navigationDelegate.simulateNavigationRequest('trust://wc');
+        await tester.pumpAndSettle();
+      } finally {
+        // The test framework checks this before tearDown runs.
+        debugDefaultTargetPlatformOverride = null;
+      }
+
+      expect(launchedInNewTask, isEmpty);
+      expect(urlLauncher.launchedUrls, ['trust://wc']);
+    });
+
+    testWidgets('a missing wallet app opens its store page', (tester) async {
+      launchError = PlatformException(code: activityNotFoundCode);
+      await openLink(tester);
+
+      await navigationDelegate.simulateNavigationRequest('tangem://wc');
+      await tester.pumpAndSettle();
+
+      expect(launchedInNewTask, ['tangem://wc']);
+      expect(urlLauncher.launchedUrls, hasLength(1));
+      expect(urlLauncher.launchedUrls.single, contains('play.google.com'));
     });
 
     testWidgets('Robinhood login stays in the webview', (tester) async {
