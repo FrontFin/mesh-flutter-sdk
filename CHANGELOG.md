@@ -1,3 +1,8 @@
+## 1.1.23
+
+### Fixed
+- Crypto.com Onchain now opens its wallet app on Android when Link pairs over its `wallet.crypto.com` link, instead of the tap doing nothing.
+
 ## 1.1.22
 
 ### Fixed
