@@ -163,6 +163,13 @@ void main() {
         expect(isAppUrlChange('okxwalletx://wallet/dapp/url'), isFalse);
       });
 
+      test('SafePal, Tangem and Zerion deep links', () {
+        expect(isAppUrlChange('safepalwallet://wc?uri=wc%3Atopic%402'), isTrue);
+        expect(isAppUrlChange('tangem://wc?uri=wc%3Atopic%402'), isTrue);
+        expect(isAppUrlChange('zerion://wc?uri=wc%3Atopic%402'), isTrue);
+        expect(isAppUrlChange('safepalwalletx://wc'), isFalse);
+      });
+
       test('bitcoincom deep link (Bitcoin.com Wallet on Android)', () {
         expect(isAppUrlChange('bitcoincom://wc?uri=wc%3Atopic%402'), isTrue);
       });

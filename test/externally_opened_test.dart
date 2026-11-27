@@ -3,6 +3,23 @@ import 'package:mesh_sdk_flutter/src/util/constants.dart';
 
 void main() {
   group('isExternallyOpenedOrigin', () {
+    test('Returns true for WalletConnect hosts of SafePal, Tangem, Zerion, '
+        'Rainbow and ZenGo', () {
+      for (final url in [
+        'https://link.safepal.io/wc?uri=wc%3Aabc',
+        'https://app.tangem.com/wc?uri=wc%3Aabc',
+        'https://wallet.zerion.io/wc?uri=wc%3Aabc',
+        'https://rnbwapp.com/wc?uri=wc%3Aabc',
+        'https://get.zengo.com/wc?uri=wc%3Aabc',
+      ]) {
+        expect(isExternallyOpenedOrigin(url), isTrue, reason: url);
+      }
+      expect(
+        isExternallyOpenedOrigin('https://link.safepal.io.evil.com/'),
+        isFalse,
+      );
+    });
+
     test('Returns true for whitelisted origins', () {
       expect(
         isExternallyOpenedOrigin('https://link.trustwallet.com/something'),

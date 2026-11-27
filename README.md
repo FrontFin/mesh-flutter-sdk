@@ -150,6 +150,9 @@ Add the following URL schemes to `LSApplicationQueriesSchemes` in your app's `In
     <string>trust</string>
     <string>metamask</string>
     <string>robinhood-wallet</string>
+    <string>safepalwallet</string>
+    <string>tangem</string>
+    <string>zerion</string>
     <string>bybit</string>
     <string>cryptocom</string>
     <string>krakenpay</string>

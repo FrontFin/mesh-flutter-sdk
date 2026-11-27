@@ -52,6 +52,9 @@
 		<string>cryptocom</string>
 		<string>krakenpay</string>
 		<string>cashapp</string>
+		<string>safepalwallet</string>
+		<string>tangem</string>
+		<string>zerion</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
