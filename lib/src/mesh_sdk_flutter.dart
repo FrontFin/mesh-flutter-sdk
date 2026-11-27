@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
@@ -34,7 +35,14 @@ abstract class MeshSdk {
     );
 
     // Restore the original theme brightness
-    onBrightnessChanged(brightness);
+    SystemChrome.setSystemUIOverlayStyle(
+      barStyle(
+        color: Colors.transparent,
+        iconBrightness: brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+    );
 
     return result ?? const MeshError(MeshErrorType.userCancelled);
   }

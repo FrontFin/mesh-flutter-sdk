@@ -1,32 +1,24 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mesh_sdk_flutter/src/util/theme.dart';
 
-const navBarColorDark = Color(0xFF1E1E24);
-const navBarColorLight = Color(0xFFFBFBFB);
-const iconColorDark = Colors.white;
+/// The status bar and navigation bar style for a Link page of [color]. Their
+/// icons follow the luminance of [color], not the theme: a client color can be
+/// light on a dark theme.
+SystemUiOverlayStyle linkBarStyle(Color color) => barStyle(
+  color: color,
+  iconBrightness: isDarkColor(color) ? Brightness.light : Brightness.dark,
+);
 
-Color getNavBarColor(Brightness brightness) => switch (brightness) {
-  Brightness.light => navBarColorLight,
-  Brightness.dark => navBarColorDark,
-};
-
-/// This will update the system bar brightness.
-///
-/// Call this whenever Mesh Link brightness is changed.
-void onBrightnessChanged(Brightness brightness) {
-  SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-      statusBarBrightness: brightness,
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: switch (brightness) {
-        Brightness.light => Brightness.dark,
-        Brightness.dark => Brightness.light,
-      },
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarIconBrightness: switch (brightness) {
-        Brightness.light => Brightness.dark,
-        Brightness.dark => Brightness.light,
-      },
-    ),
-  );
-}
+/// A bar style with the bar [color] and the brightness of the icons on it.
+SystemUiOverlayStyle barStyle({
+  required Color color,
+  required Brightness iconBrightness,
+}) => SystemUiOverlayStyle(
+  statusBarBrightness: iconBrightness == Brightness.light
+      ? Brightness.dark
+      : Brightness.light,
+  statusBarColor: color,
+  statusBarIconBrightness: iconBrightness,
+  systemNavigationBarColor: color,
+  systemNavigationBarIconBrightness: iconBrightness,
+);

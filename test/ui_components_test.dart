@@ -105,12 +105,32 @@ void main() {
   });
 
   group('MeshLinkNavBar', () {
+    testWidgets('icons contrast with the background color', (tester) async {
+      Future<Color?> iconColor(Color background) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: MeshLinkNavBar(
+                backgroundColor: background,
+                onBackPressed: () {},
+                onClosePressed: () {},
+              ),
+            ),
+          ),
+        );
+        return tester.widget<Icon>(find.byIcon(Icons.close)).color;
+      }
+
+      expect(await iconColor(const Color(0xFF1C1C1C)), Colors.white);
+      expect(await iconColor(const Color(0xFFF9F9F9)), Colors.black);
+    });
+
     testWidgets('renders back and close buttons', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: MeshLinkNavBar(
-              brightness: Brightness.light,
+              backgroundColor: const Color(0xFFF9F9F9),
               onBackPressed: () {},
               onClosePressed: () {},
             ),
@@ -129,7 +149,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: MeshLinkNavBar(
-              brightness: Brightness.light,
+              backgroundColor: const Color(0xFFF9F9F9),
               onBackPressed: () {
                 backPressed = true;
               },
@@ -152,7 +172,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: MeshLinkNavBar(
-              brightness: Brightness.dark,
+              backgroundColor: const Color(0xFF1C1C1C),
               onBackPressed: () {},
               onClosePressed: () {
                 closePressed = true;
@@ -169,15 +189,19 @@ void main() {
     });
   });
 
-  group('theme', () {
-    test('getNavBarColor returns light color for Brightness.light', () {
-      final color = getNavBarColor(Brightness.light);
-      expect(color, navBarColorLight);
-    });
+  group('linkBarStyle', () {
+    test('icons follow the luminance of the color, not the theme', () {
+      final onLight = linkBarStyle(const Color(0xFFF9F9F9));
+      expect(onLight.statusBarColor, const Color(0xFFF9F9F9));
+      expect(onLight.systemNavigationBarColor, const Color(0xFFF9F9F9));
+      expect(onLight.statusBarIconBrightness, Brightness.dark);
+      expect(onLight.statusBarBrightness, Brightness.light);
+      expect(onLight.systemNavigationBarIconBrightness, Brightness.dark);
 
-    test('getNavBarColor returns dark color for Brightness.dark', () {
-      final color = getNavBarColor(Brightness.dark);
-      expect(color, navBarColorDark);
+      final onDark = linkBarStyle(const Color(0xFF1C1C1C));
+      expect(onDark.statusBarIconBrightness, Brightness.light);
+      expect(onDark.statusBarBrightness, Brightness.dark);
+      expect(onDark.systemNavigationBarIconBrightness, Brightness.light);
     });
   });
 }

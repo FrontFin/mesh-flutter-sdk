@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_configuration.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_error_type.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
@@ -101,7 +102,7 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             MeshLinkNavBar(
-              brightness: _controller.brightness,
+              backgroundColor: _controller.backgroundColor,
               onBackPressed: _controller.goBack,
               onClosePressed: () => _showCloseDialog(context),
             ),
@@ -112,7 +113,7 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
     }
 
     final backgroundColor = _controller.isInitialized
-        ? getNavBarColor(_controller.brightness)
+        ? _controller.backgroundColor
         : Colors.transparent;
 
     return PopScope(
@@ -137,9 +138,13 @@ class _MeshLinkPageState extends State<MeshLinkPage> {
         // We're on the root page, show the close dialog
         _showCloseDialog(context);
       },
-      child: Scaffold(
-        backgroundColor: backgroundColor,
-        body: SafeArea(child: body),
+      // On the page, not set once: it then wins over the host app's own style.
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: linkBarStyle(backgroundColor),
+        child: Scaffold(
+          backgroundColor: backgroundColor,
+          body: SafeArea(child: body),
+        ),
       ),
     );
   }

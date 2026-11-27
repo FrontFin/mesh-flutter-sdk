@@ -83,7 +83,8 @@ lib/
       dialog/
         exit_confirmation_dialog.dart
     util/
-      link_uri.dart            # Decodes base64 linkToken → full URL, merges query params
+      link_url.dart            # buildLinkUrl: decodes the linkToken, sets th/lng/fiatCur/platform in one pass
+      theme.dart               # Theme order and page color (session token or link_style), bar icon luminance
       constants.dart           # Domain whitelist + externally-opened origins
       language.dart            # Resolves 'system' locale to device language
       logger.dart              # Logging setup
@@ -151,9 +152,10 @@ Clients can disable the whitelist via `MeshConfiguration` for custom flows, but 
 
 ## Theming
 
-- `ThemeMode.light`, `.dark`, `.system` — passed to Link UI as `th` query param
-- System theme resolves to device brightness at render time
-- Native nav bar adapts brightness to match
+- `ThemeMode.light` and `.dark` are sent as `th`. `.system` is sent as `system` on a session-token link; on a legacy link the resolved `light` or `dark` is sent
+- Theme order, first match wins: `th=light|dark` in the URL, the session token theme, `th=system`, `link_style.th`, then the device (session-token link) or dark (legacy link)
+- One color for the status bar, bottom area and background: the client's `bgd`/`bgl`, else a fallback pair per Link version
+- Resolved once when Link opens. Bar icons follow the luminance of that color, not the theme
 
 ---
 

@@ -12,14 +12,12 @@ import 'package:mesh_sdk_flutter/src/model/mesh_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_internal_event.dart';
 import 'package:mesh_sdk_flutter/src/model/mesh_result.dart';
 import 'package:mesh_sdk_flutter/src/model/success/success.dart';
-import 'package:mesh_sdk_flutter/src/ui/theme.dart';
 import 'package:mesh_sdk_flutter/src/util/app_url.dart';
 import 'package:mesh_sdk_flutter/src/util/constants.dart';
-import 'package:mesh_sdk_flutter/src/util/link_uri.dart';
+import 'package:mesh_sdk_flutter/src/util/link_url.dart';
 import 'package:mesh_sdk_flutter/src/util/logger.dart';
 import 'package:mesh_sdk_flutter/src/util/new_task_launcher.dart';
 import 'package:mesh_sdk_flutter/src/util/redact_uri.dart';
-import 'package:mesh_sdk_flutter/src/util/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -41,10 +39,11 @@ class MeshLinkController {
   final ValueChanged<SuccessPayload> onSuccess;
 
   WebViewController? _webViewController;
-  late Brightness _brightness;
+  late Color _backgroundColor;
   bool _isExternalAppOpened = false;
 
-  Brightness get brightness => _brightness;
+  /// The color around Link and of the native bars.
+  Color get backgroundColor => _backgroundColor;
 
   bool get isInitialized => _webViewController != null;
 
@@ -72,14 +71,18 @@ class MeshLinkController {
   /// Initialize the controller using [configuration].
   Future<void> init(BuildContext context) async {
     try {
-      final uri = buildLinkUri(configuration);
+      // Read once, like the page: Link doesn't follow a device switch.
+      final (:url, :backgroundColor, isDarkTheme: _) = buildLinkUrl(
+        configuration,
+        platformBrightness: MediaQuery.platformBrightnessOf(context),
+      );
 
-      await _initWebViewController(uri);
+      await _initWebViewController(url);
       if (!context.mounted) {
         return;
       }
 
-      _initStyle(context, uri);
+      _backgroundColor = backgroundColor;
     } catch (e, s) {
       // The exception text can echo the raw link token, so log the type only.
       logger.severe(
@@ -187,19 +190,6 @@ class MeshLinkController {
     await controller.loadRequest(uri);
 
     _webViewController = controller;
-  }
-
-  void _initStyle(BuildContext context, Uri uri) {
-    final theme = resolveTheme(uri, configuration.theme);
-
-    final brightness = switch (theme) {
-      ThemeMode.light => Brightness.light,
-      ThemeMode.dark => Brightness.dark,
-      ThemeMode.system => MediaQuery.platformBrightnessOf(context),
-    };
-
-    onBrightnessChanged(brightness);
-    _brightness = brightness;
   }
 
   /// Callback when a JavaScript console message is received.
