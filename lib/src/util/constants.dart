@@ -154,6 +154,7 @@ const _externallyOpenedOrigins = [
   'https://wallet.zerion.io',      // Zerion (WalletConnect)
   'https://rnbwapp.com',           // Rainbow (WalletConnect)
   'https://get.zengo.com',         // ZenGo (WalletConnect)
+  'https://wallet.crypto.com/deeplink', // Crypto.com Onchain (WalletConnect)
   // Revolut Connect. Prod only: Revolut asked us not to carry their
   // dev/sandbox host in SDK source, so the handoff works against prod Revolut
   // but not against their sandbox.

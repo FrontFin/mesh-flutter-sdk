@@ -20,6 +20,27 @@ void main() {
       );
     });
 
+    test('Returns true for the Crypto.com Onchain WalletConnect link', () {
+      expect(
+        isExternallyOpenedOrigin(
+          'https://wallet.crypto.com/deeplink/wc?uri=wc%3Aabc',
+        ),
+        isTrue,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://wallet.crypto.com/deeplinkevil'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://wallet.crypto.com/other'),
+        isFalse,
+      );
+      expect(
+        isExternallyOpenedOrigin('https://wallet.crypto.com.evil.com/deeplink'),
+        isFalse,
+      );
+    });
+
     test('Returns true for whitelisted origins', () {
       expect(
         isExternallyOpenedOrigin('https://link.trustwallet.com/something'),
