@@ -25,6 +25,21 @@ void main() {
       );
     });
 
+    for (final entry in {
+      'safepalwallet': 'io.safepal.wallet',
+      'tangem': 'com.tangem.wallet',
+      'zerion': 'io.zerion.android',
+    }.entries) {
+      test('Returns Play Store URL for ${entry.key} scheme', () {
+        final result = getStoreUriFromAppUri(Uri.parse('${entry.key}://wc'));
+
+        expect(
+          result.toString(),
+          'https://play.google.com/store/apps/details?id=${entry.value}',
+        );
+      });
+    }
+
     test('Returns null for https scheme', () {
       final uri = Uri.parse('https://example.com');
       final result = getStoreUriFromAppUri(uri);
